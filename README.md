@@ -1,16 +1,18 @@
 
 THIS WORK IN PROGRESS! (incomplete, buggy, non-stable, .. ;-)
 
-TypeScript tools currently available
+## Installation goes somewhat like this:
 
-Installation goes somewhat like this:
-
+  ```
   install git and node
   clone typescript
   clone typescript-tools
   node typescript/bin/tcs.js typescript-tools/tss.ts -c -target es5 -out typescript-tools/tss.js
+  ```
 
-tss.ts: TypeScript Services Server
+TypeScript tools currently available
+
+## tss.ts: TypeScript Services Server
 
   Simple commandline interface (commands in, info out) to TypeScript Services.
 
@@ -56,7 +58,7 @@ tss.ts: TypeScript Services Server
   TSS closing
   ```
 
-tss.vim: vim interface to tss.js
+## tss.vim: vim interface to tss.js
 
   Needs Vim 7.3 (plus Python 2.7 with json lib): :source tss.vim
   Currently assumes that node is in path and tss.js is in current directory..
