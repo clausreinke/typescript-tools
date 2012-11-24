@@ -1,16 +1,16 @@
 
 THIS WORK IN PROGRESS! (incomplete, buggy, non-stable, .. ;-)
 
-## Installation goes somewhat like this:
+Installation goes somewhat like this:
 
   ```
   install git and node
   clone typescript
   clone typescript-tools
-  node typescript/bin/tcs.js typescript-tools/tss.ts -c -target es5 -out typescript-tools/tss.js
+  node typescript/bin/tsc.js typescript-tools/tss.ts -c -target es5 -out typescript-tools/tss.js
   ```
 
-TypeScript tools currently available
+TypeScript tools currently available:
 
 ## tss.ts: TypeScript Services Server
 
@@ -20,7 +20,8 @@ TypeScript tools currently available
   for other configurations, you'll need to adjust the paths near the top of the '.ts' files.
 
   Start tss.js with project root file - will take several seconds to load 
-  all dependencies; then enter commands and get JSON info or error messages:
+  all dependencies; then enter commands and get JSON info or error messages
+  (NOTE: commands take absolute file paths, adjust example to your installation):
 
   ```
   $ node tss.js tss.ts
