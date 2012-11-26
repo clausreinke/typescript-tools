@@ -5,12 +5,22 @@ command! TSStype call TSScmd("type")
 
 " jump to definition of item under cursor
 command! TSSdef call TSSdef("edit")
+command! TSSdefpreview call TSSdef("pedit")
 command! TSSdefsplit call TSSdef("split")
 command! TSSdeftab call TSSdef("tabe")
 function! TSSdef(cmd)
   let info = TSScmd("definition")
-  exe a:cmd.' '.info.file
-  call cursor(info.min[0],info.min[1])
+  if info.file=='null' || type(info.min)!=type([])
+    echoerr 'no useable definition information'
+    return info
+  endif
+  if a:cmd=="pedit"
+    exe a:cmd.'+'.info.min[0].' '.info.file
+  else
+    exe a:cmd.' '.info.file
+    call cursor(info.min[0],info.min[1])
+  endif
+  return info
 endfunction
 
 " start typescript service process asynchronously, via python
@@ -50,12 +60,15 @@ filename  = vim.current.buffer.name
 cmd       = vim.eval("a:cmd")
 tss.stdin.write(cmd+' '+str(row)+' '+str(col+1)+' '+filename+'\n')
 answer = tss.stdout.readline()
-sys.stdout.write(answer)
+# sys.stdout.write(answer)
 
 try:
   result = json.dumps(json.loads(answer,parse_constant=str))
 except:
   result = "json error"
+vim.command("let null = 'null'")
+vim.command("let true = 'true'")
+vim.command("let false = 'false'")
 vim.command("let result = "+result)
 
 EOF

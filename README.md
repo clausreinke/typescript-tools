@@ -71,6 +71,7 @@ TypeScript tools currently available:
 
   " jump to definition of item under cursor
   command! TSSdef call TSSdef("edit")
+  command! TSSdefpreview call TSSdef("pedit")
   command! TSSdefsplit call TSSdef("split")
   command! TSSdeftab call TSSdef("tabe")
 
