@@ -66,8 +66,8 @@ TypeScript tools currently available:
 
   ```
   " echo symbol/type of item under cursor
-  command! TSSsymbol call TSScmd("symbol")
-  command! TSStype call TSScmd("type")
+  command! TSSsymbol echo TSScmd("symbol",{})
+  command! TSStype echo TSScmd("type",{})
 
   " jump to definition of item under cursor
   command! TSSdef call TSSdef("edit")
@@ -75,12 +75,22 @@ TypeScript tools currently available:
   command! TSSdefsplit call TSSdef("split")
   command! TSSdeftab call TSSdef("tabe")
 
+  " update TSS with current file source
+  " TODO: integrate into TSScmd
+  command! TSSupdate echo TSScmd("update "...
+
+  " completions
+  function! TSScompleteFunc(findstart,base)
+
+  " reload project sources
+  command! TSSreload echo TSScmd("reload",{'rawcmd':1})
+
   " start typescript service process asynchronously, via python
   command! -nargs=1 TSSstart call TSSstart(<f-args>)
   command! TSSstarthere call TSSstart(expand("%"))
 
   " pass a command to typescript service, get answer
-  command! -nargs=1 TSScmd call TSScmd(<f-args>)
+  command! -nargs=1 TSScmd call TSScmd(<f-args>,{})
 
   " check typescript service
   " (None: still running; <num>: exit status)
