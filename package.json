@@ -1,0 +1,20 @@
+{
+  "name": "tss",
+  "version": "0.0.0",
+  "description": "TypeScript Services commandline server",
+  "bin": "tss",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/clausreinke/typescript-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clausreinke/typescript-tools/issues"
+  },
+  "keywords": [
+    "TypeScript"
+  ],
+  "dependencies": { "typescript": ">=0.8.1" },
+  "preferGlobal": true,
+  "author": "Claus Reinke",
+  "license": "Apache License, Version 2.0"
+}

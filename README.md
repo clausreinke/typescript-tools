@@ -1,10 +1,23 @@
 
 THIS WORK IN PROGRESS! (incomplete, buggy, non-stable, .. ;-)
 
-Installation goes somewhat like this:
+npm installation goes somewhat like this:
 
   ```
-  install git and node
+  install git and node/npm
+  clone typescript-tools
+  cd typescript-tools
+  npm install -g
+  ```
+
+  (this will install typescript as a dependency, if you do not have that already, to get its lib.d.ts file)
+
+The installation should give you a global `tss` command. If you want to use this from Vim, source the `tss.vim` script. If you want to use this from other editors/IDEs, you will need to write some code, to communicate with `tss` as an asynchronous subprocess.
+
+From-source compilation, if you want it, needs the typescript sources and goes somewhat like this:
+
+  ```
+  install git and node/npm
   clone typescript
   clone typescript-tools
   node typescript/bin/tsc.js typescript-tools/tss.ts -c -target es5 -out typescript-tools/tss.js
@@ -14,7 +27,24 @@ TypeScript tools currently available:
 
 ## tss.ts: TypeScript Services Server
 
-  Simple commandline interface (commands in, info out) to TypeScript Services.
+  Simple commandline interface (commands in, info out) to TypeScript Services. Currently supported commands include:
+
+  ```
+  (symbol|type) <line> <pos> <file>
+    // get type information
+
+  definition <line> <pos> <file>
+    // get location of definition
+
+  completions (true|false) <line> <pos> <file>
+    // get member/non-member completions
+
+  update <linecount> <file> // followed by linecount lines of source text
+    // provide current source, if there are unsaved changes
+
+  quit
+    // quit tss
+  ```
 
   Assumes that typescript-tools is installed parallel to typescript repo -
   for other configurations, you'll need to adjust the paths near the top of the '.ts' files.
@@ -62,7 +92,7 @@ TypeScript tools currently available:
 ## tss.vim: vim interface to tss.js
 
   Needs Vim 7.3 (plus Python 2.7 with json lib): :source tss.vim
-  Currently assumes that node is in path and tss.js is in current directory..
+  Currently assumes that node is in path and that tss has been npm-installed globally.
 
   ```
   " echo symbol/type of item under cursor

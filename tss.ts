@@ -6,8 +6,9 @@
 ///<reference path='./resolver.ts'/>
 ///<reference path='../typescript/src/harness/external/json2.ts'/>
 
-// TODO: get rid of hardcoded path references..
-var libdts  = "../typescript/typings/lib.d.ts";
+// __dirname + a file to put path references in.. :-(
+declare var __dirname : string;
+var defaultLibs  = __dirname + "/defaultLibs.d.ts";
 
 // TS has its own declarations for node-specific stuff, so we
 // need to extend those instead of referencing node.d.ts
@@ -62,9 +63,9 @@ class TSS {
     this.typescriptLS = new Harness.TypeScriptLS();
 
     if (useDefaultLib) {
-      var libText = IO.readFile(libdts);
+      var libText = IO.readFile(defaultLibs);
       this.compilationEnvironment.code.push(
-        new TypeScript.SourceUnit(libdts,null)
+        new TypeScript.SourceUnit(defaultLibs,null)
       );
     }
 

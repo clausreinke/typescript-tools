@@ -101,7 +101,7 @@ import vim
 import json
 
 projectroot = vim.eval("a:projectroot")
-tss = subprocess.Popen(['node','tss.js',projectroot]
+tss = subprocess.Popen(['tss',projectroot]
                       ,bufsize=0
                       ,stdin=subprocess.PIPE
                       ,stdout=subprocess.PIPE
