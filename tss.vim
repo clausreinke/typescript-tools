@@ -88,6 +88,19 @@ set omnifunc=TSScompleteFunc
 " reload project sources
 command! TSSreload echo TSScmd("reload",{'rawcmd':1})
 
+" create quickfix list from TSS errors
+command! TSSshowErrors call TSSshowErrors()
+function! TSSshowErrors()
+  let info = TSScmd("showErrors",{'rawcmd':1})
+  if type(info)==type([])
+    for i in info
+      let i['lnum']     = i['line1']
+      let i['filename'] = i['file']
+    endfor
+    call setqflist(info)
+  endif
+endfunction
+
 " start typescript service process asynchronously, via python
 " TODO: the only reason for shell=True is to avoid popup console window;
 "       is there a more direct way?

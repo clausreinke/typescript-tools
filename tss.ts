@@ -95,6 +95,25 @@ class TSS {
 
   }
 
+  public showErrors() {
+    var errors = [];
+    this.ls.getErrors(100).forEach( error => {
+      var file    = this.compilationEnvironment.code[error.unitIndex].path;
+      try { // getScriptAST will throw on errors, during refresh :-(
+        var lineMap = this.ls.getScriptAST(file).locationInfo.lineMap;
+      } catch (e) {} // ignore
+      var min     = this.charToLine(lineMap,error.minChar);
+      var lim     = this.charToLine(lineMap,error.limChar);
+      var range   = min[0]+":"+min[1]+"-"+lim[0]+":"+lim[1];
+      errors.push({file  : file
+                  ,line1 : min[0], col1 : min[1]
+                  ,line2 : lim[0], col2 : lim[1]
+                  ,text  : error.message
+                  });
+    });
+    this.ioHost.printLine(JSON2.stringify(errors));
+  }
+
   // commandline server main routine: commands in, JSON info out
   public listen() {
     var line: number;
@@ -253,6 +272,10 @@ class TSS {
             this.ioHost.printLine('"updated '+file+'"');
           };
 
+        } else if (m = cmd.match(/^showErrors$/)) { // get processing errors
+
+          this.showErrors();
+
         } else if (m = cmd.match(/^dump (\S+) (.*)$/)) { // debugging only
 
           var dump = m[1];
@@ -266,7 +289,7 @@ class TSS {
 
         } else if (m = cmd.match(/^reload$/)) {
 
-          // TODO: check caching behaviour
+          // TODO: check caching behaviour, this doesn't work
           this.setup(refname);
           this.ioHost.printLine('"reloaded '+refname+', TSS listening.."');
 
