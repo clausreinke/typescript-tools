@@ -34,7 +34,7 @@ var readline:Readline = require("readline");
 class TSS {
   public compilationSettings: TypeScript.CompilationSettings;
   public compilationEnvironment: TypeScript.CompilationEnvironment;
-  public commandLineHost = new CommandLineHost();
+  public commandLineHost : CommandLineHost;
   public typescriptLS : Harness.TypeScriptLS;
   public ls : Services.ILanguageService;
   public refcode : TypeScript.SourceUnit;
@@ -50,6 +50,7 @@ class TSS {
 
   // load file and dependencies, prepare language service for queries
   public setup(file) {
+    this.commandLineHost        = new CommandLineHost();
     this.compilationSettings    = new TypeScript.CompilationSettings();
     this.compilationEnvironment = new TypeScript.CompilationEnvironment(this.compilationSettings, this.ioHost);
 

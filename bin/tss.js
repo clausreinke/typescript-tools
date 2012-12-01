@@ -37773,7 +37773,6 @@ var readline = require("readline");
 var TSS = (function () {
     function TSS(ioHost) {
         this.ioHost = ioHost;
-        this.commandLineHost = new CommandLineHost();
     }
     // NOTE: call setup
     // convert character position to line/column
@@ -37790,6 +37789,7 @@ var TSS = (function () {
     ;
     TSS.prototype.setup = function (file) {
         var _this = this;
+        this.commandLineHost = new CommandLineHost();
         this.compilationSettings = new TypeScript.CompilationSettings();
         this.compilationEnvironment = new TypeScript.CompilationEnvironment(this.compilationSettings, this.ioHost);
         var useDefaultLib = true;
