@@ -3,6 +3,14 @@
 command! TSSsymbol echo TSScmd("symbol",{})
 command! TSStype echo TSScmd("type",{})
 
+" for use as balloonexpr, symbol under mouse pointer
+" set balloonexpr=TSSballoon()
+" set ballooneval
+function! TSSballoon()
+  let file = expand("#".v:beval_bufnr.":p")
+  return TSScmd("symbol ".v:beval_lnum." ".v:beval_col." ".file,{'rawcmd':1})
+endfunction
+
 " jump to definition of item under cursor
 command! TSSdef call TSSdef("edit")
 command! TSSdefpreview call TSSdef("pedit")

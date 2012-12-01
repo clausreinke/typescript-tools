@@ -291,9 +291,8 @@ class TSS {
 
           this.ioHost.printLine('"dumped '+file+' to '+dump+'"');
 
-        } else if (m = cmd.match(/^reload$/)) {
+        } else if (m = cmd.match(/^reload$/)) { // reload current project
 
-          // TODO: check caching behaviour, this doesn't work
           this.setup(refname);
           this.ioHost.printLine('"reloaded '+refname+', TSS listening.."');
 

@@ -42,6 +42,9 @@ TypeScript tools currently available:
   update <linecount> <file> // followed by linecount lines of source text
     // provide current source, if there are unsaved changes
 
+  reload
+    // reload current project
+
   quit
     // quit tss
   ```
@@ -108,6 +111,11 @@ TypeScript tools currently available:
   " update TSS with current file source
   " TODO: integrate into TSScmd
   command! TSSupdate echo TSScmd("update "...
+
+  " for use as balloonexpr, symbol under mouse pointer
+  " set balloonexpr=TSSballoon()
+  " set ballooneval
+  function! TSSballoon()
 
   " completions
   function! TSScompleteFunc(findstart,base)
