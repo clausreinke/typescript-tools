@@ -231,8 +231,8 @@ class TSS {
 
           source       = this.ls.getScriptSyntaxAST(file).getSourceText();
           var span     = this.ls.getNameOrDottedNameSpan(file,pos,-1);
-          var spanText = source.getText(span.minChar,span.limChar);
-          member       = spanText.indexOf('.') !== -1;
+          var spanText = span && source.getText(span.minChar,span.limChar);
+          member       = span && spanText.indexOf('.') !== -1;
 
           var symbol   = this.ls.getSymbolAtPosition(script,pos);
           var type     = this.ls.getTypeAtPosition(file, pos).memberName;
