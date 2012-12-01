@@ -37819,7 +37819,8 @@ var TSS = (function () {
         // resolution); code unit for path argument is last (after dependencies)
         // TODO: find unit from path argument
         this.refcode = this.compilationEnvironment.code[this.compilationEnvironment.code.length - 1];
-    };
+    }// extract compilation errors
+    ;
     TSS.prototype.showErrors = function () {
         var _this = this;
         var errors = [];
@@ -37833,13 +37834,16 @@ var TSS = (function () {
             
             var min = _this.charToLine(lineMap, error.minChar);
             var lim = _this.charToLine(lineMap, error.limChar);
-            var range = min[0] + ":" + min[1] + "-" + lim[0] + ":" + lim[1];
             errors.push({
                 file: file,
-                line1: min[0],
-                col1: min[1],
-                line2: lim[0],
-                col2: lim[1],
+                start: {
+                    line: min[0],
+                    col: min[1]
+                },
+                end: {
+                    line: lim[0],
+                    col: lim[1]
+                },
                 text: error.message
             });
         });

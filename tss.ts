@@ -96,19 +96,22 @@ class TSS {
 
   }
 
+  // extract compilation errors
   public showErrors() {
     var errors = [];
     this.ls.getErrors(100).forEach( error => {
       var file    = this.compilationEnvironment.code[error.unitIndex].path;
+
       try { // getScriptAST will throw on errors, during refresh :-(
         var lineMap = this.ls.getScriptAST(file).locationInfo.lineMap;
       } catch (e) {} // ignore
+
       var min     = this.charToLine(lineMap,error.minChar);
       var lim     = this.charToLine(lineMap,error.limChar);
-      var range   = min[0]+":"+min[1]+"-"+lim[0]+":"+lim[1];
+
       errors.push({file  : file
-                  ,line1 : min[0], col1 : min[1]
-                  ,line2 : lim[0], col2 : lim[1]
+                  ,start : {line : min[0], col : min[1]}
+                  ,end   : {line : lim[0], col : lim[1]}
                   ,text  : error.message
                   });
     });

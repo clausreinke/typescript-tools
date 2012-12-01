@@ -94,7 +94,8 @@ function! TSSshowErrors()
   let info = TSScmd("showErrors",{'rawcmd':1})
   if type(info)==type([])
     for i in info
-      let i['lnum']     = i['line1']
+      let i['lnum']     = i['start']['line']
+      let i['col']      = i['start']['col']
       let i['filename'] = i['file']
     endfor
     call setqflist(info)
