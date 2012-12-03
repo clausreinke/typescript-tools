@@ -107,6 +107,8 @@ function! TSSshowErrors()
       let i['filename'] = i['file']
     endfor
     call setqflist(info)
+  else
+    echoerr info
   endif
 endfunction
 
@@ -161,23 +163,27 @@ opts      = vim.eval("a:opts")
 colArg    = opts['col'] if ('col' in opts) else str(col+1)
 cmd       = vim.eval("a:cmd")
 
-if ('rawcmd' in opts):
-  tss.stdin.write(cmd+'\n')
+if tss.poll()==None:
+  if ('rawcmd' in opts):
+    tss.stdin.write(cmd+'\n')
+  else:
+    tss.stdin.write(cmd+' '+str(row)+' '+colArg+' '+filename+'\n')
+
+  if ('lines' in opts):
+    for line in opts['lines']:
+      tss.stdin.write(line+'\n')
+
+  answer = tss.stdout.readline()
+  if traceFlag:
+    sys.stdout.write(answer)
+
+  try:
+    result = json.dumps(json.loads(answer,parse_constant=str))
+  except:
+    result = '"null"'
+
 else:
-  tss.stdin.write(cmd+' '+str(row)+' '+colArg+' '+filename+'\n')
-
-if ('lines' in opts):
-  for line in opts['lines']:
-    tss.stdin.write(line+'\n')
-
-answer = tss.stdout.readline()
-if traceFlag:
-  sys.stdout.write(answer)
-
-try:
-  result = json.dumps(json.loads(answer,parse_constant=str))
-except:
-  result = 'null'
+  result = '"TSS not running"'
 
 vim.command("let null = 'null'")
 vim.command("let true = 'true'")
@@ -205,9 +211,11 @@ command! TSSend call TSSend()
 function! TSSend()
 python <<EOF
 
-rest = tss.communicate('quit')[0]
-sys.stdout.write(rest)
-# print rest
+if tss.poll()==None:
+  rest = tss.communicate('quit')[0]
+  sys.stdout.write(rest)
+else:
+  sys.stdout.write('TSS not running\n')
 
 EOF
 endfunction
