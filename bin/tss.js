@@ -37765,8 +37765,10 @@ var defaultLibs = __dirname + "/defaultLibs.d.ts";
 // TS has its own declarations for node-specific stuff, so we
 // need to extend those instead of referencing node.d.ts
 // some approximated subsets..
-// bypass import, we don't want to drop out of the global module
-var readline = require("readline");
+// bypass import, we don't want to drop out of the global module;
+// use fixed readline (https://github.com/joyent/node/issues/3305),
+// fixed version should be in nodejs from about v0.9.9/v0.8.19?
+var readline = require("./readline");
 // TypeScript Services Server,
 // an interactive commandline tool
 // for getting info on .ts projects
@@ -37963,7 +37965,7 @@ var TSS = (function () {
                                         file = m[2];
                                         collecting = parseInt(m[1]);
                                         on_collected_callback = function () {
-                                            _this.typescriptLS.updateScript(file, lines.join(''));
+                                            _this.typescriptLS.updateScript(file, lines.join('\n'));
                                             on_collected_callback = undefined;
                                             lines = [];
                                             _this.ioHost.printLine('"updated ' + file + '"');
@@ -37983,7 +37985,7 @@ var TSS = (function () {
                                                 _this.ioHost.printLine('"dumped ' + file + ' to ' + dump + '"');
                                             } else {
                                                 if(m = cmd.match(/^reload$/)) {
-                                                    // TODO: check caching behaviour, this doesn't work
+                                                    // reload current project
                                                     _this.setup(refname);
                                                     _this.ioHost.printLine('"reloaded ' + refname + ', TSS listening.."');
                                                 } else {

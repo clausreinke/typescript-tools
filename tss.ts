@@ -25,8 +25,10 @@ interface Readline {
   createInterface(options:any) : ReadlineHandlers;
 }
 
-// bypass import, we don't want to drop out of the global module
-var readline:Readline = require("readline");
+// bypass import, we don't want to drop out of the global module;
+// use fixed readline (https://github.com/joyent/node/issues/3305),
+// fixed version should be in nodejs from about v0.9.9/v0.8.19?
+var readline:Readline = require("./readline");
 
 // TypeScript Services Server,
 // an interactive commandline tool
@@ -269,7 +271,7 @@ class TSS {
           collecting = parseInt(m[1]);
           on_collected_callback = () => {
 
-            this.typescriptLS.updateScript(file,lines.join(''));
+            this.typescriptLS.updateScript(file,lines.join('\n'));
             on_collected_callback = undefined;
             lines = [];
 
