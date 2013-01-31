@@ -13,7 +13,6 @@
   "keywords": [
     "TypeScript"
   ],
-  "dependencies": { "typescript": ">=0.8.1" },
   "preferGlobal": true,
   "author": "Claus Reinke",
   "license": "Apache License, Version 2.0"

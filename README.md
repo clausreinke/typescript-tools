@@ -4,93 +4,96 @@ THIS WORK IN PROGRESS! (incomplete, buggy, non-stable, .. ;-)
 npm installation goes somewhat like this:
 
   ```
-  install git and node/npm
-  clone typescript-tools
-  cd typescript-tools
-  npm install -g
+  # install git and node/npm, then
+  $ git clone git://github.com/clausreinke/typescript-tools.git
+  $ cd typescript-tools/
+  $ npm install -g
   ```
 
-  (this will install typescript as a dependency, if you do not have that already, to get its lib.d.ts file)
-
-The installation should give you a global `tss` command. If you want to use this from Vim, source the `tss.vim` script. If you want to use this from other editors/IDEs, you will need to write some code, to communicate with `tss` as an asynchronous subprocess.
-
-From-source compilation, if you want it, needs the typescript sources and goes somewhat like this:
+The installation should give you a global `tss` command, which you can use directly (note the absolute paths, which will differ in your installation).
 
   ```
-  install git and node/npm
-  clone typescript
-  clone typescript-tools
-  node typescript/bin/tsc.js typescript-tools/tss.ts -c -target es5 -out typescript-tools/tss.js
+  $ tss tests/test.ts
+  "loaded c:/javascript/typescript/tstinstall/typescript-tools/tests/test.ts, TSS
+  listening.."
+  symbol 3 2 c:/javascript/typescript/tstinstall/typescript-tools/tests/test.ts
+  "s2: string"
+  quit
+  "TSS closing"
+  ```
+
+If you want to use tss from Vim, source the `tss.vim` script. If you want to use this from other editors/IDEs, you will need to write some code, to communicate with `tss` as an asynchronous subprocess.
+
+From-source compilation should not be necessary, as a pre-compile `bin/tss.js` is included, as well as a `bin/lib.d.ts`. You might want to modify `bin/defaultLibs.d.ts`, if you want other declaration files included by default.
+
+If you do want to compile from source, you need the typescript sources (v0.8.1):
+
+  ```
+  # install git and node/npm, then
+  $ git clone https://git01.codeplex.com/typescript
+  $ git clone git://github.com/clausreinke/typescript-tools.git
+  $ (cd typescript; git checkout v0.8.1)
+  $ node typescript/bin/tsc.js typescript-tools/tss.ts -c -target es5 -out typescript-tools/bin/tss.js
   ```
 
 TypeScript tools currently available:
 
 ## tss.ts: TypeScript Services Server
 
-  Simple commandline interface (commands in, info out) to TypeScript Services. Currently supported commands include:
+  Simple commandline interface (commands in, info out) to TypeScript Services. Currently supported commands (with indication of purpose and output format) include:
 
   ```
   (symbol|type) <line> <pos> <file>
     // get type information
 
+    string
+
   definition <line> <pos> <file>
     // get location of definition
+
+    { file: string
+    , min:  [<line>,<column>]
+    , lim:  [<line>,<column>]
+    }
 
   completions (true|false) <line> <pos> <file>
     // get member/non-member completions
 
+    { entries: [{name: string, type: string}, ...]
+    }
+
   update <linecount> <file> // followed by linecount lines of source text
     // provide current source, if there are unsaved changes
+
+    "updated <file>"
 
   reload
     // reload current project
 
+    "reloaded <rootfile>, TSS listening.."
+
+  showErrors
+    // show compilation errors for current project
+
+    [{file:  string
+     ,start: {line: number, col: number}
+     ,end:   {line: number, col: number}
+     ,text:  string
+     }
+     , ...
+    ]
+
   quit
     // quit tss
+
+    "TSS closing"
   ```
 
-  Assumes that typescript-tools is installed parallel to typescript repo -
-  for other configurations, you'll need to adjust the paths near the top of the '.ts' files.
-
-  Start tss.js with project root file - will take several seconds to load 
+  Start `tss` with project root file - may take several seconds to load
   all dependencies; then enter commands and get JSON info or error messages
-  (NOTE: commands take absolute file paths, adjust example to your installation):
+  (NOTE: commands take absolute file paths, adjust example to your installation);
+  for a sample session, see `tests/` (commands in `test.script`, output in `script.out`).
 
-  ```
-  $ node tss.js tss.ts
-  loaded c:/private/home/javascript/typescript/typescript-tools/tss.ts, TSS listen
-  ing..
-  > symbol 175 31 c:/private/home/javascript/typescript/typescript-tools/tss.ts
-  "compilationEnvironment: CompilationEnvironment"
-  > type 175 31 c:/private/home/javascript/typescript/typescript-tools/tss.ts
-  "TypeScript.CompilationEnvironment"
-  > definition 175 31 c:/private/home/javascript/typescript/typescript-tools/tss.t
-  s
-  {"def":{"unitIndex":82,"minChar":1150,"limChar":1215,"kind":"property","name":"c
-  ompilationEnvironment","containerKind":"","containerName":"TSS"},"file":"c:/priv
-  ate/home/javascript/typescript/typescript-tools/tss.ts","min":[35,3],"lim":[35,6
-  8]}
-  > info 175 31 c:/private/home/javascript/typescript/typescript-tools/tss.ts
-  {"pos":5738,"linecol":[175,31],"symbol":"compilationEnvironment: CompilationEnvi
-  ronment","type":"TypeScript.CompilationEnvironment","def":{"unitIndex":82,"minCh
-  ar":1150,"limChar":1215,"kind":"property","name":"compilationEnvironment","conta
-  inerKind":"","containerName":"TSS"},"file":"c:/private/home/javascript/typescrip
-  t/typescript-tools/tss.ts","min":[35,3],"lim":[35,68],"completions":{"maybeInacc
-  urate":false,"isMemberCompletion":true,"entries":[{"name":"compilationSettings",
-  "type":"TypeScript.CompilationSettings","kind":"property","kindModifiers":"publi
-  c"},{"name":"compilationEnvironment","type":"TypeScript.CompilationEnvironment",
-  "kind":"property","kindModifiers":"public"},{"name":"commandLineHost","type":"Co
-  mmandLineHost","kind":"property","kindModifiers":"public"},{"name":"ls","type":"
-  Services.ILanguageService","kind":"property","kindModifiers":"public"},{"name":"
-  refcode","type":"TypeScript.SourceUnit","kind":"property","kindModifiers":"publi
-  c"},{"name":"ioHost","type":"IIO","kind":"property","kindModifiers":"public"},{"
-  name":"setup","type":"(file: any) => void","kind":"method","kindModifiers":"publ
-  ic"},{"name":"listen","type":"() => void","kind":"method","kindModifiers":"publi
-  c"},{"name":"charToLine","type":"(lineMap: any, ch: any) => number[]","kind":"me
-  thod","kindModifiers":"private"}]}}
-  quit
-  TSS closing
-  ```
 
 ## tss.vim: vim interface to tss.js
 
