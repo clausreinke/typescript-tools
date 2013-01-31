@@ -14,7 +14,7 @@ console.log(cmd);
 
 var tss = exec(cmd,function(error, stdout, stderr) {
                      console.log("// stdout");
-                     console.log(stdout);
+                     console.log(stdout.replace(new RegExp(PREFIX,"g"),"PREFIX"));
                      console.log("// stderr");
                      console.log(stderr);
                      if (error) console.log("// error: "+error);

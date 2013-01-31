@@ -1,8 +1,8 @@
 Minimal semi-automated testing (results may differ if you are using a different `lib.d.ts`).
 ```
-$ node script.js >script.out
+$ node script.js >script.out2
 
-$ diff  script.out*
+$ diff --strip-trailing-cr script.out*
 
 $ diff --strip-trailing-cr script.dump test.ts
 3c3
