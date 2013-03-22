@@ -4,7 +4,7 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
 License at http://www.apache.org/licenses/LICENSE-2.0  
  
-THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
 WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
 MERCHANTABLITY OR NON-INFRINGEMENT. 
@@ -229,7 +229,7 @@ interface Function {
       * @param thisArg The object to be used as the this object.
       * @param argArray A set of arguments to be passed to the function.
       */
-    apply(thisArg: any, ...argArray: any[]): any;
+    apply(thisArg: any, argArray?: any): any;
 
     /**
       * Calls a method of an object, substituting another object for the current object.
@@ -248,6 +248,10 @@ interface Function {
     
     prototype: any;
     length: number;
+
+    // Non-standard extensions
+    arguments: any;
+    caller: Function;
 }
 
 declare var Function: {
@@ -807,10 +811,25 @@ interface RegExp {
     multiline: bool;
 
     lastIndex: number;
+
+    // Non-standard extensions
+    compile(): RegExp;
 }
 declare var RegExp: {
     new (pattern: string, flags?: string): RegExp;
     (pattern: string, flags?: string): RegExp;
+
+    // Non-standard extensions
+    $1: string;
+    $2: string;
+    $3: string;
+    $4: string;
+    $5: string;
+    $6: string;
+    $7: string;
+    $8: string;
+    $9: string;
+    lastMatch: string;
 }
 
 interface Error {
@@ -924,6 +943,7 @@ interface Array {
     toString(): string;
     toLocaleString(): string;
     concat(...items: _element[][]): _element[];
+    concat(...items: _element[]): _element[];
     join(seperator?: string): string;
     pop(): _element;
     push(...items: _element[]): number;
@@ -7710,11 +7730,18 @@ interface Blob {
     size: number;
     msDetachStream(): any;
     slice(start?: number, end?: number, contentType?: string): Blob;
+    close(): void;
     msClose(): void;
+}
+interface BlobPropertyBag {
+    /** Corresponds to the 'type' property of the Blob object */
+    type?: string;
+    /** Either 'transparent' or 'native' */
+    endings?: string;
 }
 declare var Blob: {
     prototype: Blob;
-    new (): Blob;
+    new (blobParts?: any[], options?: BlobPropertyBag): Blob;
 }
 
 interface ApplicationCache extends EventTarget {
@@ -7970,6 +7997,7 @@ interface FormData {
 declare var FormData: {
     prototype: FormData;
     new (): FormData;
+    new (form: HTMLFormElement): FormData;
 }
 
 interface MSHTMLImageElementExtensions {

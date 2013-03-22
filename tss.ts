@@ -50,7 +50,7 @@ class TSS {
     return [i,ch-lineMap[i]+1];
   }
 
-  // load file and dependencies, prepare language service for queries
+  /** load file and dependencies, prepare language service for queries */
   public setup(file) {
     this.commandLineHost        = new CommandLineHost();
     this.compilationSettings    = new TypeScript.CompilationSettings();
@@ -130,7 +130,8 @@ class TSS {
 
     var rl = readline.createInterface({input:process.stdin,output:process.stdout});
 
-    var cmd, script, lineMap, pos, file, def, defFile, defLineMap, info, source, member;
+    var cmd, script, lineMap, pos, file, def, defFile, defLineMap,
+        docComment, info, source, member;
 
     var collecting = 0, on_collected_callback, lines = [];
 
@@ -160,7 +161,9 @@ class TSS {
           pos     = lineMap[line] + (col - 1);
 
           if (m[1]==='symbol') {
-            info = (this.ls.getSymbolAtPosition(script,pos)||"").toString();
+            docComment = this.ls.getTypeAtPosition(file, pos).docComment;
+            info = (this.ls.getSymbolAtPosition(script,pos)||"").toString()
+                   +(docComment ? " // " + docComment : "");
           } else {
             info = (this.ls.getTypeAtPosition(file, pos).memberName||"").toString();
           }

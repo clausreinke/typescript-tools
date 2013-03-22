@@ -38471,7 +38471,7 @@ var TSS = (function () {
             ch - lineMap[i] + 1
         ];
     };
-    TSS.prototype.setup = // load file and dependencies, prepare language service for queries
+    TSS.prototype.setup = /** load file and dependencies, prepare language service for queries */
     function (file) {
         var _this = this;
         this.commandLineHost = new CommandLineHost();
@@ -38545,7 +38545,7 @@ var TSS = (function () {
             input: process.stdin,
             output: process.stdout
         });
-        var cmd, script, lineMap, pos, file, def, defFile, defLineMap, info, source, member;
+        var cmd, script, lineMap, pos, file, def, defFile, defLineMap, docComment, info, source, member;
         var collecting = 0, on_collected_callback, lines = [];
         rl.on('line', function (input) {
             // most commands are one-liners
@@ -38567,7 +38567,8 @@ var TSS = (function () {
                     lineMap = script.locationInfo.lineMap;
                     pos = lineMap[line] + (col - 1);
                     if(m[1] === 'symbol') {
-                        info = (_this.ls.getSymbolAtPosition(script, pos) || "").toString();
+                        docComment = _this.ls.getTypeAtPosition(file, pos).docComment;
+                        info = (_this.ls.getSymbolAtPosition(script, pos) || "").toString() + (docComment ? " // " + docComment : "");
                     } else {
                         info = (_this.ls.getTypeAtPosition(file, pos).memberName || "").toString();
                     }
