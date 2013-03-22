@@ -178,7 +178,7 @@ module Harness {
         //
         public parseSourceText(fileName: string, sourceText: TypeScript.ISourceText): TypeScript.Script {
             var parser = new TypeScript.Parser();
-            parser.setErrorRecovery(null, -1, -1);
+            parser.setErrorRecovery(null);
             parser.errorCallback = (a, b, c, d) => { };
 
             var script = parser.parse(sourceText, fileName, 0);

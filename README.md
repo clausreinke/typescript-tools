@@ -26,13 +26,13 @@ If you want to use tss from Vim, source the `tss.vim` script. If you want to use
 
 From-source compilation should not be necessary, as a pre-compile `bin/tss.js` is included, as well as a `bin/lib.d.ts`. You might want to modify `bin/defaultLibs.d.ts`, if you want other declaration files included by default.
 
-If you do want to compile from source, you need the typescript sources (v0.8.1):
+If you do want to compile from source, you need the typescript sources (v0.8.3):
 
   ```
   # install git and node/npm, then
   $ git clone https://git01.codeplex.com/typescript
   $ git clone git://github.com/clausreinke/typescript-tools.git
-  $ (cd typescript; git checkout v0.8.1)
+  $ (cd typescript; git checkout v0.8.3)
   $ node typescript/bin/tsc.js typescript-tools/tss.ts -c -target es5 -out typescript-tools/bin/tss.js
   ```
 

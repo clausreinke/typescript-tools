@@ -22,9 +22,10 @@ class CommandLineHost implements TypeScript.IResolverHost {
         var nRCode = preEnv.residentCode.length;
 
         var postResolutionError = 
-            (errorFile: string, errorMessage: string) => {
+            (errorFile: string, line: number, col: number, errorMessage: string) => {
                 TypeScript.CompilerDiagnostics
                           .debugPrint("Could not resolve file '" + errorFile + "'"
+                                      + " (" + line + "/" + col +")"
                                       + (errorMessage == "" ? "" : ": " + errorMessage));
             }
 
