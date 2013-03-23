@@ -30,9 +30,9 @@ interface Readline {
 // fixed version should be in nodejs from about v0.9.9/v0.8.19?
 var readline:Readline = require("./readline");
 
-// TypeScript Services Server,
-// an interactive commandline tool
-// for getting info on .ts projects
+/** TypeScript Services Server,
+    an interactive commandline tool
+    for getting info on .ts projects */
 class TSS {
   public compilationSettings: TypeScript.CompilationSettings;
   public compilationEnvironment: TypeScript.CompilationEnvironment;
@@ -43,7 +43,7 @@ class TSS {
 
   constructor (public ioHost: IIO) { } // NOTE: call setup
 
-  // convert character position to line/column
+  /** convert character position to line/column */
   private charToLine(lineMap,ch) {
     var i=1;
     while ((i+1<lineMap.length)&&(lineMap[i+1]<ch)) { i++; }
@@ -98,7 +98,7 @@ class TSS {
 
   }
 
-  // extract compilation errors
+  /** extract compilation errors */
   public showErrors() {
     var errors = [];
     this.ls.getErrors(100).forEach( error => {
@@ -120,7 +120,7 @@ class TSS {
     this.ioHost.printLine(JSON2.stringify(errors));
   }
 
-  // commandline server main routine: commands in, JSON info out
+  /** commandline server main routine: commands in, JSON info out */
   public listen() {
     var line: number;
     var col: number;
@@ -131,7 +131,7 @@ class TSS {
     var rl = readline.createInterface({input:process.stdin,output:process.stdout});
 
     var cmd, script, lineMap, pos, file, def, defFile, defLineMap,
-        docComment, info, source, member;
+        info, source, member;
 
     var collecting = 0, on_collected_callback, lines = [];
 
@@ -161,11 +161,10 @@ class TSS {
           pos     = lineMap[line] + (col - 1);
 
           if (m[1]==='symbol') {
-            docComment = this.ls.getTypeAtPosition(file, pos).docComment;
-            info = (this.ls.getSymbolAtPosition(script,pos)||"").toString()
-                   +(docComment ? " // " + docComment : "");
+            info = (this.ls.getSymbolAtPosition(script,pos)||"").toString();
           } else {
-            info = (this.ls.getTypeAtPosition(file, pos).memberName||"").toString();
+            info = (this.ls.getTypeAtPosition(file, pos)||{});
+            info.type = (info.memberName||"").toString();
           }
 
           this.ioHost.printLine(JSON2.stringify(info).trim());

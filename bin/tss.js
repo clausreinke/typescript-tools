@@ -38452,15 +38452,15 @@ var defaultLibs = __dirname + "/defaultLibs.d.ts";
 // use fixed readline (https://github.com/joyent/node/issues/3305),
 // fixed version should be in nodejs from about v0.9.9/v0.8.19?
 var readline = require("./readline");
-// TypeScript Services Server,
-// an interactive commandline tool
-// for getting info on .ts projects
+/** TypeScript Services Server,
+an interactive commandline tool
+for getting info on .ts projects */
 var TSS = (function () {
     function TSS(ioHost) {
         this.ioHost = ioHost;
     }
     TSS.prototype.charToLine = // NOTE: call setup
-    // convert character position to line/column
+    /** convert character position to line/column */
     function (lineMap, ch) {
         var i = 1;
         while((i + 1 < lineMap.length) && (lineMap[i + 1] < ch)) {
@@ -38505,7 +38505,7 @@ var TSS = (function () {
         // TODO: find unit from path argument
         this.refcode = this.compilationEnvironment.code[this.compilationEnvironment.code.length - 1];
     };
-    TSS.prototype.showErrors = // extract compilation errors
+    TSS.prototype.showErrors = /** extract compilation errors */
     function () {
         var _this = this;
         var errors = [];
@@ -38534,7 +38534,7 @@ var TSS = (function () {
         });
         this.ioHost.printLine(JSON2.stringify(errors));
     };
-    TSS.prototype.listen = // commandline server main routine: commands in, JSON info out
+    TSS.prototype.listen = /** commandline server main routine: commands in, JSON info out */
     function () {
         var _this = this;
         var line;
@@ -38545,7 +38545,7 @@ var TSS = (function () {
             input: process.stdin,
             output: process.stdout
         });
-        var cmd, script, lineMap, pos, file, def, defFile, defLineMap, docComment, info, source, member;
+        var cmd, script, lineMap, pos, file, def, defFile, defLineMap, info, source, member;
         var collecting = 0, on_collected_callback, lines = [];
         rl.on('line', function (input) {
             // most commands are one-liners
@@ -38567,10 +38567,11 @@ var TSS = (function () {
                     lineMap = script.locationInfo.lineMap;
                     pos = lineMap[line] + (col - 1);
                     if(m[1] === 'symbol') {
-                        docComment = _this.ls.getTypeAtPosition(file, pos).docComment;
-                        info = (_this.ls.getSymbolAtPosition(script, pos) || "").toString() + (docComment ? " // " + docComment : "");
+                        info = (_this.ls.getSymbolAtPosition(script, pos) || "").toString();
                     } else {
-                        info = (_this.ls.getTypeAtPosition(file, pos).memberName || "").toString();
+                        info = (_this.ls.getTypeAtPosition(file, pos) || {
+                        });
+                        info.type = (info.memberName || "").toString();
                     }
                     _this.ioHost.printLine(JSON2.stringify(info).trim());
                 } else if(m = cmd.match(/^definition (\d+) (\d+) (.*)$/)) {

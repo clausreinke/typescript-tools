@@ -43,10 +43,17 @@ TypeScript tools currently available:
   Simple commandline interface (commands in, info out) to TypeScript Services. Currently supported commands (with indication of purpose and output format) include:
 
   ```
-  (symbol|type) <line> <pos> <file>
+  symbol <line> <pos> <file>
+    // get symbol information
+
+    string (<symbol>: <type>)
+
+  type <line> <pos> <file>
     // get type information
 
-    string
+    { type: string
+    , docComment: string
+    }
 
   definition <line> <pos> <file>
     // get location of definition
@@ -59,7 +66,7 @@ TypeScript tools currently available:
   completions (true|false) <line> <pos> <file>
     // get member/non-member completions
 
-    { entries: [{name: string, type: string}, ...]
+    { entries: [{name: string, type: string, docComment: string}, ...]
     }
 
   update <linecount> <file> // followed by linecount lines of source text

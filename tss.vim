@@ -1,7 +1,25 @@
 
 " echo symbol/type of item under cursor
+" (also show JSDoc in preview window, if known)
 command! TSSsymbol echo TSScmd("symbol",{})
-command! TSStype echo TSScmd("type",{})
+command! TSStype echo TSStype()
+function! TSStype()
+  let info = TSScmd("type",{})
+  if type(info)!=type({}) || !has_key(info,"type")
+    echoerr 'no useable type information'
+    return info
+  endif
+  if has_key(info,"docComment") && info.docComment!=""
+    silent! wincmd P
+      if &previewwindow
+      else
+        new +setlocal\ previewwindow|setlocal\ buftype=nofile|setlocal\ noswapfile
+      endif
+      call append(0,split(info.docComment,"\n"))
+      wincmd p
+  endif
+  return info.type
+endfunction
 
 " for use as balloonexpr, symbol under mouse pointer
 " set balloonexpr=TSSballoon()
@@ -107,6 +125,9 @@ function! TSSshowErrors()
       let i['filename'] = i['file']
     endfor
     call setqflist(info)
+    if len(info)!=0
+      copen
+    endif
   else
     echoerr info
   endif
