@@ -3,8 +3,6 @@
 // See LICENSE.txt in the project root for complete license information.
 
 ///<reference path='./harness.ts'/>
-///<reference path='./resolver.ts'/>
-///<reference path='../typescript/src/harness/external/json2.ts'/>
 
 // __dirname + a file to put path references in.. :-(
 declare var __dirname : string;
@@ -30,33 +28,88 @@ interface Readline {
 // fixed version should be in nodejs from about v0.9.9/v0.8.19?
 var readline:Readline = require("./readline");
 
+var EOL = require("os").EOL;
+
 /** TypeScript Services Server,
     an interactive commandline tool
     for getting info on .ts projects */
 class TSS {
   public compilationSettings: TypeScript.CompilationSettings;
-  public compilationEnvironment: TypeScript.CompilationEnvironment;
-  public commandLineHost : CommandLineHost;
   public typescriptLS : Harness.TypeScriptLS;
   public ls : Services.ILanguageService;
-  public refcode : TypeScript.SourceUnit;
+  public rootFile : TypeScript.IResolvedFile;
+  public resolutionResult : TypeScript.ReferenceResolutionResult;
 
   constructor (public ioHost: IIO) { } // NOTE: call setup
 
-  /** convert character position to line/column */
-  private charToLine(lineMap,ch) {
-    var i=1;
-    while ((i+1<lineMap.length)&&(lineMap[i+1]<ch)) { i++; }
-    return [i,ch-lineMap[i]+1];
+  // IReferenceResolverHost methods (from HarnessCompiler, modulo test-specific code)
+  getScriptSnapshot(filename: string): TypeScript.IScriptSnapshot {
+      var scriptInfo = this.typescriptLS.getScriptInfo(filename);
+      if (!scriptInfo) {
+        this.typescriptLS.addFile(filename);
+        scriptInfo = this.typescriptLS.getScriptInfo(filename);
+      }
+      // TODO: check this (StringScriptSnapshot, !snapshot)
+      var snapshot = TypeScript.ScriptSnapshot.fromString(scriptInfo.content);
+
+      if (!snapshot) {
+          this.addDiagnostic(new TypeScript.Diagnostic(null, 0, 0, TypeScript.DiagnosticCode.Cannot_read_file_0_1, [filename, '']));
+      }
+
+      return snapshot;
+  }
+
+  resolveRelativePath(path: string, directory?: string): string {
+      var unQuotedPath = TypeScript.stripStartAndEndQuotes(path);
+      var normalizedPath: string;
+
+      if (TypeScript.isRooted(unQuotedPath) || !directory) {
+          normalizedPath = unQuotedPath;
+      } else {
+          normalizedPath = IOUtils.combine(directory, unQuotedPath);
+      }
+
+      // get the absolute path
+      normalizedPath = IO.resolvePath(normalizedPath);
+
+      // Switch to forward slashes
+      normalizedPath = TypeScript.switchToForwardSlashes(normalizedPath);
+
+      return normalizedPath;
+  }
+
+  fileExists(s: string):boolean {
+      return IO.fileExists(s);
+  }
+  directoryExists(path: string): boolean {
+      return IO.directoryExists(path);
+  }
+  getParentDirectory(path: string): string {
+      return IO.dirName(path);
+  }
+
+  // IDiagnosticReporter
+  addDiagnostic(diagnostic: TypeScript.Diagnostic) {
+      if (diagnostic.fileName()) {
+          var scriptSnapshot = this.getScriptSnapshot(diagnostic.fileName());
+          if (scriptSnapshot) {
+              var lineMap = new TypeScript.LineMap(scriptSnapshot.getLineStartPositions(), scriptSnapshot.getLength());
+              var lineCol = { line: -1, character: -1 };
+              lineMap.fillLineAndCharacterFromPosition(diagnostic.start(), lineCol);
+              IO.stderr.Write(diagnostic.fileName() + "(" + (lineCol.line + 1) + "," + (lineCol.character + 1) + "): ");
+          }
+      }
+
+      IO.stderr.WriteLine(diagnostic.message());  // TODO: IO vs ioHost
   }
 
   /** load file and dependencies, prepare language service for queries */
   public setup(file) {
-    this.commandLineHost        = new CommandLineHost();
-    this.compilationSettings    = new TypeScript.CompilationSettings();
-    this.compilationEnvironment = new TypeScript.CompilationEnvironment(this.compilationSettings, this.ioHost);
+    this.compilationSettings = new TypeScript.CompilationSettings();
+    this.compilationSettings.gatherDiagnostics = true;
+    this.compilationSettings.codeGenTarget = TypeScript.LanguageVersion.EcmaScript5;
 
-    var useDefaultLib: bool = true;
+    var useDefaultLib: boolean = true;
     /*
     TypeScript.CompilerDiagnostics.debug = true;
     TypeScript.CompilerDiagnostics.diagnosticWriter = 
@@ -65,59 +118,38 @@ class TSS {
 
     this.typescriptLS = new Harness.TypeScriptLS();
 
-    if (useDefaultLib) {
-      var libText = IO.readFile(defaultLibs);
-      this.compilationEnvironment.code.push(
-        new TypeScript.SourceUnit(defaultLibs,null)
-      );
-    }
-
-    // add project root
-    this.compilationEnvironment.code.push(
-      new TypeScript.SourceUnit(file,null)
-    );
-
     // chase dependencies (references and imports)
-    this.compilationEnvironment = this.commandLineHost.resolve(this.compilationEnvironment);
+    this.resolutionResult = TypeScript.ReferenceResolver
+                              .resolve([defaultLibs,file],this,this.compilationSettings);
+    // TODO: what about resolution diagnostics?
+    var resolvedFiles = this.resolutionResult.resolvedFiles;
 
-    // copy compilation code units to languageService code units
-    this.compilationEnvironment.code.forEach( (code,i) => {
+    // remember project root, resolved
+    this.rootFile = resolvedFiles[resolvedFiles.length-1];
+
+    /*
+    if (useDefaultLib && !this.resolutionResult.seenNoDefaultLibTag) {
+      var libraryResolvedFile: TypeScript.IResolvedFile = {
+          path: this.resolveRelativePath(defaultLibs),
+          referencedFiles: [],
+          importedFiles: []
+      };
+
+      // Prepend default library to the resolved list
+      resolvedFiles = [libraryResolvedFile].concat(resolvedFiles);
+    }
+    */
+
+    // initialize languageService code units
+    resolvedFiles.forEach( (code,i) => {
       // this.ioHost.printLine(i+': '+code.path);
-      this.typescriptLS.addScript(code.path,code.content,true);
+      this.typescriptLS.addFile(code.path);
     });
 
     // Get the language service
-    this.ls = this.typescriptLS.getLanguageService();
+    this.ls = this.typescriptLS.getLanguageService().languageService;
+    this.ls.refresh();
 
-    // remember the code unit for the project root (compilationEnvironment
-    // doesn't seem to support lookup by short name, or short to full path
-    // resolution); code unit for path argument is last (after dependencies)
-    // TODO: find unit from path argument
-    this.refcode = this.compilationEnvironment
-                       .code[this.compilationEnvironment.code.length-1];
-
-  }
-
-  /** extract compilation errors */
-  public showErrors() {
-    var errors = [];
-    this.ls.getErrors(100).forEach( error => {
-      var file    = this.compilationEnvironment.code[error.unitIndex].path;
-
-      try { // getScriptAST will throw on errors, during refresh :-(
-        var lineMap = this.ls.getScriptAST(file).locationInfo.lineMap;
-      } catch (e) {} // ignore
-
-      var min     = this.charToLine(lineMap,error.minChar);
-      var lim     = this.charToLine(lineMap,error.limChar);
-
-      errors.push({file  : file
-                  ,start : {line : min[0], col : min[1]}
-                  ,end   : {line : lim[0], col : lim[1]}
-                  ,text  : error.message
-                  });
-    });
-    this.ioHost.printLine(JSON2.stringify(errors));
   }
 
   /** commandline server main routine: commands in, JSON info out */
@@ -125,13 +157,9 @@ class TSS {
     var line: number;
     var col: number;
 
-    var refcode   = this.refcode;
-    var refname   = refcode.path;
-
     var rl = readline.createInterface({input:process.stdin,output:process.stdout});
 
-    var cmd, script, lineMap, pos, file, def, defFile, defLineMap,
-        info, source, member;
+    var cmd, script, pos, file, def, info, source, member;
 
     var collecting = 0, on_collected_callback, lines = [];
 
@@ -150,55 +178,37 @@ class TSS {
             on_collected_callback();
           }
 
-        } else if (m = cmd.match(/^(symbol|type) (\d+) (\d+) (.*)$/)) {
-
-          line   = parseInt(m[2]);
-          col    = parseInt(m[3]);
-          file   = m[4];
-
-          script  = this.ls.getScriptAST(file);
-          lineMap = script.locationInfo.lineMap;
-          pos     = lineMap[line] + (col - 1);
-
-          if (m[1]==='symbol') {
-            info = (this.ls.getSymbolAtPosition(script,pos)||"").toString();
-          } else {
-            info = (this.ls.getTypeAtPosition(file, pos)||{});
-            info.type = (info.memberName||"").toString();
-          }
-
-          this.ioHost.printLine(JSON2.stringify(info).trim());
-
-        } else if (m = cmd.match(/^definition (\d+) (\d+) (.*)$/)) {
+        } else if (m = cmd.match(/^type (\d+) (\d+) (.*)$/)) {
 
           line   = parseInt(m[1]);
           col    = parseInt(m[2]);
           file   = m[3];
 
-          script  = this.ls.getScriptAST(file);
-          lineMap = script.locationInfo.lineMap;
-          pos     = lineMap[line] + (col - 1);
+          pos     = this.typescriptLS.lineColToPosition(file,line,col);
 
-          def  = this.ls.getDefinitionAtPosition(file, pos);
-          if (def) {
+          info = (this.ls.getTypeAtPosition(file, pos)||{});
+          info.type = (info.memberName||"").toString();
 
-            defFile    = this.compilationEnvironment.code[def.unitIndex].path,
-            defLineMap = this.ls.getScriptAST(defFile).locationInfo.lineMap;
+          this.ioHost.printLine(JSON.stringify(info).trim());
 
-          } else {
+        } else if (m = cmd.match(/^definition (\d+) (\d+) (.*)$/)) {
 
-            defFile = null;
+          line = parseInt(m[1]);
+          col  = parseInt(m[2]);
+          file = m[3];
 
-          }
+          pos  = this.typescriptLS.lineColToPosition(file,line,col);
+          def  = this.ls.getDefinitionAtPosition(file, pos)[0];
+          // TODO: what to do about multiple definitions?
 
           info = {
             def  : def,
-            file : defFile,
-            min  : def && this.charToLine(defLineMap,def.minChar),
-            lim  : def && this.charToLine(defLineMap,def.limChar)
+            file : def && def.fileName,
+            min  : def && this.typescriptLS.positionToLineCol(def.fileName,def.minChar),
+            lim  : def && this.typescriptLS.positionToLineCol(def.fileName,def.limChar)
           };
 
-          this.ioHost.printLine(JSON2.stringify(info).trim());
+          this.ioHost.printLine(JSON.stringify(info).trim());
 
         } else if (m = cmd.match(/^completions (true|false) (\d+) (\d+) (.*)$/)) {
 
@@ -207,13 +217,14 @@ class TSS {
           col  = parseInt(m[3]);
           file = m[4];
 
-          script  = this.ls.getScriptAST(file);
-          lineMap = script.locationInfo.lineMap;
-          pos     = lineMap[line] + (col - 1);
+          pos     = this.typescriptLS.lineColToPosition(file,line,col);
 
+          // TODO: filter by prefix / limit length
           info = this.ls.getCompletionsAtPosition(file, pos, member);
+          // fill in completion entry details
+          info && (info.entries = info.entries.map( e => this.ls.getCompletionEntryDetails(file,pos,e.name) ));
 
-          this.ioHost.printLine(JSON2.stringify(info).trim());
+          this.ioHost.printLine(JSON.stringify(info).trim());
 
         } else if (m = cmd.match(/^info (\d+) (\d+) (.*)$/)) { // mostly for debugging
 
@@ -221,51 +232,40 @@ class TSS {
           col  = parseInt(m[2]);
           file = m[3];
 
-          script  = this.ls.getScriptAST(file);
-          lineMap = script.locationInfo.lineMap;
-          pos     = lineMap[line] + (col - 1);
+          pos  = this.typescriptLS.lineColToPosition(file,line,col);
 
           def  = this.ls.getDefinitionAtPosition(file, pos);
-          if (def) {
 
-            defFile    = this.compilationEnvironment.code[def.unitIndex].path,
-            defLineMap = this.ls.getScriptAST(defFile).locationInfo.lineMap;
+          // source       = this.ls.getScriptSyntaxAST(file).getSourceText();
+          // var span     = this.ls.getNameOrDottedNameSpan(file,pos,-1);
+          // var spanText = span && source.getText(span.minChar,span.limChar);
+          // member       = span && spanText.indexOf('.') !== -1;
 
-          } else {
-
-            defFile = null;
-
-          }
-
-          source       = this.ls.getScriptSyntaxAST(file).getSourceText();
-          var span     = this.ls.getNameOrDottedNameSpan(file,pos,-1);
-          var spanText = span && source.getText(span.minChar,span.limChar);
-          member       = span && spanText.indexOf('.') !== -1;
-
-          var symbol   = this.ls.getSymbolAtPosition(script,pos);
-          var type     = this.ls.getTypeAtPosition(file, pos).memberName;
+          var typeInfo = this.ls.getTypeAtPosition(file, pos);
+          var type     = typeInfo.memberName;
+          var symbol   = typeInfo.fullSymbolName;
 
           info = { // all together now..
             pos         : pos,
-            linecol     : this.charToLine(lineMap,pos),
+            linecol     : this.typescriptLS.positionToLineCol(file,pos),
 
-            symbol      : (symbol||"").toString(),
+            symbol      : symbol,
             type        : (type||"").toString(),
 
             def         : def,
-            file        : defFile,
-            min         : def && this.charToLine(defLineMap,def.minChar),
-            lim         : def && this.charToLine(defLineMap,def.limChar),
+            file        : def && def.fileName,
+            min         : def && this.typescriptLS.positionToLineCol(def.fileName,def.minChar),
+            lim         : def && this.typescriptLS.positionToLineCol(def.fileName,def.limChar),
 
             // signature: this.ls.getSignatureAtPosition(file, pos), // ??
 
-            completions : this.ls.getCompletionsAtPosition(file, pos, member),
+            // completions : this.ls.getCompletionsAtPosition(file, pos, member),
 
-            spanText : spanText,
-            member   : member,
+            // spanText : spanText,
+            // member   : member,
           };
 
-          this.ioHost.printLine(JSON2.stringify(info).trim());
+          this.ioHost.printLine(JSON.stringify(info).trim());
 
         } else if (m = cmd.match(/^update (\d+) (.*)$/)) { // send non-saved source
 
@@ -273,7 +273,7 @@ class TSS {
           collecting = parseInt(m[1]);
           on_collected_callback = () => {
 
-            this.typescriptLS.updateScript(file,lines.join('\n'));
+            this.typescriptLS.updateScript(file,lines.join(EOL));
             on_collected_callback = undefined;
             lines = [];
 
@@ -282,23 +282,45 @@ class TSS {
 
         } else if (m = cmd.match(/^showErrors$/)) { // get processing errors
 
-          this.showErrors();
+          info = [].concat(this.resolutionResult.diagnostics,
+                           this.typescriptLS.getErrors())
+                   .map( d => {
+                           var file = d.fileName();
+                           var lc   = this.typescriptLS.positionToLineCol(file,d.start());
+                           var lc2  = this.typescriptLS.positionToLineCol(file,d.start()+d.length());
+                           return {
+                            file: file,
+                            start: {line: lc.line, character: lc.character},
+                            end: {line: lc2.line, character: lc2.character},
+                            text: /* file+"("+lc.line+"/"+lc.character+"): "+ */ d.message()
+                           };
+                         }
+                       );
+
+          this.ioHost.printLine(JSON.stringify(info).trim());
+
+        } else if (m = cmd.match(/^files/)) { // list files in project
+
+          info = this.typescriptLS.getScriptFileNames(); // TODO: shim/JSON vs real-ls/array
+
+          this.ioHost.printLine(info.trim());
 
         } else if (m = cmd.match(/^dump (\S+) (.*)$/)) { // debugging only
 
           var dump = m[1];
           file     = m[2];
 
-          source         = this.ls.getScriptSyntaxAST(file).getSourceText();
-          var sourceText = source.getText(0,source.getLength());
-          this.ioHost.writeFile(dump,sourceText);
+          source         = this.typescriptLS.getScriptInfo(file).content;
+          this.ioHost.writeFile(dump,source,false);
+          // var sourceText = source.getText(0,source.getLength());
+          // this.ioHost.writeFile(dump,sourceText);
 
           this.ioHost.printLine('"dumped '+file+' to '+dump+'"');
 
         } else if (m = cmd.match(/^reload$/)) { // reload current project
 
-          this.setup(refname);
-          this.ioHost.printLine('"reloaded '+refname+', TSS listening.."');
+          this.setup(this.rootFile.path);
+          this.ioHost.printLine('"reloaded '+this.rootFile.path+', TSS listening.."');
 
         } else if (m = cmd.match(/^quit$/)) {
 
@@ -322,7 +344,7 @@ class TSS {
 
     });
 
-    this.ioHost.printLine('"loaded '+refname+', TSS listening.."');
+    this.ioHost.printLine('"loaded '+this.rootFile.path+', TSS listening.."');
 
   }
 }

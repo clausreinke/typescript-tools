@@ -1,7 +1,44 @@
 
+""" configuration options - use your .vimrc to change defaults
+
+" assume tss is a globally available command
+if !exists("g:TSS")
+  let g:TSS = ["tss"]
+endif
+
+" assume user wants to inspect errors on project load/reload
+if !exists("g:TSSshowErrors")
+  let g:TSSshowErrors = 1
+endif
+""" end configuration options
+
+" TODO: only create log file when needed
+python <<EOF
+import logging
+LOG_FILENAME='tsstrace.log'
+logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
+EOF
+
 " echo symbol/type of item under cursor
 " (also show JSDoc in preview window, if known)
-command! TSSsymbol echo TSScmd("symbol",{})
+command! TSSsymbol echo TSSsymbol("")
+function! TSSsymbol(rawcmd)
+  if a:rawcmd==""
+    let info = TSScmd("type",{})
+  else
+    let info = TSScmd(a:rawcmd,{'rawcmd':1})
+  endif
+  if type(info)!=type({}) || !has_key(info,"fullSymbolName") || !has_key(info,"type")
+    if a:rawcmd==""
+      echoerr 'no useable type information'
+      return info
+    else " called from ballooneval
+      return ""
+    endif
+  endif
+  return info.fullSymbolName.":".info.type
+endfunction
+
 command! TSStype echo TSStype()
 function! TSStype()
   let info = TSScmd("type",{})
@@ -26,7 +63,7 @@ endfunction
 " set ballooneval
 function! TSSballoon()
   let file = expand("#".v:beval_bufnr.":p")
-  return TSScmd("symbol ".v:beval_lnum." ".v:beval_col." ".file,{'rawcmd':1})
+  return TSSsymbol("type ".v:beval_lnum." ".v:beval_col." ".file)
 endfunction
 
 " jump to definition of item under cursor
@@ -41,10 +78,10 @@ function! TSSdef(cmd)
     return info
   endif
   if a:cmd=="pedit"
-    exe a:cmd.'+'.info.min[0].' '.info.file
+    exe a:cmd.'+'.info.min.line.' '.info.file
   else
     exe a:cmd.' '.info.file
-    call cursor(info.min[0],info.min[1])
+    call cursor(info.min.line,info.min.character)
   endif
   return info
 endfunction
@@ -90,7 +127,7 @@ function! TSScompleteFunc(findstart,base)
   else
     " check if preceded by dot (won't see dot on previous line!)
     let member = (start>1 && line[start-2]==".") ? 'true' : 'false'
-    " echomsg start.":".member
+    echomsg start.":".member
 
     if &modified
       TSSupdate
@@ -112,7 +149,14 @@ endfunction
 set omnifunc=TSScompleteFunc
 
 " reload project sources
-command! TSSreload echo TSScmd("reload",{'rawcmd':1})
+command! TSSreload echo TSSreload()
+function! TSSreload()
+  let msg = TSScmd("reload",{'rawcmd':1})
+  if g:TSSshowErrors
+    TSSshowErrors
+  endif
+  return msg
+endfunction
 
 " create quickfix list from TSS errors
 command! TSSshowErrors call TSSshowErrors()
@@ -121,7 +165,7 @@ function! TSSshowErrors()
   if type(info)==type([])
     for i in info
       let i['lnum']     = i['start']['line']
-      let i['col']      = i['start']['col']
+      let i['col']      = i['start']['character']
       let i['filename'] = i['file']
     endfor
     call setqflist(info)
@@ -146,7 +190,8 @@ import vim
 import json
 
 projectroot = vim.eval("a:projectroot")
-tss = subprocess.Popen(['tss',projectroot]
+print(vim.eval("g:TSS")+[projectroot])
+tss = subprocess.Popen(vim.eval("g:TSS")+[projectroot]
                       ,bufsize=0
                       ,stdin=subprocess.PIPE
                       ,stdout=subprocess.PIPE
@@ -159,6 +204,9 @@ sys.stdout.write(prompt)
 # print prompt
 
 EOF
+  if g:TSSshowErrors
+    TSSshowErrors
+  endif
 endfunction
 
 " TSS command tracing, off by default
@@ -186,17 +234,26 @@ cmd       = vim.eval("a:cmd")
 
 if tss.poll()==None:
   if ('rawcmd' in opts):
-    tss.stdin.write(cmd+'\n')
+    request = cmd
   else:
-    tss.stdin.write(cmd+' '+str(row)+' '+colArg+' '+filename+'\n')
+    request = cmd+' '+str(row)+' '+colArg+' '+filename
+
+  if traceFlag:
+    logging.debug(request)
+
+  tss.stdin.write(request+'\n')
 
   if ('lines' in opts):
     for line in opts['lines']:
       tss.stdin.write(line+'\n')
 
   answer = tss.stdout.readline()
+
   if traceFlag:
-    sys.stdout.write(answer)
+    if ('lines' in opts):
+      for line in opts['lines']:
+        logging.debug(line)
+    logging.debug(answer)
 
   try:
     result = json.dumps(json.loads(answer,parse_constant=str))

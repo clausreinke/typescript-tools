@@ -1,11 +1,15 @@
 showErrors
 type 3 2 PREFIX/test.ts
-symbol 3 2 PREFIX/test.ts
+type 4 2 PREFIX/test.ts
 definition 3 2 PREFIX/test.ts
-completions true 3 3 PREFIX/test.ts
-update 3 PREFIX/test.ts
-var s1 = "";
-var s2 = "";
-s2.
+definition 4 2 PREFIX/test.ts
+completions true 3 4 PREFIX/test.ts
+completions true 4 4 PREFIX/test.ts
+update 4 PREFIX/test.ts
+var x = {a:1,b:2};
+var s = "";
+{s. }
+{x. }
 dump script.dump PREFIX/test.ts
-completions true 3 2 PREFIX/test.ts
+completions true 3 4 PREFIX/test.ts
+completions true 4 4 PREFIX/test.ts
