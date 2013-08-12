@@ -67578,10 +67578,12 @@ var TSS = (function () {
                     });
 
                     _this.ioHost.printLine(JSON.stringify(info).trim());
-                } else if (m = cmd.match(/^files/)) {
+                } else if (m = cmd.match(/^files$/)) {
                     info = _this.typescriptLS.getScriptFileNames();
 
                     _this.ioHost.printLine(info.trim());
+                } else if (m = cmd.match(/^lastError$/)) {
+                    _this.ioHost.printLine(_this.lastError);
                 } else if (m = cmd.match(/^dump (\S+) (.*)$/)) {
                     var dump = m[1];
                     file = m[2];
@@ -67601,6 +67603,7 @@ var TSS = (function () {
                     _this.ioHost.printLine('"TSS command syntax error: ' + cmd + '"');
                 }
             } catch (e) {
+                _this.lastError = (JSON.stringify({ msg: e.toString(), stack: e.stack })).trim();
                 _this.ioHost.printLine('"TSS command processing error: ' + e + '"');
             }
         }).on('close', function () {

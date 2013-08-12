@@ -39,6 +39,7 @@ class TSS {
   public ls : Services.ILanguageService;
   public rootFile : TypeScript.IResolvedFile;
   public resolutionResult : TypeScript.ReferenceResolutionResult;
+  public lastError;
 
   constructor (public ioHost: IIO) { } // NOTE: call setup
 
@@ -299,11 +300,15 @@ class TSS {
 
           this.ioHost.printLine(JSON.stringify(info).trim());
 
-        } else if (m = cmd.match(/^files/)) { // list files in project
+        } else if (m = cmd.match(/^files$/)) { // list files in project
 
           info = this.typescriptLS.getScriptFileNames(); // TODO: shim/JSON vs real-ls/array
 
           this.ioHost.printLine(info.trim());
+
+        } else if (m = cmd.match(/^lastError$/)) { // debugging only
+
+          this.ioHost.printLine(this.lastError);
 
         } else if (m = cmd.match(/^dump (\S+) (.*)$/)) { // debugging only
 
@@ -334,6 +339,7 @@ class TSS {
 
       } catch(e) {
 
+          this.lastError = (JSON.stringify({msg:e.toString(),stack:e.stack})).trim();
           this.ioHost.printLine('"TSS command processing error: '+e+'"');
 
       }
