@@ -47,13 +47,11 @@ function! TSStype()
     return info
   endif
   if has_key(info,"docComment") && info.docComment!=""
-    silent! wincmd P
-      if &previewwindow
-      else
-        new +setlocal\ previewwindow|setlocal\ buftype=nofile|setlocal\ noswapfile
-      endif
-      call append(0,split(info.docComment,"\n"))
-      wincmd p
+    pclose
+    new +setlocal\ previewwindow|setlocal\ buftype=nofile|setlocal\ noswapfile
+    exe "normal z" . &previewheight . "\<cr>"
+    call append(0,split(info.docComment,"\n"))
+    wincmd p
   endif
   return info.type
 endfunction
