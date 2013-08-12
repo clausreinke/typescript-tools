@@ -73,7 +73,8 @@ command! TSSdefsplit call TSSdef("split")
 command! TSSdeftab call TSSdef("tabe")
 function! TSSdef(cmd)
   let info = TSScmd("definition",{})
-  if type(info)!=type({}) || info.file=='null' || type(info.min)!=type([])
+  if type(info)!=type({}) || info.file=='null' || type(info.min)!=type({})
+    \ || type(info.min.line)!=type(0) || type(info.min.character)!=type(0)
     echoerr 'no useable definition information'
     return info
   endif
