@@ -138,6 +138,9 @@ TypeScript tools currently available:
   command! TSSdefsplit
   command! TSSdeftab
 
+  " create location list for references
+  command! TSSreferences
+
   " update TSS with current file source
   " TODO: integrate into TSScmd
   command! TSSupdate

@@ -63153,7 +63153,7 @@ var Services;
             }
 
             var typeSymbol = symbol.type;
-            var typesToSearch;
+            var typesToSearch = [];
 
             if (typeSymbol.isClass() || typeSymbol.isInterface()) {
                 typesToSearch = typeSymbol.getTypesThatExtendThisType();
@@ -66920,6 +66920,7 @@ var Services;
     })();
     Services.TypeScriptServicesFactory = TypeScriptServicesFactory;
 })(Services || (Services = {}));
+// from src/harness/harness.ts, without the test (TODO: remove shim stuff again)
 function switchToForwardSlashes(path) {
     return path.replace(/\\/g, "/");
 }
@@ -67464,7 +67465,7 @@ var TSS = (function () {
 
         var rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
-        var cmd, script, pos, file, def, info, source, member;
+        var cmd, script, pos, file, def, locs, info, source, member;
 
         var collecting = 0, on_collected_callback, lines = [];
 
@@ -67497,15 +67498,47 @@ var TSS = (function () {
                     file = m[3];
 
                     pos = _this.typescriptLS.lineColToPosition(file, line, col);
-                    def = _this.ls.getDefinitionAtPosition(file, pos)[0];
+                    locs = _this.ls.getDefinitionAtPosition(file, pos);
 
-                    // TODO: what to do about multiple definitions?
-                    info = {
-                        def: def,
-                        file: def && def.fileName,
-                        min: def && _this.typescriptLS.positionToLineCol(def.fileName, def.minChar),
-                        lim: def && _this.typescriptLS.positionToLineCol(def.fileName, def.limChar)
-                    };
+                    info = locs.map(function (def) {
+                        return ({
+                            def: def,
+                            file: def && def.fileName,
+                            min: def && _this.typescriptLS.positionToLineCol(def.fileName, def.minChar),
+                            lim: def && _this.typescriptLS.positionToLineCol(def.fileName, def.limChar)
+                        });
+                    });
+
+                    // TODO: what about multiple definitions?
+                    _this.ioHost.printLine(JSON.stringify(info[0]).trim());
+                } else if (m = cmd.match(/^(references|occurrences|implementors) (\d+) (\d+) (.*)$/)) {
+                    line = parseInt(m[2]);
+                    col = parseInt(m[3]);
+                    file = m[4];
+
+                    pos = _this.typescriptLS.lineColToPosition(file, line, col);
+                    switch (m[1]) {
+                        case "references":
+                            locs = _this.ls.getReferencesAtPosition(file, pos);
+                            break;
+                        case "occurrences":
+                            locs = _this.ls.getOccurrencesAtPosition(file, pos);
+                            break;
+                        case "implementors":
+                            locs = _this.ls.getImplementorsAtPosition(file, pos);
+                            break;
+                        default:
+                            throw "cannot happen";
+                    }
+
+                    info = locs.map(function (loc) {
+                        return ({
+                            loc: loc,
+                            file: loc && loc.fileName,
+                            min: loc && _this.typescriptLS.positionToLineCol(loc.fileName, loc.minChar),
+                            lim: loc && _this.typescriptLS.positionToLineCol(loc.fileName, loc.limChar)
+                        });
+                    });
 
                     _this.ioHost.printLine(JSON.stringify(info).trim());
                 } else if (m = cmd.match(/^completions (true|false) (\d+) (\d+) (.*)$/)) {
@@ -67532,7 +67565,7 @@ var TSS = (function () {
 
                     pos = _this.typescriptLS.lineColToPosition(file, line, col);
 
-                    def = _this.ls.getDefinitionAtPosition(file, pos);
+                    def = _this.ls.getDefinitionAtPosition(file, pos)[0];
 
                     // source       = this.ls.getScriptSyntaxAST(file).getSourceText();
                     // var span     = this.ls.getNameOrDottedNameSpan(file,pos,-1);

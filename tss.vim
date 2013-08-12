@@ -178,6 +178,25 @@ function! TSSshowErrors()
   endif
 endfunction
 
+" create location list for references
+command! TSSreferences call TSSreferences()
+function! TSSreferences()
+  let info = TSScmd("references",{})
+  if type(info)==type([])
+    for i in info
+      let i['lnum']     = i['min']['line']
+      let i['col']      = i['min']['character']
+      let i['filename'] = i['file']
+    endfor
+    call setloclist(0,info)
+    if len(info)!=0
+      lopen
+    endif
+  else
+    echoerr info
+  endif
+endfunction
+
 " start typescript service process asynchronously, via python
 " TODO: the only reason for shell=True is to avoid popup console window;
 "       is there a more direct way?

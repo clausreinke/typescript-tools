@@ -160,7 +160,7 @@ class TSS {
 
     var rl = readline.createInterface({input:process.stdin,output:process.stdout});
 
-    var cmd, script, pos, file, def, info, source, member;
+    var cmd, script, pos, file, def, locs, info, source, member;
 
     var collecting = 0, on_collected_callback, lines = [];
 
@@ -199,15 +199,45 @@ class TSS {
           file = m[3];
 
           pos  = this.typescriptLS.lineColToPosition(file,line,col);
-          def  = this.ls.getDefinitionAtPosition(file, pos)[0];
-          // TODO: what to do about multiple definitions?
+          locs = this.ls.getDefinitionAtPosition(file, pos); // NOTE: multiple definitions
 
-          info = {
+          info = locs.map( def => ({
             def  : def,
             file : def && def.fileName,
             min  : def && this.typescriptLS.positionToLineCol(def.fileName,def.minChar),
             lim  : def && this.typescriptLS.positionToLineCol(def.fileName,def.limChar)
-          };
+          }));
+
+          // TODO: what about multiple definitions?
+          this.ioHost.printLine(JSON.stringify(info[0]).trim());
+
+        } else if (m = cmd.match(/^(references|occurrences|implementors) (\d+) (\d+) (.*)$/)) {
+
+          line = parseInt(m[2]);
+          col  = parseInt(m[3]);
+          file = m[4];
+
+          pos  = this.typescriptLS.lineColToPosition(file,line,col);
+          switch (m[1]) {
+            case "references":
+              locs = this.ls.getReferencesAtPosition(file, pos);
+              break;
+            case "occurrences":
+              locs = this.ls.getOccurrencesAtPosition(file, pos);
+              break;
+            case "implementors":
+              locs = this.ls.getImplementorsAtPosition(file, pos); // NOTE: TS bug 1494
+              break;
+            default:
+              throw "cannot happen";
+          }
+
+          info = locs.map( loc => ({
+            loc  : loc,
+            file : loc && loc.fileName,
+            min  : loc && this.typescriptLS.positionToLineCol(loc.fileName,loc.minChar),
+            lim  : loc && this.typescriptLS.positionToLineCol(loc.fileName,loc.limChar)
+          }));
 
           this.ioHost.printLine(JSON.stringify(info).trim());
 
@@ -235,7 +265,7 @@ class TSS {
 
           pos  = this.typescriptLS.lineColToPosition(file,line,col);
 
-          def  = this.ls.getDefinitionAtPosition(file, pos);
+          def  = this.ls.getDefinitionAtPosition(file, pos)[0];
 
           // source       = this.ls.getScriptSyntaxAST(file).getSourceText();
           // var span     = this.ls.getNameOrDottedNameSpan(file,pos,-1);
