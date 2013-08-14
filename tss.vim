@@ -16,7 +16,6 @@ endif
 python <<EOF
 import logging
 LOG_FILENAME='tsstrace.log'
-logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
 EOF
 
 " echo symbol/type of item under cursor
@@ -230,11 +229,19 @@ endfunction
 " TSS command tracing, off by default
 python traceFlag = False
 
-command! -nargs=1 TSStrace call TSStrace(<f-args>)
+command! TSStraceOn call TSStrace(1)
+command! TSStraceOff call TSStrace(0)
 function! TSStrace(flag)
 python <<EOF
 
-traceFlag = vim.eval('a:flag')
+if vim.eval('a:flag'):
+  traceFlag = True
+  logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
+else:
+  traceFlag = False
+  logger = logging.getLogger()
+  logger.handlers[0].stream.close()
+  logger.removeHandler(logger.handlers[0])
 
 EOF
 endfunction
