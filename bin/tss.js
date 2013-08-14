@@ -66967,8 +66967,9 @@ var Harness;
         };
 
         ScriptInfo.prototype.updateContent = function (content) {
-            this.editRanges = [];
-            this.setContent(content);
+            // this.editRanges = [];
+            // this.setContent(content);
+            this.editContent(0, content.length, content);
             this.version++;
         };
 

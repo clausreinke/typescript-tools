@@ -5,11 +5,15 @@ definition 3 2 PREFIX/test.ts
 definition 4 2 PREFIX/test.ts
 completions true 3 4 PREFIX/test.ts
 completions true 4 4 PREFIX/test.ts
-update 4 PREFIX/test.ts
+update 6 PREFIX/test.ts
 var x = {a:1,b:2};
 var s = "";
+var a = [];
 {s. }
 {x. }
+{a. }
 dump script.dump PREFIX/test.ts
-completions true 3 4 PREFIX/test.ts
+showErrors
 completions true 4 4 PREFIX/test.ts
+completions true 5 4 PREFIX/test.ts
+completions true 6 4 PREFIX/test.ts

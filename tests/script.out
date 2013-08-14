@@ -217,6 +217,24 @@ node ../bin/tss.js test.ts
   ,"docComment":""}]}
 "updated PREFIX/test.ts"
 "dumped PREFIX/test.ts to script.dump"
+[{"file":"PREFIX/test.ts"
+  ,"start":{"line":4
+  ,"character":5}
+  ,"end":{"line":4
+  ,"character":6}
+  ,"text":"error TS1003: Identifier expected."}
+  ,{"file":"PREFIX/test.ts"
+  ,"start":{"line":5
+  ,"character":5}
+  ,"end":{"line":5
+  ,"character":6}
+  ,"text":"error TS1003: Identifier expected."}
+  ,{"file":"PREFIX/test.ts"
+  ,"start":{"line":6
+  ,"character":5}
+  ,"end":{"line":6
+  ,"character":6}
+  ,"text":"error TS1003: Identifier expected."}]
 {"maybeInaccurate":false
   ,"isMemberCompletion":true
   ,"entries":[{"name":"toString"
@@ -352,6 +370,140 @@ node ../bin/tss.js test.ts
   ,"kindModifiers":"public"
   ,"type":"number"
   ,"fullSymbolName":"b"
+  ,"docComment":""}]}
+{"maybeInaccurate":false
+  ,"isMemberCompletion":true
+  ,"entries":[{"name":"toString"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(): string"
+  ,"fullSymbolName":"Array<T>.toString"
+  ,"docComment":""}
+  ,{"name":"toLocaleString"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(): string"
+  ,"fullSymbolName":"Array<T>.toLocaleString"
+  ,"docComment":""}
+  ,{"name":"concat"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"<U extends Array<T>>(...items: U[]): Array<T> (+ 1 overload(s))"
+  ,"fullSymbolName":"Array<T>.concat"
+  ,"docComment":""}
+  ,{"name":"join"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(separator?: string): string"
+  ,"fullSymbolName":"Array<T>.join"
+  ,"docComment":""}
+  ,{"name":"pop"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(): T"
+  ,"fullSymbolName":"Array<T>.pop"
+  ,"docComment":""}
+  ,{"name":"push"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(...items: Array<T>): number"
+  ,"fullSymbolName":"Array<T>.push"
+  ,"docComment":""}
+  ,{"name":"reverse"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(): Array<T>"
+  ,"fullSymbolName":"Array<T>.reverse"
+  ,"docComment":""}
+  ,{"name":"shift"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(): T"
+  ,"fullSymbolName":"Array<T>.shift"
+  ,"docComment":""}
+  ,{"name":"slice"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(start: number, end?: number): Array<T>"
+  ,"fullSymbolName":"Array<T>.slice"
+  ,"docComment":""}
+  ,{"name":"sort"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(compareFn?: (a: T, b: T) => number): Array<T>"
+  ,"fullSymbolName":"Array<T>.sort"
+  ,"docComment":""}
+  ,{"name":"splice"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(start: number): Array<T> (+ 1 overload(s))"
+  ,"fullSymbolName":"Array<T>.splice"
+  ,"docComment":""}
+  ,{"name":"unshift"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(...items: Array<T>): number"
+  ,"fullSymbolName":"Array<T>.unshift"
+  ,"docComment":""}
+  ,{"name":"indexOf"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(searchElement: T, fromIndex?: number): number"
+  ,"fullSymbolName":"Array<T>.indexOf"
+  ,"docComment":""}
+  ,{"name":"lastIndexOf"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(searchElement: T, fromIndex?: number): number"
+  ,"fullSymbolName":"Array<T>.lastIndexOf"
+  ,"docComment":""}
+  ,{"name":"every"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(callbackfn: (value: T, index: number, array: Array<T>) => boolean, thisArg?: any): boolean"
+  ,"fullSymbolName":"Array<T>.every"
+  ,"docComment":""}
+  ,{"name":"some"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(callbackfn: (value: T, index: number, array: Array<T>) => boolean, thisArg?: any): boolean"
+  ,"fullSymbolName":"Array<T>.some"
+  ,"docComment":""}
+  ,{"name":"forEach"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(callbackfn: (value: T, index: number, array: Array<T>) => void, thisArg?: any): void"
+  ,"fullSymbolName":"Array<T>.forEach"
+  ,"docComment":""}
+  ,{"name":"map"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"<U>(callbackfn: (value: T, index: number, array: Array<T>) => U, thisArg?: any): U[]"
+  ,"fullSymbolName":"Array<T>.map"
+  ,"docComment":""}
+  ,{"name":"filter"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(callbackfn: (value: T, index: number, array: Array<T>) => boolean, thisArg?: any): Array<T>"
+  ,"fullSymbolName":"Array<T>.filter"
+  ,"docComment":""}
+  ,{"name":"reduce"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: Array<T>) => T, initialValue?: T): T (+ 1 overload(s))"
+  ,"fullSymbolName":"Array<T>.reduce"
+  ,"docComment":""}
+  ,{"name":"reduceRight"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: Array<T>) => T, initialValue?: T): T (+ 1 overload(s))"
+  ,"fullSymbolName":"Array<T>.reduceRight"
+  ,"docComment":""}
+  ,{"name":"length"
+  ,"kind":"property"
+  ,"kindModifiers":"public"
+  ,"type":"number"
+  ,"fullSymbolName":"Array<T>.length"
   ,"docComment":""}]}
 "TSS closing"
 

@@ -5,10 +5,10 @@ $ node script.js >script.out2
 $ diff --strip-trailing-cr script.out*
 
 $ diff --strip-trailing-cr script.dump test.ts
-4c4
-< {x. }
+3d2
+< var a = [];
+6d4
+< {a. }
 \ No newline at end of file
----
-> {x. }
 
 ```
