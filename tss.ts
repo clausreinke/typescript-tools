@@ -160,7 +160,7 @@ class TSS {
 
     var rl = readline.createInterface({input:process.stdin,output:process.stdout});
 
-    var cmd, script, pos, file, def, locs, info, source, member;
+    var cmd, script, pos, file, def, locs, info, source, brief, member;
 
     var collecting = 0, on_collected_callback, lines = [];
 
@@ -241,19 +241,37 @@ class TSS {
 
           this.ioHost.printLine(JSON.stringify(info).trim());
 
-        } else if (m = cmd.match(/^completions (true|false) (\d+) (\d+) (.*)$/)) {
+        } else if (m = cmd.match(/^completions(-brief)? (true|false) (\d+) (\d+) (.*)$/)) {
 
-          member = m[1]==='true';
-          line = parseInt(m[2]);
-          col  = parseInt(m[3]);
-          file = m[4];
+          brief  = m[1];
+          member = m[2]==='true';
+          line   = parseInt(m[3]);
+          col    = parseInt(m[4]);
+          file   = m[5];
 
           pos     = this.typescriptLS.lineColToPosition(file,line,col);
 
-          // TODO: filter by prefix / limit length
           info = this.ls.getCompletionsAtPosition(file, pos, member);
-          // fill in completion entry details
-          info && (info.entries = info.entries.map( e => this.ls.getCompletionEntryDetails(file,pos,e.name) ));
+          // fill in completion entry details, unless briefness requested
+          info && !brief && (info.entries = info.entries.map( e =>
+                                              this.ls.getCompletionEntryDetails(file,pos,e.name) ));
+
+          (()=>{ // filter entries by prefix, determined by pos
+            var languageVersion = this.compilationSettings.codeGenTarget;
+            var source   = this.typescriptLS.getScriptInfo(file).content;
+            var startPos = pos;
+            var idPart   = p => /[0-9a-zA-Z_$]/.test(source[p])
+                             || TypeScript.Unicode.isIdentifierPart(source.charCodeAt(p),languageVersion);
+            var idStart  = p => /[a-zA-Z_$]/.test(source[p])
+                             || TypeScript.Unicode.isIdentifierStart(source.charCodeAt(p),languageVersion);
+            while ((--startPos>=0) && idPart(startPos) );
+            if ((++startPos < pos) && idStart(startPos)) {
+              var prefix = source.slice(startPos,pos);
+              info["prefix"] = prefix;
+              var len    = prefix.length;
+              info.entries = info.entries.filter( e => e.name.substr(0,len)===prefix );
+            }
+          })();
 
           this.ioHost.printLine(JSON.stringify(info).trim());
 

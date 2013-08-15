@@ -218,12 +218,6 @@ node ../bin/tss.js test.ts
 "updated PREFIX/test.ts"
 "dumped PREFIX/test.ts to script.dump"
 [{"file":"PREFIX/test.ts"
-  ,"start":{"line":4
-  ,"character":5}
-  ,"end":{"line":4
-  ,"character":6}
-  ,"text":"error TS1003: Identifier expected."}
-  ,{"file":"PREFIX/test.ts"
   ,"start":{"line":5
   ,"character":5}
   ,"end":{"line":5
@@ -234,7 +228,13 @@ node ../bin/tss.js test.ts
   ,"character":5}
   ,"end":{"line":6
   ,"character":6}
-  ,"text":"error TS1003: Identifier expected."}]
+  ,"text":"error TS1003: Identifier expected."}
+  ,{"file":"PREFIX/test.ts"
+  ,"start":{"line":4
+  ,"character":4}
+  ,"end":{"line":4
+  ,"character":6}
+  ,"text":"error TS2094: The property 'to' does not exist on value of type 'String'."}]
 {"maybeInaccurate":false
   ,"isMemberCompletion":true
   ,"entries":[{"name":"toString"
@@ -505,6 +505,107 @@ node ../bin/tss.js test.ts
   ,"type":"number"
   ,"fullSymbolName":"Array<T>.length"
   ,"docComment":""}]}
+{"maybeInaccurate":false
+  ,"isMemberCompletion":true
+  ,"entries":[{"name":"toString"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"toLocaleString"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"concat"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"join"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"pop"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"push"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"reverse"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"shift"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"slice"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"sort"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"splice"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"unshift"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"indexOf"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"lastIndexOf"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"every"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"some"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"forEach"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"map"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"filter"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"reduce"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"reduceRight"
+  ,"kind":"method"
+  ,"kindModifiers":"public"}
+  ,{"name":"length"
+  ,"kind":"property"
+  ,"kindModifiers":"public"}]}
+{"maybeInaccurate":false
+  ,"isMemberCompletion":true
+  ,"entries":[{"name":"toString"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(): string"
+  ,"fullSymbolName":"String.toString"
+  ,"docComment":"Returns a string representation of a string. "}
+  ,{"name":"toLowerCase"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(): string"
+  ,"fullSymbolName":"String.toLowerCase"
+  ,"docComment":"Converts all the alphabetic characters in a string to lowercase. "}
+  ,{"name":"toLocaleLowerCase"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(): string"
+  ,"fullSymbolName":"String.toLocaleLowerCase"
+  ,"docComment":"Converts all alphabetic characters to lowercase, taking into account the host environment's current locale. "}
+  ,{"name":"toUpperCase"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(): string"
+  ,"fullSymbolName":"String.toUpperCase"
+  ,"docComment":"Converts all the alphabetic characters in a string to uppercase. "}
+  ,{"name":"toLocaleUpperCase"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(): string"
+  ,"fullSymbolName":"String.toLocaleUpperCase"
+  ,"docComment":"Returns a string where all alphabetic characters have been converted to uppercase, taking into account the host environment's current locale. "}]
+  ,"prefix":"to"}
 "TSS closing"
 
 // stderr

@@ -67466,7 +67466,7 @@ var TSS = (function () {
 
         var rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
-        var cmd, script, pos, file, def, locs, info, source, member;
+        var cmd, script, pos, file, def, locs, info, source, brief, member;
 
         var collecting = 0, on_collected_callback, lines = [];
 
@@ -67542,21 +67542,43 @@ var TSS = (function () {
                     });
 
                     _this.ioHost.printLine(JSON.stringify(info).trim());
-                } else if (m = cmd.match(/^completions (true|false) (\d+) (\d+) (.*)$/)) {
-                    member = m[1] === 'true';
-                    line = parseInt(m[2]);
-                    col = parseInt(m[3]);
-                    file = m[4];
+                } else if (m = cmd.match(/^completions(-brief)? (true|false) (\d+) (\d+) (.*)$/)) {
+                    brief = m[1];
+                    member = m[2] === 'true';
+                    line = parseInt(m[3]);
+                    col = parseInt(m[4]);
+                    file = m[5];
 
                     pos = _this.typescriptLS.lineColToPosition(file, line, col);
 
-                    // TODO: filter by prefix / limit length
                     info = _this.ls.getCompletionsAtPosition(file, pos, member);
 
-                    // fill in completion entry details
-                    info && (info.entries = info.entries.map(function (e) {
+                    // fill in completion entry details, unless briefness requested
+                    info && !brief && (info.entries = info.entries.map(function (e) {
                         return _this.ls.getCompletionEntryDetails(file, pos, e.name);
                     }));
+
+                    (function () {
+                        var languageVersion = _this.compilationSettings.codeGenTarget;
+                        var source = _this.typescriptLS.getScriptInfo(file).content;
+                        var startPos = pos;
+                        var idPart = function (p) {
+                            return /[0-9a-zA-Z_$]/.test(source[p]) || TypeScript.Unicode.isIdentifierPart(source.charCodeAt(p), languageVersion);
+                        };
+                        var idStart = function (p) {
+                            return /[a-zA-Z_$]/.test(source[p]) || TypeScript.Unicode.isIdentifierStart(source.charCodeAt(p), languageVersion);
+                        };
+                        while ((--startPos >= 0) && idPart(startPos))
+                            ;
+                        if ((++startPos < pos) && idStart(startPos)) {
+                            var prefix = source.slice(startPos, pos);
+                            info["prefix"] = prefix;
+                            var len = prefix.length;
+                            info.entries = info.entries.filter(function (e) {
+                                return e.name.substr(0, len) === prefix;
+                            });
+                        }
+                    })();
 
                     _this.ioHost.printLine(JSON.stringify(info).trim());
                 } else if (m = cmd.match(/^info (\d+) (\d+) (.*)$/)) {
