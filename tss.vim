@@ -12,7 +12,6 @@ if !exists("g:TSSshowErrors")
 endif
 """ end configuration options
 
-" TODO: only create log file when needed
 python <<EOF
 import logging
 LOG_FILENAME='tsstrace.log'
@@ -195,8 +194,7 @@ function! TSSreferences()
 endfunction
 
 " start typescript service process asynchronously, via python
-" TODO: the only reason for shell=True is to avoid popup console window;
-"       is there a more direct way?
+" NOTE: one reason for shell=True is to avoid popup console window;
 command! -nargs=1 TSSstart call TSSstart(<f-args>)
 command! TSSstarthere call TSSstart(expand("%"))
 function! TSSstart(projectroot)
@@ -229,12 +227,12 @@ endfunction
 " TSS command tracing, off by default
 python traceFlag = False
 
-command! TSStraceOn call TSStrace(1)
-command! TSStraceOff call TSStrace(0)
+command! TSStraceOn call TSStrace('on')
+command! TSStraceOff call TSStrace('off')
 function! TSStrace(flag)
 python <<EOF
 
-if vim.eval('a:flag'):
+if vim.eval('a:flag')=='on':
   traceFlag = True
   logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
 else:
