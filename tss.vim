@@ -143,7 +143,10 @@ function! TSScompleteFunc(findstart,base)
     return result
   endif
 endfunction
-set omnifunc=TSScompleteFunc
+aug TSS
+au BufNewFile,BufRead *.ts setlocal omnifunc=TSScompleteFunc
+aug END
+doau TSS BufRead
 
 " reload project sources
 command! TSSreload echo TSSreload()
