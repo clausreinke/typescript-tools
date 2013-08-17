@@ -12,6 +12,10 @@ if !exists("g:TSSshowErrors")
 endif
 """ end configuration options
 
+if !exists("g:TSSupdates")
+  let g:TSSupdates = {}
+endif
+
 python <<EOF
 import logging
 LOG_FILENAME='tsstrace.log'
@@ -83,9 +87,21 @@ function! TSSdef(cmd)
   return info
 endfunction
 
-" update TSS with current file source
-" TODO: integrate into TSScmd
-command! TSSupdate echo TSScmd("update ".line('$')." ".expand("%:p"),{'rawcmd':1,'lines':getline(1,line('$'))})
+" update TSS with current file source, record state of updates
+" NOTE: this will be hard to get right:
+"         disk vs buffer, update vs reload, dependencies, ...
+command! TSSupdate echo TSSupdate()
+function! TSSupdate()
+  let file = expand("%:p")
+  let cur  = undotree().seq_cur
+  let updated = has_key(g:TSSupdates,file)
+  if (!updated && &modified) || (updated && (cur!=g:TSSupdates[file]))
+    let g:TSSupdates[file] = cur
+    return TSScmd("update ".line('$')." ".file,{'rawcmd':1,'lines':getline(1,line('$'))})
+  else
+    return ""
+  endif
+endfunction
 
 " dump TSS internal file source
 command! -nargs=1 TSSdump echo TSScmd("dump ".<f-args>." ".expand("%:p"),{'rawcmd':1})
@@ -126,9 +142,7 @@ function! TSScompleteFunc(findstart,base)
     let member = (start>1 && line[start-2]==".") ? 'true' : 'false'
     echomsg start.":".member
 
-    if &modified
-      TSSupdate
-    endif
+    TSSupdate
 
     let info = TSScmd("completions ".member,{'col':start})
 
@@ -151,7 +165,21 @@ doau TSS BufRead
 " reload project sources
 command! TSSreload echo TSSreload()
 function! TSSreload()
+  let unsaved = []
+  for f in TSScmd("files",{'rawcmd':1})
+    if bufloaded(f) && getbufvar(f,"&modified")
+      let unsaved += [f]
+    endif
+  endfor
+  if unsaved!=[]
+    echoerr "there are buffers with unsaved changes:"
+    for f in unsaved
+      echomsg f
+    endfor
+    return "TSSreload cancelled"
+  endif
   let msg = TSScmd("reload",{'rawcmd':1})
+  let g:TSSupdates = {}
   if g:TSSshowErrors
     TSSshowErrors
   endif
@@ -161,6 +189,9 @@ endfunction
 " create quickfix list from TSS errors
 command! TSSshowErrors call TSSshowErrors()
 function! TSSshowErrors()
+
+  TSSupdate
+
   let info = TSScmd("showErrors",{'rawcmd':1})
   if type(info)==type([])
     for i in info
