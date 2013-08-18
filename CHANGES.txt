@@ -1,0 +1,29 @@
+
+0.1.0 to 0.2.0:
+
+  - partial rewrite, including PROTOCOL CHANGES
+    (outlined below, see README.md for details of current protocol)
+
+  - tss v0.2 supports/uses TypeScript v0.9
+
+  - `symbol` command is gone
+    (use `type` command instead, properties `fullSymbolName` and `type`)
+
+  - commands now return `{line,character}` records, whereever positions are concerned
+
+  - `completions-brief` command omits `type`/`docComment` details
+
+  - `completions` commands prefilter suggestions, based on identifier prefix before cursor
+
+  - `files` command returns list of files in current project
+
+  - `references` command returns list of reference locations (`getReferencesAtPosition`)
+
+  - improved feature test coverage
+
+  - tss.vim:
+    - add TSSreferences command
+    - fix preview window handling
+    - improved tracing and log file handling
+    - set omnifunc only for .ts files
+    - improved update handling

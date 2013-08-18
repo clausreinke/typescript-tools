@@ -1,8 +1,8 @@
-
+(if you are upgrading from an older version, see CHANGES.txt)
 
 ## typescript-tools
 
-typescript-tools provides access to the TypeScript Language Services (v0.9) via a simple commandline server (tss). This makes it easy to build editor plugins supporting TypeScript. A Vim plugin (tss.vim) is included. If you build plugins for other editors/IDEs based on typescript-tools, please let me know, or better: announce them on our new project mailing list.
+typescript-tools (v0.2.0) provides access to the TypeScript Language Services (v0.9) via a simple commandline server (tss). This makes it easy to build editor plugins supporting TypeScript. A Vim plugin (tss.vim) is included. If you build plugins for other editors/IDEs based on typescript-tools, please let me know, or better: announce them on our new project mailing list.
 
 - Vim plugin: included in this repo (see below for list of features)
 - Emacs plugin: https://github.com/aki2o/emacs-tss
