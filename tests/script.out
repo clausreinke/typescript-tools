@@ -1,4 +1,5 @@
 node ../bin/tss.js test.ts
+node ../bin/tss.js issue-9.ts
 // stdout
 "loaded PREFIX/test.ts, TSS listening.."
 [{"file":"PREFIX/test.ts"
@@ -606,6 +607,28 @@ node ../bin/tss.js test.ts
   ,"fullSymbolName":"String.toLocaleUpperCase"
   ,"docComment":"Returns a string where all alphabetic characters have been converted to uppercase, taking into account the host environment's current locale. "}]
   ,"prefix":"to"}
+"TSS closing"
+
+// stderr
+
+// stdout
+"loaded PREFIX/issue-9.ts, TSS listening.."
+"updated PREFIX/issue-9.ts"
+[{"file":"PREFIX/issue-9.ts"
+  ,"start":{"line":2
+  ,"character":1}
+  ,"end":{"line":2
+  ,"character":1}
+  ,"text":"error TS1003: Identifier expected."}]
+"updated PREFIX/issue-9.ts"
+[]
+"updated PREFIX/issue-9.ts"
+[{"file":"PREFIX/issue-9.ts"
+  ,"start":{"line":2
+  ,"character":1}
+  ,"end":{"line":2
+  ,"character":1}
+  ,"text":"error TS1003: Identifier expected."}]
 "TSS closing"
 
 // stderr

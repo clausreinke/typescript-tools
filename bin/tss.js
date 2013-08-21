@@ -66967,9 +66967,12 @@ var Harness;
         };
 
         ScriptInfo.prototype.updateContent = function (content) {
-            // this.editRanges = [];
-            // this.setContent(content);
-            this.editContent(0, content.length, content);
+            var old_length = this.content.length;
+            this.setContent(content);
+            this.editRanges.push({
+                length: content.length,
+                textChangeRange: null
+            });
             this.version++;
         };
 

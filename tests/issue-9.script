@@ -1,0 +1,12 @@
+update 2 PREFIX/issue-9.ts
+for(;;)
+
+showErrors
+update 2 PREFIX/issue-9.ts
+for(;;)
+;
+showErrors
+update 2 PREFIX/issue-9.ts
+for(;;)
+
+showErrors

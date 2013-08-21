@@ -53,9 +53,15 @@ module Harness {
         }
 
         public updateContent(content: string): void {
-            // this.editRanges = [];
-            // this.setContent(content);
-            this.editContent(0,content.length,content);
+            var old_length = this.content.length;
+            this.setContent(content);
+            this.editRanges.push({
+                length: content.length,
+                textChangeRange: null // update everything
+                    // alternatively:
+                    // new TypeScript.TextChangeRange(
+                    // new TypeScript.TextSpan(0, old_length), content.length)
+            });
             this.version++;
         }
 
