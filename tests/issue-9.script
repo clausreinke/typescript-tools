@@ -1,12 +1,12 @@
-update 2 PREFIX/issue-9.ts
+update 2 PREFIX/empty.ts
 for(;;)
 
 showErrors
-update 2 PREFIX/issue-9.ts
+update 2 PREFIX/empty.ts
 for(;;)
 ;
 showErrors
-update 2 PREFIX/issue-9.ts
+update 2 PREFIX/empty.ts
 for(;;)
 
 showErrors

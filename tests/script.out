@@ -1,5 +1,4 @@
 node ../bin/tss.js test.ts
-node ../bin/tss.js issue-9.ts
 // stdout
 "loaded PREFIX/test.ts, TSS listening.."
 [{"file":"PREFIX/test.ts"
@@ -611,24 +610,46 @@ node ../bin/tss.js issue-9.ts
 
 // stderr
 
+node ../bin/tss.js empty.ts
 // stdout
-"loaded PREFIX/issue-9.ts, TSS listening.."
-"updated PREFIX/issue-9.ts"
-[{"file":"PREFIX/issue-9.ts"
+"loaded PREFIX/empty.ts, TSS listening.."
+"updated PREFIX/empty.ts"
+[{"file":"PREFIX/empty.ts"
   ,"start":{"line":2
   ,"character":1}
   ,"end":{"line":2
   ,"character":1}
   ,"text":"error TS1003: Identifier expected."}]
-"updated PREFIX/issue-9.ts"
+"updated PREFIX/empty.ts"
 []
-"updated PREFIX/issue-9.ts"
-[{"file":"PREFIX/issue-9.ts"
+"updated PREFIX/empty.ts"
+[{"file":"PREFIX/empty.ts"
   ,"start":{"line":2
   ,"character":1}
   ,"end":{"line":2
   ,"character":1}
   ,"text":"error TS1003: Identifier expected."}]
+"TSS closing"
+
+// stderr
+
+node ../bin/tss.js empty.ts
+// stdout
+"loaded PREFIX/empty.ts, TSS listening.."
+"updated PREFIX/empty.ts"
+"updated PREFIX/empty.ts"
+{"def":{"fileName":"PREFIX/empty.ts"
+  ,"minChar":4
+  ,"limChar":10
+  ,"kind":"var"
+  ,"name":"i"
+  ,"containerKind":""
+  ,"containerName":""}
+  ,"file":"PREFIX/empty.ts"
+  ,"min":{"line":1
+  ,"character":5}
+  ,"lim":{"line":1
+  ,"character":11}}
 "TSS closing"
 
 // stderr

@@ -1,0 +1,5 @@
+update 1 PREFIX/empty.ts
+var i = 20;
+update 1 PREFIX/empty.ts
+var i = 10;
+definition 1 5 PREFIX/empty.ts

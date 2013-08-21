@@ -57,10 +57,9 @@ module Harness {
             this.setContent(content);
             this.editRanges.push({
                 length: content.length,
-                textChangeRange: null // update everything
-                    // alternatively:
-                    // new TypeScript.TextChangeRange(
-                    // new TypeScript.TextSpan(0, old_length), content.length)
+                textChangeRange:
+                    // NOTE: no shortcut for "update everything" (null only works in some places, #10)
+                    new TypeScript.TextChangeRange(new TypeScript.TextSpan(0, old_length), content.length)
             });
             this.version++;
         }

@@ -66971,7 +66971,7 @@ var Harness;
             this.setContent(content);
             this.editRanges.push({
                 length: content.length,
-                textChangeRange: null
+                textChangeRange: new TypeScript.TextChangeRange(new TypeScript.TextSpan(0, old_length), content.length)
             });
             this.version++;
         };
