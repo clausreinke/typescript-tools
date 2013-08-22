@@ -67627,12 +67627,17 @@ var TSS = (function () {
                     info = [].concat(_this.resolutionResult.diagnostics, _this.typescriptLS.getErrors()).map(function (d) {
                         var file = d.fileName();
                         var lc = _this.typescriptLS.positionToLineCol(file, d.start());
-                        var lc2 = _this.typescriptLS.positionToLineCol(file, d.start() + d.length());
+                        var len = _this.typescriptLS.getScriptInfo(file).content.length;
+                        var end = Math.min(len, d.start() + d.length());
+                        var lc2 = _this.typescriptLS.positionToLineCol(file, end);
+                        var diagInfo = TypeScript.getDiagnosticInfoFromKey(d.diagnosticKey());
+                        var category = TypeScript.DiagnosticCategory[diagInfo.category];
                         return {
                             file: file,
                             start: { line: lc.line, character: lc.character },
                             end: { line: lc2.line, character: lc2.character },
-                            text: /* file+"("+lc.line+"/"+lc.character+"): "+ */ d.message()
+                            text: /* file+"("+lc.line+"/"+lc.character+"): "+ */ d.message(),
+                            category: category
                         };
                     });
 

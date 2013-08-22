@@ -1,3 +1,4 @@
+// test.script
 node ../bin/tss.js test.ts
 // stdout
 "loaded PREFIX/test.ts, TSS listening.."
@@ -6,13 +7,15 @@ node ../bin/tss.js test.ts
   ,"character":5}
   ,"end":{"line":3
   ,"character":6}
-  ,"text":"error TS1003: Identifier expected."}
+  ,"text":"error TS1003: Identifier expected."
+  ,"category":"Error"}
   ,{"file":"PREFIX/test.ts"
   ,"start":{"line":4
   ,"character":5}
   ,"end":{"line":4
   ,"character":6}
-  ,"text":"error TS1003: Identifier expected."}]
+  ,"text":"error TS1003: Identifier expected."
+  ,"category":"Error"}]
 {"memberName":{"prefix":"string"
   ,"suffix":""
   ,"delim":""
@@ -222,19 +225,22 @@ node ../bin/tss.js test.ts
   ,"character":5}
   ,"end":{"line":5
   ,"character":6}
-  ,"text":"error TS1003: Identifier expected."}
+  ,"text":"error TS1003: Identifier expected."
+  ,"category":"Error"}
   ,{"file":"PREFIX/test.ts"
   ,"start":{"line":6
   ,"character":5}
   ,"end":{"line":6
   ,"character":6}
-  ,"text":"error TS1003: Identifier expected."}
+  ,"text":"error TS1003: Identifier expected."
+  ,"category":"Error"}
   ,{"file":"PREFIX/test.ts"
   ,"start":{"line":4
   ,"character":4}
   ,"end":{"line":4
   ,"character":6}
-  ,"text":"error TS2094: The property 'to' does not exist on value of type 'String'."}]
+  ,"text":"error TS2094: The property 'to' does not exist on value of type 'String'."
+  ,"category":"Error"}]
 {"maybeInaccurate":false
   ,"isMemberCompletion":true
   ,"entries":[{"name":"toString"
@@ -610,6 +616,7 @@ node ../bin/tss.js test.ts
 
 // stderr
 
+// issue-9.script
 node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
@@ -619,7 +626,8 @@ node ../bin/tss.js empty.ts
   ,"character":1}
   ,"end":{"line":2
   ,"character":1}
-  ,"text":"error TS1003: Identifier expected."}]
+  ,"text":"error TS1003: Identifier expected."
+  ,"category":"Error"}]
 "updated PREFIX/empty.ts"
 []
 "updated PREFIX/empty.ts"
@@ -628,11 +636,13 @@ node ../bin/tss.js empty.ts
   ,"character":1}
   ,"end":{"line":2
   ,"character":1}
-  ,"text":"error TS1003: Identifier expected."}]
+  ,"text":"error TS1003: Identifier expected."
+  ,"category":"Error"}]
 "TSS closing"
 
 // stderr
 
+// issue-10.script
 node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
@@ -650,6 +660,29 @@ node ../bin/tss.js empty.ts
   ,"character":5}
   ,"lim":{"line":1
   ,"character":11}}
+"TSS closing"
+
+// stderr
+
+// issue-11.script
+node ../bin/tss.js empty.ts
+// stdout
+"loaded PREFIX/empty.ts, TSS listening.."
+"updated PREFIX/empty.ts"
+[{"file":"PREFIX/empty.ts"
+  ,"start":{"line":1
+  ,"character":11}
+  ,"end":{"line":1
+  ,"character":11}
+  ,"text":"error TS1002: Missing close quote character."
+  ,"category":"Error"}
+  ,{"file":"PREFIX/empty.ts"
+  ,"start":{"line":1
+  ,"character":1}
+  ,"end":{"line":1
+  ,"character":4}
+  ,"text":"error TS2095: Could not find symbol 'foo'."
+  ,"category":"Error"}]
 "TSS closing"
 
 // stderr

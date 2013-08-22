@@ -336,12 +336,18 @@ class TSS {
                    .map( d => {
                            var file = d.fileName();
                            var lc   = this.typescriptLS.positionToLineCol(file,d.start());
-                           var lc2  = this.typescriptLS.positionToLineCol(file,d.start()+d.length());
+                           var len  = this.typescriptLS.getScriptInfo(file).content.length;
+                           var end  = Math.min(len,d.start()+d.length()); // NOTE: clamped to end of file (#11)
+                           var lc2  = this.typescriptLS.positionToLineCol(file,end);
+                           var diagInfo = TypeScript.getDiagnosticInfoFromKey(d.diagnosticKey());
+                           var category = TypeScript.DiagnosticCategory[diagInfo.category];
                            return {
                             file: file,
                             start: {line: lc.line, character: lc.character},
                             end: {line: lc2.line, character: lc2.character},
-                            text: /* file+"("+lc.line+"/"+lc.character+"): "+ */ d.message()
+                            text: /* file+"("+lc.line+"/"+lc.character+"): "+ */ d.message(),
+                            category: category
+                            // ,diagnostic: d
                            };
                          }
                        );

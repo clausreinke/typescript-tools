@@ -1,0 +1,3 @@
+update 1 PREFIX/empty.ts
+foo = 'bar
+showErrors

@@ -14,7 +14,7 @@ function test(scriptName,fileName) {
 
   var cmd = "node "+tss_path+" "+fileName;
   tests.push(scriptName);
-  log[scriptName] = [cmd];
+  log[scriptName] = ["// "+scriptName,cmd];
 
   var tss = exec(cmd
                 ,{maxBuffer:Infinity}
@@ -41,3 +41,4 @@ function collectResults() {
 test("test.script","test.ts");
 test("issue-9.script","empty.ts");
 test("issue-10.script","empty.ts");
+test("issue-11.script","empty.ts");
