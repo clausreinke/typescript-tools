@@ -42,4 +42,5 @@ test("test.script","test.ts");
 test("issue-9.script","empty.ts");
 test("issue-10.script","empty.ts");
 test("issue-11.script","empty.ts");
+test("issue-12.script","empty.ts");
 test("issue-13.script","empty.ts");

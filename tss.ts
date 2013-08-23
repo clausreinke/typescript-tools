@@ -252,26 +252,29 @@ class TSS {
           pos     = this.typescriptLS.lineColToPosition(file,line,col);
 
           info = this.ls.getCompletionsAtPosition(file, pos, member);
-          // fill in completion entry details, unless briefness requested
-          info && !brief && (info.entries = info.entries.map( e =>
-                                              this.ls.getCompletionEntryDetails(file,pos,e.name) ));
 
-          (()=>{ // filter entries by prefix, determined by pos
-            var languageVersion = this.compilationSettings.codeGenTarget;
-            var source   = this.typescriptLS.getScriptInfo(file).content;
-            var startPos = pos;
-            var idPart   = p => /[0-9a-zA-Z_$]/.test(source[p])
-                             || TypeScript.Unicode.isIdentifierPart(source.charCodeAt(p),languageVersion);
-            var idStart  = p => /[a-zA-Z_$]/.test(source[p])
-                             || TypeScript.Unicode.isIdentifierStart(source.charCodeAt(p),languageVersion);
-            while ((--startPos>=0) && idPart(startPos) );
-            if ((++startPos < pos) && idStart(startPos)) {
-              var prefix = source.slice(startPos,pos);
-              info["prefix"] = prefix;
-              var len    = prefix.length;
-              info.entries = info.entries.filter( e => e.name.substr(0,len)===prefix );
-            }
-          })();
+          if (info) {
+            // fill in completion entry details, unless briefness requested
+            !brief && (info.entries = info.entries.map( e =>
+                                        this.ls.getCompletionEntryDetails(file,pos,e.name) ));
+
+            (()=>{ // filter entries by prefix, determined by pos
+              var languageVersion = this.compilationSettings.codeGenTarget;
+              var source   = this.typescriptLS.getScriptInfo(file).content;
+              var startPos = pos;
+              var idPart   = p => /[0-9a-zA-Z_$]/.test(source[p])
+                               || TypeScript.Unicode.isIdentifierPart(source.charCodeAt(p),languageVersion);
+              var idStart  = p => /[a-zA-Z_$]/.test(source[p])
+                               || TypeScript.Unicode.isIdentifierStart(source.charCodeAt(p),languageVersion);
+              while ((--startPos>=0) && idPart(startPos) );
+              if ((++startPos < pos) && idStart(startPos)) {
+                var prefix = source.slice(startPos,pos);
+                info["prefix"] = prefix;
+                var len    = prefix.length;
+                info.entries = info.entries.filter( e => e.name.substr(0,len)===prefix );
+              }
+            })();
+          }
 
           this.ioHost.printLine(JSON.stringify(info).trim());
 

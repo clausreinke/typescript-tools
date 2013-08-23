@@ -68624,32 +68624,34 @@ var TSS = (function () {
 
                     info = _this.ls.getCompletionsAtPosition(file, pos, member);
 
-                    // fill in completion entry details, unless briefness requested
-                    info && !brief && (info.entries = info.entries.map(function (e) {
-                        return _this.ls.getCompletionEntryDetails(file, pos, e.name);
-                    }));
+                    if (info) {
+                        // fill in completion entry details, unless briefness requested
+                        !brief && (info.entries = info.entries.map(function (e) {
+                            return _this.ls.getCompletionEntryDetails(file, pos, e.name);
+                        }));
 
-                    (function () {
-                        var languageVersion = _this.compilationSettings.codeGenTarget;
-                        var source = _this.typescriptLS.getScriptInfo(file).content;
-                        var startPos = pos;
-                        var idPart = function (p) {
-                            return /[0-9a-zA-Z_$]/.test(source[p]) || TypeScript.Unicode.isIdentifierPart(source.charCodeAt(p), languageVersion);
-                        };
-                        var idStart = function (p) {
-                            return /[a-zA-Z_$]/.test(source[p]) || TypeScript.Unicode.isIdentifierStart(source.charCodeAt(p), languageVersion);
-                        };
-                        while ((--startPos >= 0) && idPart(startPos))
-                            ;
-                        if ((++startPos < pos) && idStart(startPos)) {
-                            var prefix = source.slice(startPos, pos);
-                            info["prefix"] = prefix;
-                            var len = prefix.length;
-                            info.entries = info.entries.filter(function (e) {
-                                return e.name.substr(0, len) === prefix;
-                            });
-                        }
-                    })();
+                        (function () {
+                            var languageVersion = _this.compilationSettings.codeGenTarget;
+                            var source = _this.typescriptLS.getScriptInfo(file).content;
+                            var startPos = pos;
+                            var idPart = function (p) {
+                                return /[0-9a-zA-Z_$]/.test(source[p]) || TypeScript.Unicode.isIdentifierPart(source.charCodeAt(p), languageVersion);
+                            };
+                            var idStart = function (p) {
+                                return /[a-zA-Z_$]/.test(source[p]) || TypeScript.Unicode.isIdentifierStart(source.charCodeAt(p), languageVersion);
+                            };
+                            while ((--startPos >= 0) && idPart(startPos))
+                                ;
+                            if ((++startPos < pos) && idStart(startPos)) {
+                                var prefix = source.slice(startPos, pos);
+                                info["prefix"] = prefix;
+                                var len = prefix.length;
+                                info.entries = info.entries.filter(function (e) {
+                                    return e.name.substr(0, len) === prefix;
+                                });
+                            }
+                        })();
+                    }
 
                     _this.ioHost.printLine(JSON.stringify(info).trim());
                 } else if (m = cmd.match(/^info (\d+) (\d+) (.*)$/)) {

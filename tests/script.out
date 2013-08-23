@@ -696,6 +696,16 @@ node ../bin/tss.js empty.ts
 
 // stderr
 
+// issue-12.script
+node ../bin/tss.js empty.ts
+// stdout
+"loaded PREFIX/empty.ts, TSS listening.."
+"updated PREFIX/empty.ts"
+null
+"TSS closing"
+
+// stderr
+
 // issue-13.script
 node ../bin/tss.js empty.ts
 // stdout

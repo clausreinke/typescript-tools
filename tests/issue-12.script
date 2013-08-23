@@ -1,0 +1,3 @@
+update 1 PREFIX/empty.ts
+var t
+completions false 1 6 PREFIX/empty.ts
