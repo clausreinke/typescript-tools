@@ -331,7 +331,7 @@ class TSS {
 
         } else if (m = cmd.match(/^showErrors$/)) { // get processing errors
 
-          info = [].concat(this.resolutionResult.diagnostics,
+          info = [].concat(this.resolutionResult.diagnostics.map(d=>{d["phase"]="Resolution";return d}),
                            this.typescriptLS.getErrors())
                    .map( d => {
                            var file = d.fileName();
@@ -346,6 +346,7 @@ class TSS {
                             start: {line: lc.line, character: lc.character},
                             end: {line: lc2.line, character: lc2.character},
                             text: /* file+"("+lc.line+"/"+lc.character+"): "+ */ d.message(),
+                            phase: d.phase,
                             category: category
                             // ,diagnostic: d
                            };

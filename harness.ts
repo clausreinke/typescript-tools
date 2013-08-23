@@ -192,6 +192,7 @@ module Harness {
 
         // collect Diagnostics
         public getErrors(): TypeScript.Diagnostic[] {
+            var addPhase = phase => d => {d.phase = phase; return d};
             var errors = [];
             this.ls.refresh(false);
             this.fileNameToScript.getAllKeys().forEach( file=>{
@@ -199,7 +200,8 @@ module Harness {
               // the next two trigger isResolved of null error - TS bug 1472
               var semantic = this.ls.languageService.getSemanticDiagnostics(file);
               // this.ls.languageService.getEmitOutput(file).diagnostics);
-              errors = errors.concat(syntactic, semantic);
+              errors = errors.concat(syntactic.map(addPhase("Syntax"))
+                                    ,semantic.map(addPhase("Semantics")));
             });
             return errors;
         }

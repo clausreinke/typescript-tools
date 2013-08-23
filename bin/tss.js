@@ -67116,6 +67116,12 @@ var Harness;
         // collect Diagnostics
         TypeScriptLS.prototype.getErrors = function () {
             var _this = this;
+            var addPhase = function (phase) {
+                return function (d) {
+                    d.phase = phase;
+                    return d;
+                };
+            };
             var errors = [];
             this.ls.refresh(false);
             this.fileNameToScript.getAllKeys().forEach(function (file) {
@@ -67125,7 +67131,7 @@ var Harness;
                 var semantic = _this.ls.languageService.getSemanticDiagnostics(file);
 
                 // this.ls.languageService.getEmitOutput(file).diagnostics);
-                errors = errors.concat(syntactic, semantic);
+                errors = errors.concat(syntactic.map(addPhase("Syntax")), semantic.map(addPhase("Semantics")));
             });
             return errors;
         };
@@ -67624,7 +67630,10 @@ var TSS = (function () {
                         _this.ioHost.printLine('"updated ' + file + '"');
                     };
                 } else if (m = cmd.match(/^showErrors$/)) {
-                    info = [].concat(_this.resolutionResult.diagnostics, _this.typescriptLS.getErrors()).map(function (d) {
+                    info = [].concat(_this.resolutionResult.diagnostics.map(function (d) {
+                        d["phase"] = "Resolution";
+                        return d;
+                    }), _this.typescriptLS.getErrors()).map(function (d) {
                         var file = d.fileName();
                         var lc = _this.typescriptLS.positionToLineCol(file, d.start());
                         var len = _this.typescriptLS.getScriptInfo(file).content.length;
@@ -67637,6 +67646,7 @@ var TSS = (function () {
                             start: { line: lc.line, character: lc.character },
                             end: { line: lc2.line, character: lc2.character },
                             text: /* file+"("+lc.line+"/"+lc.character+"): "+ */ d.message(),
+                            phase: d.phase,
                             category: category
                         };
                     });

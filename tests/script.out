@@ -8,6 +8,7 @@ node ../bin/tss.js test.ts
   ,"end":{"line":3
   ,"character":6}
   ,"text":"error TS1003: Identifier expected."
+  ,"phase":"Syntax"
   ,"category":"Error"}
   ,{"file":"PREFIX/test.ts"
   ,"start":{"line":4
@@ -15,6 +16,7 @@ node ../bin/tss.js test.ts
   ,"end":{"line":4
   ,"character":6}
   ,"text":"error TS1003: Identifier expected."
+  ,"phase":"Syntax"
   ,"category":"Error"}]
 {"memberName":{"prefix":"string"
   ,"suffix":""
@@ -226,6 +228,7 @@ node ../bin/tss.js test.ts
   ,"end":{"line":5
   ,"character":6}
   ,"text":"error TS1003: Identifier expected."
+  ,"phase":"Syntax"
   ,"category":"Error"}
   ,{"file":"PREFIX/test.ts"
   ,"start":{"line":6
@@ -233,6 +236,7 @@ node ../bin/tss.js test.ts
   ,"end":{"line":6
   ,"character":6}
   ,"text":"error TS1003: Identifier expected."
+  ,"phase":"Syntax"
   ,"category":"Error"}
   ,{"file":"PREFIX/test.ts"
   ,"start":{"line":4
@@ -240,6 +244,7 @@ node ../bin/tss.js test.ts
   ,"end":{"line":4
   ,"character":6}
   ,"text":"error TS2094: The property 'to' does not exist on value of type 'String'."
+  ,"phase":"Semantics"
   ,"category":"Error"}]
 {"maybeInaccurate":false
   ,"isMemberCompletion":true
@@ -627,6 +632,7 @@ node ../bin/tss.js empty.ts
   ,"end":{"line":2
   ,"character":1}
   ,"text":"error TS1003: Identifier expected."
+  ,"phase":"Syntax"
   ,"category":"Error"}]
 "updated PREFIX/empty.ts"
 []
@@ -637,6 +643,7 @@ node ../bin/tss.js empty.ts
   ,"end":{"line":2
   ,"character":1}
   ,"text":"error TS1003: Identifier expected."
+  ,"phase":"Syntax"
   ,"category":"Error"}]
 "TSS closing"
 
@@ -675,6 +682,7 @@ node ../bin/tss.js empty.ts
   ,"end":{"line":1
   ,"character":11}
   ,"text":"error TS1002: Missing close quote character."
+  ,"phase":"Syntax"
   ,"category":"Error"}
   ,{"file":"PREFIX/empty.ts"
   ,"start":{"line":1
@@ -682,6 +690,7 @@ node ../bin/tss.js empty.ts
   ,"end":{"line":1
   ,"character":4}
   ,"text":"error TS2095: Could not find symbol 'foo'."
+  ,"phase":"Semantics"
   ,"category":"Error"}]
 "TSS closing"
 
