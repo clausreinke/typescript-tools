@@ -1,0 +1,5 @@
+update 3 D:/empty.ts
+function foo(bar){
+  b
+}
+completions false 2 4 D:/empty.ts

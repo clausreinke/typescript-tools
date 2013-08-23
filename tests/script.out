@@ -696,3 +696,45 @@ node ../bin/tss.js empty.ts
 
 // stderr
 
+// issue-13.script
+node ../bin/tss.js empty.ts
+// stdout
+"loaded PREFIX/empty.ts, TSS listening.."
+"updated D:/empty.ts"
+{"maybeInaccurate":false
+  ,"isMemberCompletion":false
+  ,"entries":[{"name":"bar"
+  ,"kind":"parameter"
+  ,"kindModifiers":"public"
+  ,"type":"any"
+  ,"fullSymbolName":"bar"
+  ,"docComment":""}
+  ,{"name":"boolean"
+  ,"kind":"primitive type"
+  ,"kindModifiers":""
+  ,"type":"boolean"
+  ,"fullSymbolName":""
+  ,"docComment":""}
+  ,{"name":"blur"
+  ,"kind":"function"
+  ,"kindModifiers":"declare"
+  ,"type":"(): void"
+  ,"fullSymbolName":"blur"
+  ,"docComment":""}
+  ,{"name":"btoa"
+  ,"kind":"function"
+  ,"kindModifiers":"declare"
+  ,"type":"(rawString: string): string"
+  ,"fullSymbolName":"btoa"
+  ,"docComment":""}
+  ,{"name":"break"
+  ,"kind":"keyword"
+  ,"kindModifiers":""
+  ,"type":null
+  ,"fullSymbolName":"break"
+  ,"docComment":null}]
+  ,"prefix":"b"}
+"TSS closing"
+
+// stderr
+
