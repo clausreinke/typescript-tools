@@ -197,7 +197,6 @@ module Harness {
             this.ls.refresh(false);
             this.fileNameToScript.getAllKeys().forEach( file=>{
               var syntactic = this.ls.languageService.getSyntacticDiagnostics(file);
-              // the next two trigger isResolved of null error - TS bug 1472
               var semantic = this.ls.languageService.getSemanticDiagnostics(file);
               // this.ls.languageService.getEmitOutput(file).diagnostics);
               errors = errors.concat(syntactic.map(addPhase("Syntax"))
@@ -416,6 +415,5 @@ module Harness {
 
     }
 
-    if (Error) (<any>Error).stackTraceLimit = 1;
 
 }

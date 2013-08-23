@@ -226,7 +226,7 @@ class TSS {
               locs = this.ls.getOccurrencesAtPosition(file, pos);
               break;
             case "implementors":
-              locs = this.ls.getImplementorsAtPosition(file, pos); // NOTE: TS bug 1494
+              locs = this.ls.getImplementorsAtPosition(file, pos);
               break;
             default:
               throw "cannot happen";
@@ -361,9 +361,15 @@ class TSS {
 
           this.ioHost.printLine(info.trim());
 
-        } else if (m = cmd.match(/^lastError$/)) { // debugging only
+        } else if (m = cmd.match(/^lastError(Dump)$/)) { // debugging only
 
-          this.ioHost.printLine(this.lastError);
+          if (this.lastError)
+            if (m[1]) // commandline use
+              this.ioHost.printLine(JSON.parse(this.lastError).stack);
+            else
+              this.ioHost.printLine(this.lastError);
+          else
+            this.ioHost.printLine('"no last error"');
 
         } else if (m = cmd.match(/^dump (\S+) (.*)$/)) { // debugging only
 
