@@ -74,7 +74,8 @@ class TSS {
       normalizedPath = IO.resolvePath(normalizedPath);
 
       // Switch to forward slashes
-      normalizedPath = TypeScript.switchToForwardSlashes(normalizedPath);
+      normalizedPath = TypeScript.switchToForwardSlashes(normalizedPath)
+                           .replace(/^(.:)/,function(_,drive){return drive.toLowerCase()});
 
       return normalizedPath;
   }
@@ -183,7 +184,7 @@ class TSS {
 
           line   = parseInt(m[1]);
           col    = parseInt(m[2]);
-          file   = m[3];
+          file   = this.resolveRelativePath(m[3]);
 
           pos     = this.typescriptLS.lineColToPosition(file,line,col);
 
@@ -196,7 +197,7 @@ class TSS {
 
           line = parseInt(m[1]);
           col  = parseInt(m[2]);
-          file = m[3];
+          file = this.resolveRelativePath(m[3]);
 
           pos  = this.typescriptLS.lineColToPosition(file,line,col);
           locs = this.ls.getDefinitionAtPosition(file, pos); // NOTE: multiple definitions
@@ -215,7 +216,7 @@ class TSS {
 
           line = parseInt(m[2]);
           col  = parseInt(m[3]);
-          file = m[4];
+          file = this.resolveRelativePath(m[4]);
 
           pos  = this.typescriptLS.lineColToPosition(file,line,col);
           switch (m[1]) {
@@ -247,7 +248,7 @@ class TSS {
           member = m[2]==='true';
           line   = parseInt(m[3]);
           col    = parseInt(m[4]);
-          file   = m[5];
+          file   = this.resolveRelativePath(m[5]);
 
           pos     = this.typescriptLS.lineColToPosition(file,line,col);
 
@@ -282,7 +283,7 @@ class TSS {
 
           line = parseInt(m[1]);
           col  = parseInt(m[2]);
-          file = m[3];
+          file = this.resolveRelativePath(m[3]);
 
           pos  = this.typescriptLS.lineColToPosition(file,line,col);
 
@@ -321,7 +322,7 @@ class TSS {
 
         } else if (m = cmd.match(/^update (\d+) (.*)$/)) { // send non-saved source
 
-          file       = m[2];
+          file       = this.resolveRelativePath(m[2]);
           collecting = parseInt(m[1]);
           on_collected_callback = () => {
 
@@ -377,7 +378,7 @@ class TSS {
         } else if (m = cmd.match(/^dump (\S+) (.*)$/)) { // debugging only
 
           var dump = m[1];
-          file     = m[2];
+          file     = this.resolveRelativePath(m[2]);
 
           source         = this.typescriptLS.getScriptInfo(file).content;
           this.ioHost.writeFile(dump,source,false);

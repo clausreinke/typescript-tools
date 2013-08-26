@@ -68451,7 +68451,9 @@ var TSS = (function () {
         normalizedPath = IO.resolvePath(normalizedPath);
 
         // Switch to forward slashes
-        normalizedPath = TypeScript.switchToForwardSlashes(normalizedPath);
+        normalizedPath = TypeScript.switchToForwardSlashes(normalizedPath).replace(/^(.:)/, function (_, drive) {
+            return drive.toLowerCase();
+        });
 
         return normalizedPath;
     };
@@ -68556,7 +68558,7 @@ var TSS = (function () {
                 } else if (m = cmd.match(/^type (\d+) (\d+) (.*)$/)) {
                     line = parseInt(m[1]);
                     col = parseInt(m[2]);
-                    file = m[3];
+                    file = _this.resolveRelativePath(m[3]);
 
                     pos = _this.typescriptLS.lineColToPosition(file, line, col);
 
@@ -68567,7 +68569,7 @@ var TSS = (function () {
                 } else if (m = cmd.match(/^definition (\d+) (\d+) (.*)$/)) {
                     line = parseInt(m[1]);
                     col = parseInt(m[2]);
-                    file = m[3];
+                    file = _this.resolveRelativePath(m[3]);
 
                     pos = _this.typescriptLS.lineColToPosition(file, line, col);
                     locs = _this.ls.getDefinitionAtPosition(file, pos);
@@ -68586,7 +68588,7 @@ var TSS = (function () {
                 } else if (m = cmd.match(/^(references|occurrences|implementors) (\d+) (\d+) (.*)$/)) {
                     line = parseInt(m[2]);
                     col = parseInt(m[3]);
-                    file = m[4];
+                    file = _this.resolveRelativePath(m[4]);
 
                     pos = _this.typescriptLS.lineColToPosition(file, line, col);
                     switch (m[1]) {
@@ -68618,7 +68620,7 @@ var TSS = (function () {
                     member = m[2] === 'true';
                     line = parseInt(m[3]);
                     col = parseInt(m[4]);
-                    file = m[5];
+                    file = _this.resolveRelativePath(m[5]);
 
                     pos = _this.typescriptLS.lineColToPosition(file, line, col);
 
@@ -68657,7 +68659,7 @@ var TSS = (function () {
                 } else if (m = cmd.match(/^info (\d+) (\d+) (.*)$/)) {
                     line = parseInt(m[1]);
                     col = parseInt(m[2]);
-                    file = m[3];
+                    file = _this.resolveRelativePath(m[3]);
 
                     pos = _this.typescriptLS.lineColToPosition(file, line, col);
 
@@ -68684,7 +68686,7 @@ var TSS = (function () {
 
                     _this.ioHost.printLine(JSON.stringify(info).trim());
                 } else if (m = cmd.match(/^update (\d+) (.*)$/)) {
-                    file = m[2];
+                    file = _this.resolveRelativePath(m[2]);
                     collecting = parseInt(m[1]);
                     on_collected_callback = function () {
                         _this.typescriptLS.updateScript(file, lines.join(EOL));
@@ -68730,7 +68732,7 @@ else
                         _this.ioHost.printLine('"no last error"');
                 } else if (m = cmd.match(/^dump (\S+) (.*)$/)) {
                     var dump = m[1];
-                    file = m[2];
+                    file = _this.resolveRelativePath(m[2]);
 
                     source = _this.typescriptLS.getScriptInfo(file).content;
                     _this.ioHost.writeFile(dump, source, false);
