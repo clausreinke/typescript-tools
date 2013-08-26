@@ -220,7 +220,7 @@ node ../bin/tss.js test.ts
   ,"type":"number"
   ,"fullSymbolName":"b"
   ,"docComment":""}]}
-"updated PREFIX/test.ts"
+"updated PREFIX/test.ts, (2/1) errors"
 "dumped PREFIX/test.ts to script.dump"
 [{"file":"PREFIX/test.ts"
   ,"start":{"line":5
@@ -625,7 +625,7 @@ node ../bin/tss.js test.ts
 node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
-"updated PREFIX/empty.ts"
+"updated PREFIX/empty.ts, (1/0) errors"
 [{"file":"PREFIX/empty.ts"
   ,"start":{"line":2
   ,"character":1}
@@ -634,9 +634,9 @@ node ../bin/tss.js empty.ts
   ,"text":"error TS1003: Identifier expected."
   ,"phase":"Syntax"
   ,"category":"Error"}]
-"updated PREFIX/empty.ts"
+"updated PREFIX/empty.ts, (0/0) errors"
 []
-"updated PREFIX/empty.ts"
+"updated PREFIX/empty.ts, (1/0) errors"
 [{"file":"PREFIX/empty.ts"
   ,"start":{"line":2
   ,"character":1}
@@ -653,8 +653,8 @@ node ../bin/tss.js empty.ts
 node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
-"updated PREFIX/empty.ts"
-"updated PREFIX/empty.ts"
+"updated PREFIX/empty.ts, (0/0) errors"
+"updated PREFIX/empty.ts, (0/0) errors"
 {"def":{"fileName":"PREFIX/empty.ts"
   ,"minChar":4
   ,"limChar":10
@@ -675,7 +675,7 @@ node ../bin/tss.js empty.ts
 node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
-"updated PREFIX/empty.ts"
+"updated PREFIX/empty.ts, (1/1) errors"
 [{"file":"PREFIX/empty.ts"
   ,"start":{"line":1
   ,"character":11}
@@ -700,7 +700,7 @@ node ../bin/tss.js empty.ts
 node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
-"updated PREFIX/empty.ts"
+"updated PREFIX/empty.ts, (0/0) errors"
 null
 "TSS closing"
 
@@ -710,7 +710,7 @@ null
 node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
-"updated D:/empty.ts"
+"updated PREFIX/empty.ts, (0/1) errors"
 {"maybeInaccurate":false
   ,"isMemberCompletion":false
   ,"entries":[{"name":"bar"

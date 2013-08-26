@@ -7,8 +7,10 @@ var tss_path = "../bin/tss.js";
 var PREFIX = __dirname.replace(/\\/g,"/");
 
 var tests = [], log = {}, done = {};
+var filter = process.argv[2] && new RegExp(process.argv[2]);
 
 function test(scriptName,fileName) {
+  if (filter && !filter.test(scriptName)) return;
   var script = fs.readFileSync(scriptName,"utf8")
                  .replace(/PREFIX/g,PREFIX);
 

@@ -68696,7 +68696,7 @@ var TSS = (function () {
                         on_collected_callback = undefined;
                         lines = [];
 
-                        _this.ioHost.printLine((added ? '"added ' : '"updated ') + file + ' (' + syn + '/' + sem + ') errors"');
+                        _this.ioHost.printLine((added ? '"added ' : '"updated ') + file + ', (' + syn + '/' + sem + ') errors"');
                     };
                 } else if (m = cmd.match(/^showErrors$/)) {
                     info = [].concat(_this.resolutionResult.diagnostics.map(function (d) {
