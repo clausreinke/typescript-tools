@@ -210,7 +210,7 @@ class TSS {
           }));
 
           // TODO: what about multiple definitions?
-          this.ioHost.printLine(JSON.stringify(info[0]).trim());
+          this.ioHost.printLine(JSON.stringify(info[0]||null).trim());
 
         } else if (m = cmd.match(/^(references|occurrences|implementors) (\d+) (\d+) (.*)$/)) {
 

@@ -68584,7 +68584,7 @@ var TSS = (function () {
                     });
 
                     // TODO: what about multiple definitions?
-                    _this.ioHost.printLine(JSON.stringify(info[0]).trim());
+                    _this.ioHost.printLine(JSON.stringify(info[0] || null).trim());
                 } else if (m = cmd.match(/^(references|occurrences|implementors) (\d+) (\d+) (.*)$/)) {
                     line = parseInt(m[2]);
                     col = parseInt(m[3]);
