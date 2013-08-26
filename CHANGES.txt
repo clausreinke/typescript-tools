@@ -1,4 +1,22 @@
 
+0.2.0 to ...:
+
+  - updated TS to 553bc9e1a57eeb77f69d85f249da9cb028f24394
+
+  - several fixes in file `update` handling
+
+  - `update`: show syntax/semantic error count,
+    distinguish updated from added files
+
+  - fixes in `completions` and `definitions`
+
+  - improved tests and commandline debugging
+
+  - improved file path resolution and normalization
+
+  - `showErrors`: provide category of diagnostic (error/warning)
+    and phase which generated it (resolution/syntax/semantics)
+
 0.1.0 to 0.2.0:
 
   - partial rewrite, including PROTOCOL CHANGES
