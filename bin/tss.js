@@ -68539,7 +68539,7 @@ var TSS = (function () {
 
         var rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
-        var cmd, script, pos, file, def, locs, info, source, brief, member;
+        var cmd, script, pos, file, added, def, locs, info, source, brief, member;
 
         var collecting = 0, on_collected_callback, lines = [];
 
@@ -68687,13 +68687,16 @@ var TSS = (function () {
                     _this.ioHost.printLine(JSON.stringify(info).trim());
                 } else if (m = cmd.match(/^update (\d+) (.*)$/)) {
                     file = _this.resolveRelativePath(m[2]);
+                    added = _this.typescriptLS.getScriptInfo(file) == null;
                     collecting = parseInt(m[1]);
                     on_collected_callback = function () {
                         _this.typescriptLS.updateScript(file, lines.join(EOL));
+                        var syn = _this.ls.getSyntacticDiagnostics(file).length;
+                        var sem = _this.ls.getSemanticDiagnostics(file).length;
                         on_collected_callback = undefined;
                         lines = [];
 
-                        _this.ioHost.printLine('"updated ' + file + '"');
+                        _this.ioHost.printLine((added ? '"added ' : '"updated ') + file + ' (' + syn + '/' + sem + ') errors"');
                     };
                 } else if (m = cmd.match(/^showErrors$/)) {
                     info = [].concat(_this.resolutionResult.diagnostics.map(function (d) {

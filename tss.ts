@@ -161,7 +161,7 @@ class TSS {
 
     var rl = readline.createInterface({input:process.stdin,output:process.stdout});
 
-    var cmd, script, pos, file, def, locs, info, source, brief, member;
+    var cmd, script, pos, file, added, def, locs, info, source, brief, member;
 
     var collecting = 0, on_collected_callback, lines = [];
 
@@ -323,14 +323,17 @@ class TSS {
         } else if (m = cmd.match(/^update (\d+) (.*)$/)) { // send non-saved source
 
           file       = this.resolveRelativePath(m[2]);
+          added      = this.typescriptLS.getScriptInfo(file)==null;
           collecting = parseInt(m[1]);
           on_collected_callback = () => {
 
             this.typescriptLS.updateScript(file,lines.join(EOL));
+            var syn = this.ls.getSyntacticDiagnostics(file).length;
+            var sem = this.ls.getSemanticDiagnostics(file).length;
             on_collected_callback = undefined;
             lines = [];
 
-            this.ioHost.printLine('"updated '+file+'"');
+            this.ioHost.printLine((added ? '"added ' : '"updated ')+file+', ('+syn+'/'+sem+') errors"');
           };
 
         } else if (m = cmd.match(/^showErrors$/)) { // get processing errors
