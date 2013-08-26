@@ -384,11 +384,14 @@ class TSS {
           file     = this.resolveRelativePath(m[2]);
 
           source         = this.typescriptLS.getScriptInfo(file).content;
-          this.ioHost.writeFile(dump,source,false);
-          // var sourceText = source.getText(0,source.getLength());
-          // this.ioHost.writeFile(dump,sourceText);
+          if (dump==="-") { // to console
+            this.ioHost.printLine('dumping '+file);
+            this.ioHost.printLine(source);
+          } else { // to file
+            this.ioHost.writeFile(dump,source,false);
 
-          this.ioHost.printLine('"dumped '+file+' to '+dump+'"');
+            this.ioHost.printLine('"dumped '+file+' to '+dump+'"');
+          }
 
         } else if (m = cmd.match(/^reload$/)) { // reload current project
 

@@ -68738,11 +68738,14 @@ else
                     file = _this.resolveRelativePath(m[2]);
 
                     source = _this.typescriptLS.getScriptInfo(file).content;
-                    _this.ioHost.writeFile(dump, source, false);
+                    if (dump === "-") {
+                        _this.ioHost.printLine('dumping ' + file);
+                        _this.ioHost.printLine(source);
+                    } else {
+                        _this.ioHost.writeFile(dump, source, false);
 
-                    // var sourceText = source.getText(0,source.getLength());
-                    // this.ioHost.writeFile(dump,sourceText);
-                    _this.ioHost.printLine('"dumped ' + file + ' to ' + dump + '"');
+                        _this.ioHost.printLine('"dumped ' + file + ' to ' + dump + '"');
+                    }
                 } else if (m = cmd.match(/^reload$/)) {
                     _this.setup(_this.rootFile.path);
                     _this.ioHost.printLine('"reloaded ' + _this.rootFile.path + ', TSS listening.."');
