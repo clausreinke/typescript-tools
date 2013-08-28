@@ -43,15 +43,16 @@ class TSS {
 
   constructor (public ioHost: IIO) { } // NOTE: call setup
 
+  private fileNameToContent = new TypeScript.StringHashTable();
+
   // IReferenceResolverHost methods (from HarnessCompiler, modulo test-specific code)
   getScriptSnapshot(filename: string): TypeScript.IScriptSnapshot {
-      var scriptInfo = this.typescriptLS.getScriptInfo(filename);
-      if (!scriptInfo) {
-        this.typescriptLS.addFile(filename);
-        scriptInfo = this.typescriptLS.getScriptInfo(filename);
+      var content = this.fileNameToContent.lookup(filename);
+      if (!content) {
+        content = readFile(filename).contents;
+        this.fileNameToContent.add(filename,content);
       }
-      // TODO: check this (StringScriptSnapshot, !snapshot)
-      var snapshot = TypeScript.ScriptSnapshot.fromString(scriptInfo.content);
+      var snapshot = TypeScript.ScriptSnapshot.fromString(content);
 
       if (!snapshot) {
           this.addDiagnostic(new TypeScript.Diagnostic(null, 0, 0, TypeScript.DiagnosticCode.Cannot_read_file_0_1, [filename, '']));
@@ -145,7 +146,7 @@ class TSS {
     // initialize languageService code units
     resolvedFiles.forEach( (code,i) => {
       // this.ioHost.printLine(i+': '+code.path);
-      this.typescriptLS.addFile(code.path);
+      this.typescriptLS.addScript(code.path,this.fileNameToContent.lookup(code.path));
     });
 
     // Get the language service

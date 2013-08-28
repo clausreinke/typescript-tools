@@ -6,8 +6,6 @@
 ///<reference path='../typescript/src/compiler/typescript.ts'/>
 ///<reference path='../typescript/src/services/typescriptServices.ts' />
 
-declare var __dirname: any; // Node-specific
-
 // from src/harness/harness.ts, without the test (TODO: remove shim stuff again)
 
 function switchToForwardSlashes(path: string) {
