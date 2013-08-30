@@ -18,7 +18,7 @@ endif
 
 python <<EOF
 import logging
-LOG_FILENAME='tsstrace.log'
+TSS_LOG_FILENAME='tsstrace.log'
 EOF
 
 " echo symbol/type of item under cursor
@@ -268,7 +268,7 @@ python <<EOF
 
 if vim.eval('a:flag')=='on':
   traceFlag = True
-  logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
+  logging.basicConfig(filename=TSS_LOG_FILENAME,level=logging.DEBUG)
 else:
   traceFlag = False
   logger = logging.getLogger()
