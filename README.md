@@ -158,6 +158,9 @@ TypeScript tools currently available:
   command! TSSsymbol
   command! TSStype
 
+  " browse url for ES5 global property/method under cursor
+  command! TSSbrowse
+
   " jump to definition of item under cursor
   command! TSSdef
   command! TSSdefpreview

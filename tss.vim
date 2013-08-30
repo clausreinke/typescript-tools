@@ -16,10 +16,41 @@ if !exists("g:TSSupdates")
   let g:TSSupdates = {}
 endif
 
+py TSS_MDN = "https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/"
+
 python <<EOF
 import logging
 TSS_LOG_FILENAME='tsstrace.log'
 EOF
+
+" browse url for ES5 global property/method under cursor
+command! TSSbrowse echo TSSbrowse()
+function! TSSbrowse()
+  let info = TSScmd("type",{})
+  if type(info)!=type({}) || !has_key(info,"fullSymbolName")
+    return info
+  endif
+  let patterns = ["\\(Object\\)\\.\\(\\k*\\)"
+                \,"\\(Function\\)\\.\\(\\k*\\)"
+                \,"\\(String\\)\\.\\(\\k*\\)"
+                \,"\\(Boolean\\)\\.\\(\\k*\\)"
+                \,"\\(Number\\)\\.\\(\\k*\\)"
+                \,"\\(Array\\)<.*>\\.\\(\\k*\\)"
+                \,"\\(Date\\)\\.\\(\\k*\\)"
+                \,"\\(RegExp\\)\\.\\(\\k*\\)"
+                \,"\\(Error\\)\\.\\(\\k*\\)"
+                \,"\\(Math\\)\\.\\(\\k*\\)"
+                \,"\\(JSON\\)\\.\\(\\k*\\)"
+                \]
+  for p in patterns
+    let m = matchlist(info.fullSymbolName,p)
+    if m!=[]
+      py webbrowser.open(TSS_MDN+vim.eval("m[1].'/'.m[2]"))
+      return m[1].'.'.m[2]
+    endif
+  endfor
+  return "no url found"
+endfunction
 
 " echo symbol/type of item under cursor
 " (also show JSDoc in preview window, if known)
