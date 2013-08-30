@@ -162,12 +162,14 @@ class TSS {
 
     var rl = readline.createInterface({input:process.stdin,output:process.stdout});
 
-    var cmd, script, pos, file, added, def, locs, info, source, brief, member;
+    var cmd:string, pos:number, file:string, added:boolean
+      , def, refs:Services.ReferenceEntry[], locs:Services.DefinitionInfo[], info, source:string
+      , brief, member:boolean;
 
-    var collecting = 0, on_collected_callback, lines = [];
+    var collecting = 0, on_collected_callback:()=>void, lines:string[] = [];
 
     rl.on('line', input => {  // most commands are one-liners
-      var m;
+      var m:string[];
       try {
 
         cmd = input.trim();
@@ -222,23 +224,23 @@ class TSS {
           pos  = this.typescriptLS.lineColToPosition(file,line,col);
           switch (m[1]) {
             case "references":
-              locs = this.ls.getReferencesAtPosition(file, pos);
+              refs = this.ls.getReferencesAtPosition(file, pos);
               break;
             case "occurrences":
-              locs = this.ls.getOccurrencesAtPosition(file, pos);
+              refs = this.ls.getOccurrencesAtPosition(file, pos);
               break;
             case "implementors":
-              locs = this.ls.getImplementorsAtPosition(file, pos);
+              refs = this.ls.getImplementorsAtPosition(file, pos);
               break;
             default:
               throw "cannot happen";
           }
 
-          info = locs.map( loc => ({
-            loc  : loc,
-            file : loc && loc.fileName,
-            min  : loc && this.typescriptLS.positionToLineCol(loc.fileName,loc.minChar),
-            lim  : loc && this.typescriptLS.positionToLineCol(loc.fileName,loc.limChar)
+          info = refs.map( ref => ({
+            ref  : ref,
+            file : ref && ref.fileName,
+            min  : ref && this.typescriptLS.positionToLineCol(ref.fileName,ref.minChar),
+            lim  : ref && this.typescriptLS.positionToLineCol(ref.fileName,ref.limChar)
           }));
 
           this.ioHost.printLine(JSON.stringify(info).trim());
