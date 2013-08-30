@@ -68620,6 +68620,21 @@ var TSS = (function () {
                     });
 
                     _this.ioHost.printLine(JSON.stringify(info).trim());
+                } else if (m = cmd.match(/^structure (.*)$/)) {
+                    file = _this.resolveRelativePath(m[1]);
+
+                    locs = _this.ls.getScriptLexicalStructure(file);
+
+                    info = locs.map(function (loc) {
+                        return ({
+                            loc: loc,
+                            file: loc && loc.fileName,
+                            min: loc && _this.typescriptLS.positionToLineCol(loc.fileName, loc.minChar),
+                            lim: loc && _this.typescriptLS.positionToLineCol(loc.fileName, loc.limChar)
+                        });
+                    });
+
+                    _this.ioHost.printLine(JSON.stringify(info).trim());
                 } else if (m = cmd.match(/^completions(-brief)? (true|false) (\d+) (\d+) (.*)$/)) {
                     brief = m[1];
                     member = m[2] === 'true';

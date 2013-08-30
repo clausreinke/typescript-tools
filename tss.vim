@@ -227,6 +227,30 @@ function! TSSreferences()
   endif
 endfunction
 
+" create location list for file structure items
+command! TSSstructure call TSSstructure()
+function! TSSstructure()
+  let info = TSScmd("structure ".expand("%:p"),{'rawcmd':1})
+  if type(info)==type([])
+    for i in info
+      let i['lnum']     = i['min']['line']
+      let i['col']      = i['min']['character']
+      let i['filename'] = i['file']
+      let l             = i['loc']
+      let lck           = l['containerKind']
+      let lcn           = l['containerName']
+      let i['text']     = lck!='' ? lcn.'.'.l['name'].':'.l['kindModifiers'].' '.lck.' '.l['kind']
+                                \ : l['name'].':'.l['kindModifiers'].' '.l['kind']
+    endfor
+    call setloclist(0,info)
+    if len(info)!=0
+      topleft lopen
+    endif
+  else
+    echoerr info
+  endif
+endfunction
+
 " start typescript service process asynchronously, via python
 " NOTE: one reason for shell=True is to avoid popup console window;
 command! -nargs=1 TSSstart call TSSstart(<f-args>)

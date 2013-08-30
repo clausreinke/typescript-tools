@@ -245,6 +245,21 @@ class TSS {
 
           this.ioHost.printLine(JSON.stringify(info).trim());
 
+        } else if (m = cmd.match(/^structure (.*)$/)) {
+
+          file = this.resolveRelativePath(m[1]);
+
+          locs = this.ls.getScriptLexicalStructure(file);
+
+          info = locs.map( loc => ({
+            loc  : loc,
+            file : loc && loc.fileName,
+            min  : loc && this.typescriptLS.positionToLineCol(loc.fileName,loc.minChar),
+            lim  : loc && this.typescriptLS.positionToLineCol(loc.fileName,loc.limChar)
+          }));
+
+          this.ioHost.printLine(JSON.stringify(info).trim());
+
         } else if (m = cmd.match(/^completions(-brief)? (true|false) (\d+) (\d+) (.*)$/)) {
 
           brief  = m[1];

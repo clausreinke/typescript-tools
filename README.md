@@ -109,6 +109,16 @@ TypeScript tools currently available:
 
     [<fileName>,...]
 
+  structure <file>
+    // list quick navigation items for <file>; experimental
+    // (currently, this exposes getScriptLexicalStructure data directly)
+
+    [{ file: string
+     , min:  { line: number, character: number }
+     , lim:  { line: number, character: number }
+     , loc: <data returned from services>
+     }]
+
   showErrors
     // show compilation errors for current project
 
@@ -156,6 +166,9 @@ TypeScript tools currently available:
 
   " create location list for references
   command! TSSreferences
+
+  " create location list for file structure items (experimental)
+  command! TSSstructure
 
   " update TSS with current file source
   command! TSSupdate
