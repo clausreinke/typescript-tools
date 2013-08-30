@@ -162,6 +162,18 @@ au BufNewFile,BufRead *.ts setlocal omnifunc=TSScompleteFunc
 aug END
 doau TSS BufRead
 
+" show project file list in preview window
+command! TSSfiles echo TSSfiles()
+function! TSSfiles()
+  let files = TSScmd("files",{'rawcmd':1})
+  if type(files)==type([])
+    new +setlocal\ previewwindow|setlocal\ buftype=nofile|setlocal\ noswapfile
+    exe "normal z" . &previewheight . "\<cr>"
+    call append(0,files)
+    " TODO: group by prefix paths
+  endif
+endfunction
+
 " reload project sources
 command! TSSreload echo TSSreload()
 function! TSSreload()

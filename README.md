@@ -184,6 +184,9 @@ TypeScript tools currently available:
   " completions
   function! TSScompleteFunc(findstart,base)
 
+  " show project file list in preview window
+  command! TSSfiles
+
   " reload project sources - will ask you to save modified buffers first
   command! TSSreload
 
