@@ -754,3 +754,57 @@ node ../bin/tss.js empty.ts
 
 // stderr
 
+// partial-update.script
+node ../bin/tss.js empty.ts
+// stdout
+"loaded PREFIX/empty.ts, TSS listening.."
+"updated PREFIX/empty.ts, (0/0) errors"
+dumping PREFIX/empty.ts
+function foo(bar) {
+bar
+}
+"updated lines 2-2 in PREFIX/empty.ts, (0/0) errors"
+dumping PREFIX/empty.ts
+function foo(bar) {
+"hi";
+"ho";
+}
+"updated lines 4-4 in PREFIX/empty.ts, (0/0) errors"
+dumping PREFIX/empty.ts
+function foo(bar) {
+"hi";
+"ho";
+} // EOF
+"updated lines 3-3 in PREFIX/empty.ts, (0/1) errors"
+dumping PREFIX/empty.ts
+function foo(bar) {
+"hi";
+bozo;
+} // EOF
+[{"file":"PREFIX/empty.ts"
+  ,"start":{"line":3
+  ,"character":1}
+  ,"end":{"line":3
+  ,"character":5}
+  ,"text":"error TS2095: Could not find symbol 'bozo'."
+  ,"phase":"Semantics"
+  ,"category":"Error"}]
+"updated lines 5-5 in PREFIX/empty.ts, (0/1) errors"
+dumping PREFIX/empty.ts
+function foo(bar) {
+"hi";
+bozo;
+} // EOF
+// postmortem
+"updated lines 0-0 in PREFIX/empty.ts, (0/1) errors"
+dumping PREFIX/empty.ts
+// header
+function foo(bar) {
+"hi";
+bozo;
+} // EOF
+// postmortem
+"TSS closing"
+
+// stderr
+

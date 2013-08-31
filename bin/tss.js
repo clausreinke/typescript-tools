@@ -68544,7 +68544,7 @@ var TSS = (function () {
 
         var rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
-        var cmd, script, pos, file, added, def, locs, info, source, brief, member;
+        var cmd, pos, file, script, added, def, refs, locs, info, source, brief, member;
 
         var collecting = 0, on_collected_callback, lines = [];
 
@@ -68598,24 +68598,24 @@ var TSS = (function () {
                     pos = _this.typescriptLS.lineColToPosition(file, line, col);
                     switch (m[1]) {
                         case "references":
-                            locs = _this.ls.getReferencesAtPosition(file, pos);
+                            refs = _this.ls.getReferencesAtPosition(file, pos);
                             break;
                         case "occurrences":
-                            locs = _this.ls.getOccurrencesAtPosition(file, pos);
+                            refs = _this.ls.getOccurrencesAtPosition(file, pos);
                             break;
                         case "implementors":
-                            locs = _this.ls.getImplementorsAtPosition(file, pos);
+                            refs = _this.ls.getImplementorsAtPosition(file, pos);
                             break;
                         default:
                             throw "cannot happen";
                     }
 
-                    info = locs.map(function (loc) {
+                    info = refs.map(function (ref) {
                         return ({
-                            loc: loc,
-                            file: loc && loc.fileName,
-                            min: loc && _this.typescriptLS.positionToLineCol(loc.fileName, loc.minChar),
-                            lim: loc && _this.typescriptLS.positionToLineCol(loc.fileName, loc.limChar)
+                            ref: ref,
+                            file: ref && ref.fileName,
+                            min: ref && _this.typescriptLS.positionToLineCol(ref.fileName, ref.minChar),
+                            lim: ref && _this.typescriptLS.positionToLineCol(ref.fileName, ref.limChar)
                         });
                     });
 
@@ -68705,19 +68705,35 @@ var TSS = (function () {
                     };
 
                     _this.ioHost.printLine(JSON.stringify(info).trim());
-                } else if (m = cmd.match(/^update (\d+) (.*)$/)) {
-                    file = _this.resolveRelativePath(m[2]);
-                    added = _this.typescriptLS.getScriptInfo(file) == null;
-                    collecting = parseInt(m[1]);
-                    on_collected_callback = function () {
-                        _this.typescriptLS.updateScript(file, lines.join(EOL));
-                        var syn = _this.ls.getSyntacticDiagnostics(file).length;
-                        var sem = _this.ls.getSemanticDiagnostics(file).length;
-                        on_collected_callback = undefined;
-                        lines = [];
+                } else if (m = cmd.match(/^update (\d+)( (\d+)-(\d+))? (.*)$/)) {
+                    file = _this.resolveRelativePath(m[5]);
+                    script = _this.typescriptLS.getScriptInfo(file);
+                    added = script == null;
 
-                        _this.ioHost.printLine((added ? '"added ' : '"updated ') + file + ', (' + syn + '/' + sem + ') errors"');
-                    };
+                    if (!added || !m[2]) {
+                        collecting = parseInt(m[1]);
+                        on_collected_callback = function () {
+                            if (!m[2]) {
+                                _this.typescriptLS.updateScript(file, lines.join(EOL));
+                            } else {
+                                var startLine = parseInt(m[3]);
+                                var endLine = parseInt(m[4]);
+                                var maxLines = script.lineMap.lineCount();
+                                var startPos = startLine <= maxLines ? (startLine < 1 ? 0 : _this.typescriptLS.lineColToPosition(file, startLine, 1)) : script.content.length;
+                                var endPos = endLine < maxLines ? (endLine < 1 ? 0 : _this.typescriptLS.lineColToPosition(file, endLine + 1, 1) - 1) : script.content.length;
+
+                                _this.typescriptLS.editScript(file, startPos, endPos, lines.join(EOL));
+                            }
+                            var syn = _this.ls.getSyntacticDiagnostics(file).length;
+                            var sem = _this.ls.getSemanticDiagnostics(file).length;
+                            on_collected_callback = undefined;
+                            lines = [];
+
+                            _this.ioHost.printLine((added ? '"added ' : '"updated ') + (m[2] ? 'lines' + m[2] + ' in ' : '') + file + ', (' + syn + '/' + sem + ') errors"');
+                        };
+                    } else {
+                        _this.ioHost.printLine('"cannot update line range in new file"');
+                    }
                 } else if (m = cmd.match(/^showErrors$/)) {
                     info = [].concat(_this.resolutionResult.diagnostics.map(function (d) {
                         d["phase"] = "Resolution";
@@ -68745,7 +68761,7 @@ var TSS = (function () {
                     info = _this.typescriptLS.getScriptFileNames();
 
                     _this.ioHost.printLine(info.trim());
-                } else if (m = cmd.match(/^lastError(Dump)$/)) {
+                } else if (m = cmd.match(/^lastError(Dump)?$/)) {
                     if (_this.lastError)
                         if (m[1])
                             _this.ioHost.printLine(JSON.parse(_this.lastError).stack);

@@ -1,0 +1,24 @@
+update 3 empty.ts
+function foo(bar) {
+bar
+}
+dump - empty.ts
+update 2 2-2 empty.ts
+"hi";
+"ho";
+dump - empty.ts
+update 1 4-4 empty.ts
+} // EOF
+dump - empty.ts
+update 1 3-3 empty.ts
+bozo;
+dump - empty.ts
+showErrors
+update 2 5-5 empty.ts
+
+// postmortem
+dump - empty.ts
+update 2 0-0 empty.ts
+// header
+
+dump - empty.ts
