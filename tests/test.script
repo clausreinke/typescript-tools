@@ -12,7 +12,7 @@ var a = [];
 {s.to }
 {x. }
 {a. }
-dump script.dump PREFIX/test.ts
+dump - PREFIX/test.ts
 showErrors
 completions true 4 4 PREFIX/test.ts
 completions true 5 4 PREFIX/test.ts

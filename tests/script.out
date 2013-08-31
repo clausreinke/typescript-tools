@@ -221,7 +221,13 @@ node ../bin/tss.js test.ts
   ,"fullSymbolName":"b"
   ,"docComment":""}]}
 "updated PREFIX/test.ts, (2/1) errors"
-"dumped PREFIX/test.ts to script.dump"
+dumping PREFIX/test.ts
+var x = {a:1,b:2};
+var s = "";
+var a = [];
+{s.to }
+{x. }
+{a. }
 [{"file":"PREFIX/test.ts"
   ,"start":{"line":5
   ,"character":5}
