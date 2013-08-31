@@ -47,3 +47,4 @@ test("issue-11.script","empty.ts");
 test("issue-12.script","empty.ts");
 test("issue-13.script","empty.ts");
 test("partial-update.script","empty.ts");
+test("update-nocheck-completion-chain.script","empty.ts");

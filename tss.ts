@@ -162,7 +162,7 @@ class TSS {
 
     var rl = readline.createInterface({input:process.stdin,output:process.stdout});
 
-    var cmd:string, pos:number, file:string, script, added:boolean
+    var cmd:string, pos:number, file:string, script, added:boolean, range:boolean, check:boolean
       , def, refs:Services.ReferenceEntry[], locs:Services.DefinitionInfo[], info, source:string
       , brief, member:boolean;
 
@@ -338,21 +338,23 @@ class TSS {
 
           this.ioHost.printLine(JSON.stringify(info).trim());
 
-        } else if (m = cmd.match(/^update (\d+)( (\d+)-(\d+))? (.*)$/)) { // send non-saved source
+        } else if (m = cmd.match(/^update( nocheck)? (\d+)( (\d+)-(\d+))? (.*)$/)) { // send non-saved source
 
-          file       = this.resolveRelativePath(m[5]);
+          file       = this.resolveRelativePath(m[6]);
           script     = this.typescriptLS.getScriptInfo(file);
           added      = script==null;
+          range      = !!m[3]
+          check      = !m[1]
 
-          if (!added || !m[2]) {
-            collecting = parseInt(m[1]);
+          if (!added || !range) {
+            collecting = parseInt(m[2]);
             on_collected_callback = () => {
 
-              if (!m[2]) {
+              if (!range) {
                 this.typescriptLS.updateScript(file,lines.join(EOL));
               } else {
-                var startLine = parseInt(m[3]);
-                var endLine   = parseInt(m[4]);
+                var startLine = parseInt(m[4]);
+                var endLine   = parseInt(m[5]);
                 var maxLines  = script.lineMap.lineCount();
                 var startPos  = startLine<=maxLines
                               ? (startLine<1 ? 0 : this.typescriptLS.lineColToPosition(file,startLine,1))
@@ -363,14 +365,17 @@ class TSS {
 
                 this.typescriptLS.editScript(file, startPos, endPos, lines.join(EOL));
               }
-              var syn = this.ls.getSyntacticDiagnostics(file).length;
-              var sem = this.ls.getSemanticDiagnostics(file).length;
+              var syn:number,sem:number;
+              if (check) {
+                syn = this.ls.getSyntacticDiagnostics(file).length;
+                sem = this.ls.getSemanticDiagnostics(file).length;
+              }
               on_collected_callback = undefined;
               lines = [];
 
               this.ioHost.printLine((added ? '"added ' : '"updated ')
-                                    +(m[2] ? 'lines'+m[2]+' in ' : '')
-                                    +file+', ('+syn+'/'+sem+') errors"');
+                                    +(range ? 'lines'+m[3]+' in ' : '')
+                                    +file+(check ? ', ('+syn+'/'+sem+') errors' : '')+'"');
             };
           } else {
             this.ioHost.printLine('"cannot update line range in new file"');

@@ -810,3 +810,79 @@ bozo;
 
 // stderr
 
+// update-nocheck-completion-chain.script
+node ../bin/tss.js empty.ts
+// stdout
+"loaded PREFIX/empty.ts, TSS listening.."
+"updated PREFIX/empty.ts"
+{"maybeInaccurate":false
+  ,"isMemberCompletion":true
+  ,"entries":[{"name":"forEach"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(callbackfn: (value: T, index: number, array: Array<T>) => void, thisArg?: any): void"
+  ,"fullSymbolName":"Array<T>.forEach"
+  ,"docComment":""}
+  ,{"name":"filter"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(callbackfn: (value: T, index: number, array: Array<T>) => boolean, thisArg?: any): Array<T>"
+  ,"fullSymbolName":"Array<T>.filter"
+  ,"docComment":""}]
+  ,"prefix":"f"}
+"updated PREFIX/empty.ts"
+{"maybeInaccurate":false
+  ,"isMemberCompletion":true
+  ,"entries":[{"name":"map"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"<U>(callbackfn: (value: T, index: number, array: Array<T>) => U, thisArg?: any): U[]"
+  ,"fullSymbolName":"Array<T>.map"
+  ,"docComment":""}]
+  ,"prefix":"m"}
+"updated PREFIX/empty.ts"
+{"maybeInaccurate":false
+  ,"isMemberCompletion":true
+  ,"entries":[{"name":"forEach"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(callbackfn: (value: T, index: number, array: Array<T>) => void, thisArg?: any): void"
+  ,"fullSymbolName":"Array<T>.forEach"
+  ,"docComment":""}]
+  ,"prefix":"fo"}
+"updated PREFIX/empty.ts"
+{"maybeInaccurate":false
+  ,"isMemberCompletion":true
+  ,"entries":[{"name":"toLowerCase"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(): string"
+  ,"fullSymbolName":"String.toLowerCase"
+  ,"docComment":"Converts all the alphabetic characters in a string to lowercase. "}
+  ,{"name":"toLocaleLowerCase"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(): string"
+  ,"fullSymbolName":"String.toLocaleLowerCase"
+  ,"docComment":"Converts all alphabetic characters to lowercase, taking into account the host environment's current locale. "}
+  ,{"name":"toLocaleUpperCase"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(): string"
+  ,"fullSymbolName":"String.toLocaleUpperCase"
+  ,"docComment":"Returns a string where all alphabetic characters have been converted to uppercase, taking into account the host environment's current locale. "}]
+  ,"prefix":"toL"}
+"updated PREFIX/empty.ts"
+{"maybeInaccurate":false
+  ,"isMemberCompletion":false
+  ,"entries":[{"name":"bar"
+  ,"kind":"parameter"
+  ,"kindModifiers":"public"
+  ,"type":"any"
+  ,"fullSymbolName":"bar"
+  ,"docComment":""}]
+  ,"prefix":"ba"}
+"TSS closing"
+
+// stderr
+

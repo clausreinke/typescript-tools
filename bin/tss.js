@@ -68544,7 +68544,7 @@ var TSS = (function () {
 
         var rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
-        var cmd, pos, file, script, added, def, refs, locs, info, source, brief, member;
+        var cmd, pos, file, script, added, range, check, def, refs, locs, info, source, brief, member;
 
         var collecting = 0, on_collected_callback, lines = [];
 
@@ -68705,31 +68705,36 @@ var TSS = (function () {
                     };
 
                     _this.ioHost.printLine(JSON.stringify(info).trim());
-                } else if (m = cmd.match(/^update (\d+)( (\d+)-(\d+))? (.*)$/)) {
-                    file = _this.resolveRelativePath(m[5]);
+                } else if (m = cmd.match(/^update( nocheck)? (\d+)( (\d+)-(\d+))? (.*)$/)) {
+                    file = _this.resolveRelativePath(m[6]);
                     script = _this.typescriptLS.getScriptInfo(file);
                     added = script == null;
+                    range = !!m[3];
+                    check = !m[1];
 
-                    if (!added || !m[2]) {
-                        collecting = parseInt(m[1]);
+                    if (!added || !range) {
+                        collecting = parseInt(m[2]);
                         on_collected_callback = function () {
-                            if (!m[2]) {
+                            if (!range) {
                                 _this.typescriptLS.updateScript(file, lines.join(EOL));
                             } else {
-                                var startLine = parseInt(m[3]);
-                                var endLine = parseInt(m[4]);
+                                var startLine = parseInt(m[4]);
+                                var endLine = parseInt(m[5]);
                                 var maxLines = script.lineMap.lineCount();
                                 var startPos = startLine <= maxLines ? (startLine < 1 ? 0 : _this.typescriptLS.lineColToPosition(file, startLine, 1)) : script.content.length;
                                 var endPos = endLine < maxLines ? (endLine < 1 ? 0 : _this.typescriptLS.lineColToPosition(file, endLine + 1, 1) - 1) : script.content.length;
 
                                 _this.typescriptLS.editScript(file, startPos, endPos, lines.join(EOL));
                             }
-                            var syn = _this.ls.getSyntacticDiagnostics(file).length;
-                            var sem = _this.ls.getSemanticDiagnostics(file).length;
+                            var syn, sem;
+                            if (check) {
+                                syn = _this.ls.getSyntacticDiagnostics(file).length;
+                                sem = _this.ls.getSemanticDiagnostics(file).length;
+                            }
                             on_collected_callback = undefined;
                             lines = [];
 
-                            _this.ioHost.printLine((added ? '"added ' : '"updated ') + (m[2] ? 'lines' + m[2] + ' in ' : '') + file + ', (' + syn + '/' + sem + ') errors"');
+                            _this.ioHost.printLine((added ? '"added ' : '"updated ') + (range ? 'lines' + m[3] + ' in ' : '') + file + (check ? ', (' + syn + '/' + sem + ') errors' : '') + '"');
                         };
                     } else {
                         _this.ioHost.printLine('"cannot update line range in new file"');

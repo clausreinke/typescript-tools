@@ -1,0 +1,32 @@
+update nocheck 3 empty.ts
+function foo(bar) {
+[].f
+}
+completions true 2 5 empty.ts
+update nocheck 4 empty.ts
+function foo(bar) {
+[].filter(x=>true)
+  .m
+}
+completions true 3 5 empty.ts
+update nocheck 5 empty.ts
+function foo(bar) {
+[].filter(x=>true)
+  .map(_=>'o')
+  .fo
+}
+completions true 4 6 empty.ts
+update nocheck 5 empty.ts
+function foo(bar) {
+[].filter(x=>true)
+  .map(_=>'o')
+  .forEach(s=>s.toL)
+}
+completions true 4 20 empty.ts
+update nocheck 5 empty.ts
+function foo(bar) {
+[].filter(x=>true)
+  .map(_=>'o')
+  .forEach(s=>s.toLowerCase()+ba)
+}
+completions false 4 33 empty.ts
