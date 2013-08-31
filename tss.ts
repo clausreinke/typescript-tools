@@ -386,7 +386,7 @@ class TSS {
 
           this.ioHost.printLine(info.trim());
 
-        } else if (m = cmd.match(/^lastError(Dump)$/)) { // debugging only
+        } else if (m = cmd.match(/^lastError(Dump)?$/)) { // debugging only
 
           if (this.lastError)
             if (m[1]) // commandline use
