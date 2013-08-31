@@ -1,5 +1,13 @@
-update 3 PREFIX/empty.ts
+update 4 PREFIX/empty.ts
+// semantics check after update avoids #13
 function foo(bar){
   b
 }
-completions false 2 4 PREFIX/empty.ts
+completions false 3 4 PREFIX/empty.ts
+update nocheck 5 empty.ts
+// without the check, completion fails
+// once TS issue 1592 gets fixed, completion should succeed and this test should fail
+function foo(bar) {
+  b
+}
+completions false 4 4 empty.ts

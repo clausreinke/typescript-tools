@@ -750,6 +750,8 @@ node ../bin/tss.js empty.ts
   ,"fullSymbolName":"break"
   ,"docComment":null}]
   ,"prefix":"b"}
+"updated PREFIX/empty.ts"
+"TSS command processing error: TypeError: Cannot call method 'setUnresolved' of null"
 "TSS closing"
 
 // stderr
