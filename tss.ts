@@ -471,6 +471,13 @@ class TSS {
   }
 }
 
+if (IO.arguments.indexOf("--version")!==-1) {
+  console.log(require("../package.json").version);
+  IO.fileExists(__dirname+"/../.git/refs/heads/master") &&
+    console.log(readFile(__dirname+"/../.git/refs/heads/master").contents);
+  process.exit(0);
+}
+
 var tss = new TSS(IO);
 tss.setup(IO.arguments[0]);
 tss.listen();
