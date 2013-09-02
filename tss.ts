@@ -43,7 +43,7 @@ class TSS {
 
   constructor (public ioHost: IIO) { } // NOTE: call setup
 
-  private fileNameToContent = new TypeScript.StringHashTable();
+  private fileNameToContent:TypeScript.StringHashTable<string>;
 
   // IReferenceResolverHost methods (from HarnessCompiler, modulo test-specific code)
   getScriptSnapshot(filename: string): TypeScript.IScriptSnapshot {
@@ -120,6 +120,7 @@ class TSS {
     */
 
     this.typescriptLS = new Harness.TypeScriptLS();
+    this.fileNameToContent = new TypeScript.StringHashTable();
 
     // chase dependencies (references and imports)
     this.resolutionResult = TypeScript.ReferenceResolver

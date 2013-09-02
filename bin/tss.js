@@ -68424,7 +68424,6 @@ for getting info on .ts projects */
 var TSS = (function () {
     function TSS(ioHost) {
         this.ioHost = ioHost;
-        this.fileNameToContent = new TypeScript.StringHashTable();
     }
     // IReferenceResolverHost methods (from HarnessCompiler, modulo test-specific code)
     TSS.prototype.getScriptSnapshot = function (filename) {
@@ -68503,6 +68502,7 @@ var TSS = (function () {
         { Alert: (s: string) => { this.ioHost.printLine(s); } };
         */
         this.typescriptLS = new Harness.TypeScriptLS();
+        this.fileNameToContent = new TypeScript.StringHashTable();
 
         // chase dependencies (references and imports)
         this.resolutionResult = TypeScript.ReferenceResolver.resolve([defaultLibs, file], this, this.compilationSettings);
