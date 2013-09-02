@@ -121,14 +121,15 @@ endfunction
 " update TSS with current file source, record state of updates
 " NOTE: this will be hard to get right:
 "         disk vs buffer, update vs reload, dependencies, ...
-command! TSSupdate echo TSSupdate()
-function! TSSupdate()
+command! -nargs=? TSSupdate echo TSSupdate(<q-args>)
+function! TSSupdate(completion)
+  let nocheck = a:completion=="completionStart" ? " nocheck" : ""
   let file = expand("%:p")
   let cur  = undotree().seq_cur
   let updated = has_key(g:TSSupdates,file)
-  if (!updated && &modified) || (updated && (cur!=g:TSSupdates[file]))
+  if (!updated && &modified) || (updated && (cur!=g:TSSupdates[file])) || a:completion!=""
     let g:TSSupdates[file] = cur
-    return TSScmd("update ".line('$')." ".file,{'rawcmd':1,'lines':getline(1,line('$'))})
+    return TSScmd("update".nocheck." ".line('$')." ".file,{'rawcmd':1,'lines':getline(1,line('$'))})
   else
     return ""
   endif
@@ -167,15 +168,25 @@ function! TSScompleteFunc(findstart,base)
   endwhile
 
   if a:findstart
+    " force updates for completed fragments, while still in insert mode
+    " bypass error checking (cf #13,#14)
+    TSSupdate completionStart
+
     return line[start-1] =~ "\\k" ? start-1 : -1
   else
     " check if preceded by dot (won't see dot on previous line!)
     let member = (start>1 && line[start-2]==".") ? 'true' : 'false'
     echomsg start.":".member
 
-    TSSupdate
-
+    " cf #13,#14
     let info = TSScmd("completions ".member,{'col':start})
+    if type(info)==type("") && info=~"TSS command processing error"
+      " force updates for completed fragments, while still in insert mode
+      " try update again, this time with error checking (to trigger semantic analysis)
+      call TSSupdate("completion")
+      unlet info
+      let info = TSScmd("completions ".member,{'col':start})
+    endif
 
     let result = []
     if type(info)==type({})
