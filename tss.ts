@@ -170,10 +170,14 @@ class TSS {
     var collecting = 0, on_collected_callback:()=>void, lines:string[] = [];
 
     rl.on('line', input => {  // most commands are one-liners
-      var m:string[];
+      var m:string[], commands = {};
       try {
 
-        cmd = input.trim();
+        cmd = String(input.trim());
+        cmd.match = <any>((regexp:RegExp)=>{
+                      commands[regexp.source] = true;
+                      return <string[]>String.prototype.match.call(cmd,regexp);
+                    });
 
         if (collecting>0) { // multiline input, eg, source
 
@@ -447,6 +451,10 @@ class TSS {
         } else if (m = cmd.match(/^quit$/)) {
 
           rl.close();
+
+        } else if (m = cmd.match(/^help$/)) {
+
+          this.ioHost.printLine(Object.keys(commands).join(EOL));
 
         } else {
 

@@ -68549,9 +68549,13 @@ var TSS = (function () {
         var collecting = 0, on_collected_callback, lines = [];
 
         rl.on('line', function (input) {
-            var m;
+            var m, commands = {};
             try  {
-                cmd = input.trim();
+                cmd = String(input.trim());
+                cmd.match = (function (regexp) {
+                    commands[regexp.source] = true;
+                    return String.prototype.match.call(cmd, regexp);
+                });
 
                 if (collecting > 0) {
                     lines.push(input);
@@ -68792,6 +68796,8 @@ else
                     _this.ioHost.printLine('"reloaded ' + _this.rootFile.path + ', TSS listening.."');
                 } else if (m = cmd.match(/^quit$/)) {
                     rl.close();
+                } else if (m = cmd.match(/^help$/)) {
+                    _this.ioHost.printLine(Object.keys(commands).join(EOL));
                 } else {
                     _this.ioHost.printLine('"TSS command syntax error: ' + cmd + '"');
                 }
