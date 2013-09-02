@@ -2,11 +2,11 @@
 
 ## typescript-tools
 
-typescript-tools (v0.2.0) provides access to the TypeScript Language Services (v0.9) via a simple commandline server (tss). This makes it easy to build editor plugins supporting TypeScript. A Vim plugin (tss.vim) is included. If you build plugins for other editors/IDEs based on typescript-tools, please let me know, or better: announce them on our new project mailing list.
+typescript-tools (v0.2) provides access to the TypeScript Language Services (v0.9) via a simple commandline server (tss). This makes it easy to build editor plugins supporting TypeScript. A Vim plugin (tss.vim) is included. If you build plugins for other editors/IDEs based on typescript-tools, please let me know, or better: announce them on our new project mailing list.
 
 - Vim plugin: included in this repo (see below for list of features)
 - Emacs plugin: https://github.com/aki2o/emacs-tss
-- Sublime plugin: (work in progress, but author has not published; yet?-)
+- Sublime plugin: https://github.com/Railk/T3S
 
 There is now a project mailing list: [typescript-tools@googlegroups.com](https://groups.google.com/forum/#!aboutgroup/typescript-tools)
 
@@ -42,7 +42,7 @@ If you want to use tss from Vim, source the `tss.vim` script. If you want to use
 
 From-source compilation should not be necessary, as a pre-compiled `bin/tss.js` is included, as well as a `bin/lib.d.ts`. You might want to modify `bin/defaultLibs.d.ts`, if you want other declaration files included by default.
 
-If you do want to compile from source, you need the typescript sources (I used the develop branch, commit 553bc9e1a57eeb77f69d85f249da9cb028f24394, roughly TS v0.9.1.1):
+If you do want to compile from source, you need the typescript sources (I used the develop branch, v0.9.1-338-g553bc9e):
 
   ```
   # install git and node/npm, then
@@ -89,18 +89,22 @@ TypeScript tools currently available:
   references <line> <pos> <file>
     // get references
 
-    { file: string
-    , min:  { line: number, character: number }
-    , lim:  { line: number, character: number }
-    }
+    [{ file: string
+     , min:  { line: number, character: number }
+     , lim:  { line: number, character: number }
+     }]
 
-  update <linecount> <file> // followed by linecount lines of source text
+  update (nocheck)? <linecount> <file> // followed by linecount lines of source text
     // provide current source, if there are unsaved changes
 
-    "updated <file>"
+    "updated <file>, (<syntax>/<semantics>) errors"
+
+    or (probably not a good idea to use this)
+
+    "added <file>, (<syntax>/<semantics>) errors"
 
   reload
-    // reload current project
+    // reload current project (chasing dependencies from <rootfile>)
 
     "reloaded <rootfile>, TSS listening.."
 
@@ -126,6 +130,8 @@ TypeScript tools currently available:
      ,start: {line: number, character: number}
      ,end:   {line: number, character: number}
      ,text:  string
+     ,phase: string
+     ,category: string
      }
      , ...
     ]
@@ -148,7 +154,7 @@ TypeScript tools currently available:
   Currently assumes that node is in path and that tss has been npm-installed globally.
   See top of file for configuration options.
 
-  In practice, you'll use `:TSSstarthere`, `:TSSend`, `:TSSreload`, `TSStype`, `TSSdef*`, 
+  In practice, you'll use `:TSSstarthere`, `:TSSend`, `:TSSreload`, `TSStype`, `TSSdef*`,
   as well as CTRL-X CTRL-O for insert mode completion. Sometimes, calling `:TSSshowErrors`
   directly can give enough error information for the current file -- eventually,
   you'll probably have to call `:TSSreload` to account for changes in dependencies.

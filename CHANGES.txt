@@ -1,21 +1,35 @@
 
-0.2.0 to ...:
+0.2.0 to 0.2.1:
 
-  - updated TS to 553bc9e1a57eeb77f69d85f249da9cb028f24394
+  - store project files in dependency-first order
+    (avoids some spurious type errors)
+
+  - updated TS to v0.9.1-338-g553bc9e
 
   - several fixes in file `update` handling
 
-  - `update`: show syntax/semantic error count,
-    distinguish updated from added files
+  - `update`: show syntax/semantics error count (works around TS issue 1592),
+    distinguish updated from added files (highlights file addition accidents);
+    for speed in combination with completions, use `update nocheck`, with fallback
+    to full `update` when `completions` fails (cf #13,#14)
 
-  - fixes in `completions` and `definitions`
+  - fixes in `completions`, `definitions`, and `showErrors`
 
-  - improved tests and commandline debugging
+  - add `--version` flag, use 'git describe --tags' for versioning
+
+  - improved tests and commandline debugging; add basic Makefile
 
   - improved file path resolution and normalization
 
   - `showErrors`: provide category of diagnostic (error/warning)
     and phase which generated it (resolution/syntax/semantics)
+
+  - add `structure` command (getScriptLexicalStructure)
+
+  - tss.vim: rudimentary support for
+      - showing file structure `TSSstructure`
+      - listing project files `TSSfiles`
+      - browsing MDN docs for EcmaScript global object properties&methods
 
 0.1.0 to 0.2.0:
 
