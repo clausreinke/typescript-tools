@@ -751,7 +751,39 @@ node ../bin/tss.js empty.ts
   ,"docComment":null}]
   ,"prefix":"b"}
 "updated PREFIX/empty.ts"
-"TSS command processing error: TypeError: Cannot call method 'setUnresolved' of null"
+{"maybeInaccurate":false
+  ,"isMemberCompletion":false
+  ,"entries":[{"name":"bar"
+  ,"kind":"parameter"
+  ,"kindModifiers":"public"
+  ,"type":"any"
+  ,"fullSymbolName":"bar"
+  ,"docComment":""}
+  ,{"name":"boolean"
+  ,"kind":"primitive type"
+  ,"kindModifiers":""
+  ,"type":"boolean"
+  ,"fullSymbolName":""
+  ,"docComment":""}
+  ,{"name":"blur"
+  ,"kind":"function"
+  ,"kindModifiers":"declare"
+  ,"type":"(): void"
+  ,"fullSymbolName":"blur"
+  ,"docComment":""}
+  ,{"name":"btoa"
+  ,"kind":"function"
+  ,"kindModifiers":"declare"
+  ,"type":"(rawString: string): string"
+  ,"fullSymbolName":"btoa"
+  ,"docComment":""}
+  ,{"name":"break"
+  ,"kind":"keyword"
+  ,"kindModifiers":""
+  ,"type":null
+  ,"fullSymbolName":"break"
+  ,"docComment":null}]
+  ,"prefix":"b"}
 "TSS closing"
 
 // stderr

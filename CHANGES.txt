@@ -4,7 +4,7 @@
   - store project files in dependency-first order
     (avoids some spurious type errors)
 
-  - updated TS to v0.9.1-338-g553bc9e
+  - updated TS to v0.9.1-376-gad18600
 
   - several fixes in file `update` handling
 
