@@ -51056,7 +51056,7 @@ var TypeScript;
                         // the dynamic module will be the only child
                         var childDecls = unit.getTopLevelDecls()[0].getChildDecls();
 
-                        if (childDecls.length === 1 && childDecls[0].kind == TypeScript.PullElementKind.DynamicModule) {
+                        if (childDecls.length >= 1 && childDecls[0].kind == TypeScript.PullElementKind.DynamicModule) {
                             return childDecls;
                         }
                     }

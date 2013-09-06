@@ -918,3 +918,89 @@ node ../bin/tss.js empty.ts
 
 // stderr
 
+// issue-15.script
+node ../bin/tss.js issue-15.ts
+// stdout
+"loaded PREFIX/issue-15.ts, TSS listening.."
+"updated PREFIX/issue-15.ts"
+{"memberName":{"prefix":"any"
+  ,"suffix":""
+  ,"delim":""
+  ,"entries":[{"prefix":""
+  ,"suffix":""
+  ,"delim":""
+  ,"entries":[]}]}
+  ,"docComment":""
+  ,"fullSymbolName":"xx"
+  ,"kind":"local var"
+  ,"minChar":353
+  ,"limChar":355
+  ,"type":"any"}
+{"memberName":{"prefix":"Background.Class"
+  ,"suffix":""
+  ,"delim":""
+  ,"entries":[{"prefix":""
+  ,"suffix":""
+  ,"delim":""
+  ,"entries":[]}]}
+  ,"docComment":""
+  ,"fullSymbolName":"bg"
+  ,"kind":"local var"
+  ,"minChar":377
+  ,"limChar":379
+  ,"type":"Background.Class"}
+{"maybeInaccurate":false
+  ,"isMemberCompletion":true
+  ,"entries":[{"name":"Class"
+  ,"kind":"class"
+  ,"kindModifiers":"export"
+  ,"type":"Background.Class"
+  ,"fullSymbolName":"Background.Class"
+  ,"docComment":""}]}
+{"maybeInaccurate":false
+  ,"isMemberCompletion":true
+  ,"entries":[{"name":"Class"
+  ,"kind":"class"
+  ,"kindModifiers":"export"
+  ,"type":"Background.Class"
+  ,"fullSymbolName":"Background.Class"
+  ,"docComment":""}]}
+null
+{"maybeInaccurate":false
+  ,"isMemberCompletion":true
+  ,"entries":[{"name":"a"
+  ,"kind":"property"
+  ,"kindModifiers":"public"
+  ,"type":"any"
+  ,"fullSymbolName":"Background.Class.a"
+  ,"docComment":""}
+  ,{"name":"b"
+  ,"kind":"property"
+  ,"kindModifiers":"public"
+  ,"type":"any"
+  ,"fullSymbolName":"Background.Class.b"
+  ,"docComment":""}
+  ,{"name":"init"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(): void"
+  ,"fullSymbolName":"Background.Class.init"
+  ,"docComment":""}]}
+{"maybeInaccurate":false
+  ,"isMemberCompletion":true
+  ,"entries":[{"name":"test_var"
+  ,"kind":"property"
+  ,"kindModifiers":"public"
+  ,"type":"any"
+  ,"fullSymbolName":"Test.test_var"
+  ,"docComment":""}
+  ,{"name":"test_method"
+  ,"kind":"method"
+  ,"kindModifiers":"public"
+  ,"type":"(): void"
+  ,"fullSymbolName":"Test.test_method"
+  ,"docComment":""}]}
+"TSS closing"
+
+// stderr
+

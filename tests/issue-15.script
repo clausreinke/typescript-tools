@@ -1,0 +1,38 @@
+update nocheck 30 issue-15.ts
+/*
+declare module 'issue-15-import' {
+  export class Background { public a; public b; init() }
+}
+*/
+
+import Background = require('issue-15-import');
+
+class Test {
+
+  public test_var;
+
+  constructor(){ }
+
+  public test_method(){ }
+
+}
+
+function main(){
+
+  var xx = new Background.noSuchExport();
+  var bg = new Background.Class();
+  xx.noSuchProperty();
+  bg.noSuchProperty();
+
+  var test = new Test()
+  test.test_method();
+
+}
+
+type 23 3 issue-15.ts
+type 24 3 issue-15.ts
+completions true 21 27 issue-15.ts
+completions true 22 27 issue-15.ts
+completions true 23 6 issue-15.ts
+completions true 24 6 issue-15.ts
+completions true 27 8 issue-15.ts

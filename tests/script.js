@@ -48,3 +48,4 @@ test("issue-12.script","empty.ts");
 test("issue-13.script","empty.ts");
 test("partial-update.script","empty.ts");
 test("update-nocheck-completion-chain.script","empty.ts");
+test("issue-15.script","issue-15.ts");
