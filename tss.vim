@@ -16,6 +16,10 @@ if !exists("g:TSSupdates")
   let g:TSSupdates = {}
 endif
 
+if !exists("g:TSSfiles")
+  let g:TSSfiles = []
+endif
+
 py TSS_MDN = "https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/"
 
 python <<EOF
@@ -94,7 +98,12 @@ endfunction
 " set ballooneval
 function! TSSballoon()
   let file = expand("#".v:beval_bufnr.":p")
-  return TSSsymbol("type ".v:beval_lnum." ".v:beval_col." ".file)
+  " case-insensitive..
+  if count(g:TSSfiles,file,1)!=0
+    return TSSsymbol("type ".v:beval_lnum." ".v:beval_col." ".file)
+  else
+    return ''
+  endif
 endfunction
 
 " jump to definition of item under cursor
@@ -205,14 +214,18 @@ aug END
 doau TSS BufRead
 
 " show project file list in preview window
-command! TSSfiles echo TSSfiles()
-function! TSSfiles()
-  let files = TSScmd("files",{'rawcmd':1})
+command! TSSfiles echo TSSfiles('show')
+function! TSSfiles(action)
+  let files = a:action=~'fetch' ? TSScmd("files",{'rawcmd':1}) : g:TSSfiles
   if type(files)==type([])
-    new +setlocal\ previewwindow|setlocal\ buftype=nofile|setlocal\ noswapfile
-    exe "normal z" . &previewheight . "\<cr>"
-    call append(0,files)
-    " TODO: group by prefix paths
+    let g:TSSfiles = files
+    if a:action=~'show'
+      pclose
+      new +setlocal\ previewwindow|setlocal\ buftype=nofile|setlocal\ noswapfile
+      exe "normal z" . &previewheight . "\<cr>"
+      call append(0,files)
+      " TODO: group by prefix paths
+    endif
   endif
 endfunction
 
@@ -220,7 +233,7 @@ endfunction
 command! TSSreload echo TSSreload()
 function! TSSreload()
   let unsaved = []
-  for f in TSScmd("files",{'rawcmd':1})
+  for f in g:TSSfiles
     if bufloaded(f) && getbufvar(f,"&modified")
       let unsaved += [f]
     endif
@@ -233,6 +246,7 @@ function! TSSreload()
     return "TSSreload cancelled"
   endif
   let msg = TSScmd("reload",{'rawcmd':1})
+  call TSSfiles('fetch')
   let g:TSSupdates = {}
   if g:TSSshowErrors
     TSSshowErrors
@@ -331,6 +345,7 @@ sys.stdout.write(prompt)
 # print prompt
 
 EOF
+  call TSSfiles('fetch')
   if g:TSSshowErrors
     TSSshowErrors
   endif
