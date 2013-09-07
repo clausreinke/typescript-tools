@@ -6,6 +6,8 @@
 
   - updated TS to v0.9.1-376-gad18600
 
+  - patch for #15 (TS issue 1651)
+
   - several fixes in file `update` handling
 
   - `update`: show syntax/semantics error count (works around TS issue 1592),

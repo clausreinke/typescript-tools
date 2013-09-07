@@ -1,6 +1,6 @@
 {
   "name": "tss",
-  "version": "v0.2.0-35-gf711530",
+  "version": "v0.2.1",
   "description": "TypeScript Services commandline server",
   "bin": "bin/tss",
   "repository": {
