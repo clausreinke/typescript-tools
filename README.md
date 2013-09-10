@@ -2,7 +2,7 @@
 
 ## typescript-tools
 
-typescript-tools (v0.2) provides access to the TypeScript Language Services (v0.9) via a simple commandline server (tss). This makes it easy to build editor plugins supporting TypeScript. A Vim plugin (tss.vim) is included. If you build plugins for other editors/IDEs based on typescript-tools, please let me know, or better: announce them on our new project mailing list.
+typescript-tools (v0.2) provides access to the TypeScript Language Services (v0.9) via a simple commandline server (tss). This makes it easy to build editor plugins supporting TypeScript. A Vim plugin (`typescript_tss.vim`) is included. If you build plugins for other editors/IDEs based on typescript-tools, please let me know, or better: announce them on our new project mailing list.
 
 - Vim plugin: included in this repo (see below for list of features)
 - Emacs plugin: https://github.com/aki2o/emacs-tss
@@ -38,7 +38,7 @@ The installation should give you a global `tss` command, which you can use direc
   "TSS closing"
   ```
 
-If you want to use tss from Vim, source the `tss.vim` script. If you want to use this from other editors/IDEs, you will need to write some code, to communicate with `tss` as an asynchronous subprocess (please let me know how it goes, especially if you release a working plugin).
+If you want to use tss from Vim, add the `typescript-tools` directory to your Vim's `rtp`. If you want to use this from other editors/IDEs, you will need to write some code, to communicate with `tss` as an asynchronous subprocess (please let me know how it goes, especially if you release a working plugin).
 
 From-source compilation should not be necessary, as a pre-compiled `bin/tss.js` is included, as well as a `bin/lib.d.ts`. You might want to modify `bin/defaultLibs.d.ts`, if you want other declaration files included by default.
 
@@ -148,11 +148,26 @@ TypeScript tools currently available:
   for a sample session, see `tests/` (commands in `test.script`, output in `script.out`).
 
 
-## tss.vim: vim interface to tss.js
+## vim interface to tss.js
 
-  Needs Vim 7.3 (plus Python 2.7 with json lib): :source tss.vim
+  Needs Vim 7.3 (plus Python 2.7 with json lib): this repo includes a Vim filetype plugin
+  for the `typescript` filetype, so just add the path to the repo to your Vim's
+  runtime path and enable filetype plugins.
+  ```
+  filetype plugin on
+  au BufRead,BufNewFile *.ts		setlocal filetype=typescript
+  set rtp+=<your_path_here>/typescript-tools/
+  ```
+
+  If you want to use the npm-installed package path for `typescript-tools` instead of 
+  your local git repo path, this npm command should tell you the installed
+  package path:
+  ```
+  npm ls -sg --parseable typescript-tools
+  ```
+
   Currently assumes that node is in path and that tss has been npm-installed globally.
-  See top of file for configuration options.
+  See top of file `ftplugin/typescript_tss.vim` for configuration options.
 
   In practice, you'll use `:TSSstarthere`, `:TSSend`, `:TSSreload`, `TSStype`, `TSSdef*`,
   as well as CTRL-X CTRL-O for insert mode completion. Sometimes, calling `:TSSshowErrors`

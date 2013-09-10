@@ -1,3 +1,16 @@
+0.2.1 to 0.2.2:             NOTE: package name changed!
+
+  - same code as 0.2.1, packaged slightly differently:
+
+    - package name changed from `tss` to `typescript-tools`
+      (matches repo name, is descriptive and easier to find
+       in package lists)
+
+      NOTE: remember to uninstall previous version (named `tss`)
+
+    - Vim plugin reorganised as a filetype plugin
+      (so you can just add the repo path to Vim's runtime path
+       and enable filetype plugins)
 
 0.2.0 to 0.2.1:
 

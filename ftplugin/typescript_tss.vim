@@ -1,3 +1,7 @@
+if exists("g:TSSloaded")
+  finish
+endif
+let g:TSSloaded = 1
 
 """ configuration options - use your .vimrc to change defaults
 
@@ -209,6 +213,7 @@ function! TSScompleteFunc(findstart,base)
   endif
 endfunction
 aug TSS
+au!
 au BufNewFile,BufRead *.ts setlocal omnifunc=TSScompleteFunc
 aug END
 doau TSS BufRead
