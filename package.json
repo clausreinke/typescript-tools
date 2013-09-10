@@ -1,8 +1,8 @@
 {
   "name": "typescript-tools",
-  "version": "v0.2.2",
+  "version": "v0.2.2-1",
   "description": "TypeScript Services commandline server",
-  "bin": "bin/tss",
+  "bin": {"tss": "bin/tss"},
   "repository": {
     "type": "git",
     "url": "git://github.com/clausreinke/typescript-tools.git"
