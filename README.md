@@ -14,13 +14,19 @@ I expect our mailing list to be low volume, carrying announcements, calls for he
 
 ### Installation
 
-npm installation goes somewhat like this:
+npm installation goes somewhat like this - via github:
 
   ```
   # install git and node/npm, then
   $ git clone git://github.com/clausreinke/typescript-tools.git
   $ cd typescript-tools/
   $ npm install -g
+  ```
+
+or via the npm registry:
+
+  ```
+  $ npm install -g typescript-tools
   ```
 
 The installation should give you a global `tss` command, which you can use directly, as in this sample session (note the absolute paths, which will differ in your installation):
@@ -191,7 +197,7 @@ TypeScript tools currently available:
   " create location list for references
   command! TSSreferences
 
-  " create location list for file structure items (experimental)
+  " create navigation menu for file structure items (experimental)
   command! TSSstructure
 
   " update TSS with current file source
@@ -207,6 +213,9 @@ TypeScript tools currently available:
 
   " completions
   function! TSScompleteFunc(findstart,base)
+
+  " open project file, with filename completion
+  command! -complete=customlist,TSSfile -nargs=1 TSSfile
 
   " show project file list in preview window
   command! TSSfiles

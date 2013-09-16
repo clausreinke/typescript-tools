@@ -1,4 +1,10 @@
-0.2.1 to 0.2.2:             NOTE: package name changed!
+0.2.2-1 to .:
+
+  - tss.vim:
+    - change `TSSstructure` to popup nagivation menu
+    - add `TSSfile`: quickly open project files, with filename completion
+
+0.2.1 to 0.2.2-1:             NOTE: package name changed!
 
   - same code as 0.2.1, packaged slightly differently:
 

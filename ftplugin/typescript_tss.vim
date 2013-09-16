@@ -136,13 +136,14 @@ endfunction
 "         disk vs buffer, update vs reload, dependencies, ...
 command! -nargs=? TSSupdate echo TSSupdate(<q-args>)
 function! TSSupdate(completion)
-  let nocheck = a:completion=="completionStart" ? " nocheck" : ""
+  let nocheck = ((a:completion=="completionStart")||(a:completion=="nocheck")) ? " nocheck" : ""
   let file = expand("%:p")
   let cur  = undotree().seq_cur
   let updated = has_key(g:TSSupdates,file)
-  if (!updated && &modified) || (updated && (cur!=g:TSSupdates[file])) || a:completion!=""
+  if (!updated && &modified) || (updated && (cur!=g:TSSupdates[file])) || a:completion=~"completion"
     let g:TSSupdates[file] = cur
-    return TSScmd("update".nocheck." ".line('$')." ".file,{'rawcmd':1,'lines':getline(1,line('$'))})
+    let info = TSScmd("update".nocheck." ".line('$')." ".file,{'rawcmd':1,'lines':getline(1,line('$'))})
+    return (a:completion!="" ? "" : info)
   else
     return ""
   endif
@@ -218,6 +219,12 @@ au BufNewFile,BufRead *.ts setlocal omnifunc=TSScompleteFunc
 aug END
 doau TSS BufRead
 
+" open project file, with filename completion
+command! -complete=customlist,TSSfile -nargs=1 TSSfile edit <args>
+function! TSSfile(A,L,P)
+  return filter(copy(g:TSSfiles),'v:val=~"'.a:A.'"')
+endfunction
+
 " show project file list in preview window
 command! TSSfiles echo TSSfiles('show')
 function! TSSfiles(action)
@@ -263,7 +270,7 @@ endfunction
 command! TSSshowErrors call TSSshowErrors()
 function! TSSshowErrors()
 
-  TSSupdate
+  TSSupdate nocheck
 
   let info = TSScmd("showErrors",{'rawcmd':1})
   if type(info)==type([])
@@ -300,30 +307,33 @@ function! TSSreferences()
   endif
 endfunction
 
-" create location list for file structure items
+" create navigation menu for file structure items
 command! TSSstructure call TSSstructure()
 function! TSSstructure()
   let info = TSScmd("structure ".expand("%:p"),{'rawcmd':1})
   if type(info)==type([])
+    silent! unmenu ]TSSstructure
     for i in info
-      let i['lnum']     = i['min']['line']
-      let i['col']      = i['min']['character']
-      let i['filename'] = i['file']
-      let l             = i['loc']
-      let lck           = l['containerKind']
-      let lcn           = l['containerName']
-      let i['text']     = lck!='' ? lcn.'.'.l['name'].':'.l['kindModifiers'].' '.lck.' '.l['kind']
-                                \ : l['name'].':'.l['kindModifiers'].' '.l['kind']
+      let l   = i.loc
+      let lck = l['containerKind']
+      let lcn = l['containerName']
+      let ln  = l['name']
+      let lk  = l['kind']
+      let lkm = l['kindModifiers']
+      let submenuheader = lk=~'module\|class\|interface' ? '.' : ''
+      let entry = (lck!=''? lcn.'.'.ln.submenuheader.':\ '.(lkm!='' ? lkm.'\ ' : '').lk
+                        \ : ln.submenuheader.':\ '.(lkm!='' ? lkm.'\ ' : '').lk)
+      let entry = substitute(entry,'\.','\.','g')
+      exe 'menu ]TSSstructure.'.entry.' :call cursor('.i.min.line.','.i.min.character.')<cr>'
     endfor
-    call setloclist(0,info)
-    if len(info)!=0
-      topleft lopen
-    endif
+    normal m'
+    popup ]TSSstructure
   else
     echoerr info
   endif
 endfunction
 
+"TODO: guard tss usage in later functions
 " start typescript service process asynchronously, via python
 " NOTE: one reason for shell=True is to avoid popup console window;
 command! -nargs=1 TSSstart call TSSstart(<f-args>)
