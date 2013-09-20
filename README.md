@@ -239,5 +239,9 @@ TypeScript tools currently available:
 
   " stop typescript service
   command! TSSend
-  ```
 
+  " sample keymap
+  " (highjacking some keys otherwise used for tags,
+  "  since we support jump to definition directly)
+  function! TSSkeymap()
+  ```

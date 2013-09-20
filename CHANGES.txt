@@ -4,6 +4,7 @@
     - change `TSSstructure` to popup nagivation menu
     - add `TSSfile`: quickly open project files, with filename completion
     - add `TSSfilesMenu`: quickly open project files, with popup navigation menu
+    - add sample keymap
 
 0.2.1 to 0.2.2-1:             NOTE: package name changed!
 

@@ -31,6 +31,31 @@ import logging
 TSS_LOG_FILENAME='tsstrace.log'
 EOF
 
+" sample keymapping
+" (highjacking some keys otherwise used for tags,
+"  since we support jump to definition directly)
+function! TSSkeymap()
+  map <buffer>   <C-]> :TSSdef<cr>
+  map <buffer> <C-w>]  :TSSdefsplit<cr>
+  map <buffer> <C-w>]] :TSSdeftab<cr>
+  map <buffer> <C-w>?  :TSSdefpreview<cr>
+  map <buffer> _?  :TSStype<cr>
+  " :TSSsymbol
+  map <buffer> _?? :TSSbrowse<cr>
+  " :TSSreferences
+  map <buffer> <C-t>s :TSSstructure<cr>
+  map <buffer> <C-t>u :TSSupdate<cr>
+  map <buffer> <C-t>e :TSSshowErrors<cr>
+  map <buffer> <C-t>p :TSSfilesMenu<cr>
+  map <buffer> <C-t>f :TSSfile
+  " :TSSfiles
+  map <buffer> <C-t>r :TSSreload<cr>
+  " :TSSstart
+  " :TSSstarthere
+  " :TSSstatus
+  " :TSSend
+endfunction
+
 " browse url for ES5 global property/method under cursor
 command! TSSbrowse echo TSSbrowse()
 function! TSSbrowse()
