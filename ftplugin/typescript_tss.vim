@@ -225,6 +225,49 @@ function! TSSfile(A,L,P)
   return filter(copy(g:TSSfiles),'v:val=~"'.a:A.'"')
 endfunction
 
+function! TSSgroupPaths(pl)
+  let ps = {}
+  for p in a:pl
+    let pfrags = split(p,'/')
+    let prefix = ps
+    for f in pfrags
+      if !has_key(prefix,f)
+        let prefix[f] = {}
+      endif
+      let prefix = prefix[f]
+    endfor
+  endfor
+  return ps
+endfunction
+
+function! TSSpathMenu(prefix,path,pt)
+  if empty(a:pt)
+    exe a:prefix.' :edit '.a:path.'<cr>'
+  elseif len(a:pt)==1
+    let key = keys(a:pt)[0]
+    call TSSpathMenu(a:prefix.(a:path==''?'.':'/').substitute(key,'\.','\\.','g'),(a:path==''?'':a:path.'/').key,a:pt[key])
+  else
+    for key in sort(keys(a:pt))
+      call TSSpathMenu(a:prefix.'.'.substitute(key,'\.','\\.','g'),(a:path==''?'':a:path.'/').key,a:pt[key])
+    endfor
+  endif
+endfunction
+
+" navigate to project file via popup menu
+command! TSSfilesMenu echo TSSfilesMenu('show')
+function! TSSfilesMenu(action)
+  let files = a:action=~'fetch' ? TSScmd("files",{'rawcmd':1}) : g:TSSfiles
+  if type(files)==type([])
+    let g:TSSfiles = files
+    if a:action=~'show'
+      silent! unmenu ]TSSfiles
+      call TSSpathMenu('menu ]TSSfiles','',TSSgroupPaths(g:TSSfiles))
+      popup ]TSSfiles
+    endif
+  endif
+  popup ]TSSfiles
+endfunction
+
 " show project file list in preview window
 command! TSSfiles echo TSSfiles('show')
 function! TSSfiles(action)
@@ -326,6 +369,7 @@ function! TSSstructure()
       let entry = substitute(entry,'\.','\.','g')
       exe 'menu ]TSSstructure.'.entry.' :call cursor('.i.min.line.','.i.min.character.')<cr>'
     endfor
+    " TODO: mark directly before call cursor (bco tear-off menus)
     normal m'
     popup ]TSSstructure
   else

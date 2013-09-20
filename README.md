@@ -197,7 +197,7 @@ TypeScript tools currently available:
   " create location list for references
   command! TSSreferences
 
-  " create navigation menu for file structure items (experimental)
+  " navigation menu for current file structure
   command! TSSstructure
 
   " update TSS with current file source
@@ -219,6 +219,9 @@ TypeScript tools currently available:
 
   " show project file list in preview window
   command! TSSfiles
+
+  " navigate to project file via popup menu
+  command! TSSfilesMenu echo TSSfilesMenu('show')
 
   " reload project sources - will ask you to save modified buffers first
   command! TSSreload
