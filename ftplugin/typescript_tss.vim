@@ -31,7 +31,7 @@ endif
 py TSS_MDN = "https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/"
 
 python <<EOF
-import logging
+import logging, platform
 TSS_LOG_FILENAME='tsstrace.log'
 
 class TSSnotrunning:
@@ -431,7 +431,7 @@ tss = subprocess.Popen(vim.eval("g:TSS")+[projectroot]
                       ,stdin=subprocess.PIPE
                       ,stdout=subprocess.PIPE
                       ,stderr=subprocess.PIPE
-                      ,shell=True
+                      ,shell=platform.system()=="Windows"
                       ,universal_newlines=True)
 
 prompt = tss.stdout.readline()
