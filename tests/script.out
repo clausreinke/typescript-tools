@@ -1004,3 +1004,57 @@ null
 
 // stderr
 
+// issue-17.script
+node ../bin/tss.js issue-17.ts
+// stdout
+"loaded PREFIX/issue-17.ts, TSS listening.."
+[{"ref":{"fileName":"PREFIX/issue-17-import.ts"
+  ,"minChar":64
+  ,"limChar":69
+  ,"isWriteAccess":true}
+  ,"file":"PREFIX/issue-17-import.ts"
+  ,"min":{"line":7
+  ,"character":12}
+  ,"lim":{"line":7
+  ,"character":17}}
+  ,{"ref":{"fileName":"PREFIX/issue-17.ts"
+  ,"minChar":86
+  ,"limChar":91
+  ,"isWriteAccess":false}
+  ,"file":"PREFIX/issue-17.ts"
+  ,"min":{"line":4
+  ,"character":8}
+  ,"lim":{"line":4
+  ,"character":13}}]
+[{"ref":{"fileName":"PREFIX/issue-17-import.ts"
+  ,"minChar":64
+  ,"limChar":69
+  ,"isWriteAccess":true}
+  ,"file":"PREFIX/issue-17-import.ts"
+  ,"min":{"line":7
+  ,"character":12}
+  ,"lim":{"line":7
+  ,"character":17}}
+  ,{"ref":{"fileName":"PREFIX/issue-17.ts"
+  ,"minChar":86
+  ,"limChar":91
+  ,"isWriteAccess":false}
+  ,"file":"PREFIX/issue-17.ts"
+  ,"min":{"line":4
+  ,"character":8}
+  ,"lim":{"line":4
+  ,"character":13}}]
+"TSS closing"
+
+// stderr
+
+// concat-map.script
+node ../bin/tss.js empty.ts
+// stdout
+"loaded PREFIX/empty.ts, TSS listening.."
+"updated PREFIX/empty.ts, (0/0) errors"
+[]
+"TSS closing"
+
+// stderr
+

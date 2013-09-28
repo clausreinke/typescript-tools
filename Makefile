@@ -17,6 +17,11 @@ tests/script.diff: tests/script.out tests/script.out2
 	cd tests;\
 	diff --strip-trailing-cr script.out* 2>&1 | tee script.diff
 
+tests/script.results: tests/script.diff
+	grep '^[0-9]' tests/script.diff  >script.results;\
+	grep -n '//.*script' tests/script.out >>script.results;\
+	sort -n script.results
+
 package.json: .git/refs/heads/master
 	node -e "var pj=require('./package.json'); \
 					 pj.version='$(VERSION)';\
