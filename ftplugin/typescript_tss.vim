@@ -1,6 +1,10 @@
 if exists("g:TSSloaded")
   finish
 endif
+if !has("python")
+  echoerr "typescript_tss.vim needs python interface"
+  finish
+endif
 let g:TSSloaded = 1
 
 """ configuration options - use your .vimrc to change defaults
@@ -29,6 +33,12 @@ py TSS_MDN = "https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global
 python <<EOF
 import logging
 TSS_LOG_FILENAME='tsstrace.log'
+
+class TSSnotrunning:
+  def poll(self):
+    return 0
+
+tss = TSSnotrunning()
 EOF
 
 " sample keymapping
