@@ -1,5 +1,7 @@
 0.2.2-1 to .:
 
+  - update TS to v0.9.1-1074-ge860bba
+
   - tss.vim:
     - change `TSSstructure` to popup nagivation menu
     - add `TSSfile`: quickly open project files, with filename completion

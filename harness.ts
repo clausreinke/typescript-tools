@@ -47,7 +47,7 @@ module Harness {
 
         private setContent(content: string): void {
             this.content = content;
-            this.lineMap = TypeScript.LineMap.fromString(content);
+            this.lineMap = TypeScript.LineMap1.fromString(content);
         }
 
         public updateContent(content: string): void {
@@ -114,7 +114,7 @@ module Harness {
 
         public getLineStartPositions(): string {
             if (this.lineMap === null) {
-                this.lineMap = TypeScript.LineMap.fromString(this.textSnapshot);
+                this.lineMap = TypeScript.LineMap1.fromString(this.textSnapshot);
             }
 
             return JSON.stringify(this.lineMap.lineStarts());
@@ -275,10 +275,11 @@ module Harness {
             var compilationSettings = new TypeScript.CompilationSettings();
             compilationSettings.codeGenTarget = TypeScript.LanguageVersion.EcmaScript5;
 
-            var parseOptions = TypeScript.getParseOptions(compilationSettings);
+            var settings = TypeScript.ImmutableCompilationSettings.fromCompilationSettings(compilationSettings);
+            var parseOptions = TypeScript.getParseOptions(settings);
             return TypeScript.SyntaxTreeToAstVisitor.visit(
                 TypeScript.Parser.parse(fileName, TypeScript.SimpleText.fromScriptSnapshot(sourceText), TypeScript.isDTSFile(fileName), parseOptions),
-                fileName, compilationSettings, /*incrementalAST: */ true);
+                fileName, settings, /*incrementalAST: */ true);
         }
 
         /** Parse a file on disk given its fileName */

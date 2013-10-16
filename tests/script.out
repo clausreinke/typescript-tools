@@ -395,7 +395,7 @@ var a = [];
   ,"kindModifiers":"public"
   ,"type":"(): string"
   ,"fullSymbolName":"Array<T>.toString"
-  ,"docComment":""}
+  ,"docComment":"Returns a string representation of an array."}
   ,{"name":"toLocaleString"
   ,"kind":"method"
   ,"kindModifiers":"public"
@@ -405,123 +405,123 @@ var a = [];
   ,{"name":"concat"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"<U extends Array<T>>(...items: U[]): Array<T> (+ 1 overload(s))"
+  ,"type":"<U extends T[]>(...items: U[]): T[] (+ 1 overload(s))"
   ,"fullSymbolName":"Array<T>.concat"
-  ,"docComment":""}
+  ,"docComment":"Combines two or more arrays."}
   ,{"name":"join"
   ,"kind":"method"
   ,"kindModifiers":"public"
   ,"type":"(separator?: string): string"
   ,"fullSymbolName":"Array<T>.join"
-  ,"docComment":""}
+  ,"docComment":"Adds all the elements of an array separated by the specified separator string."}
   ,{"name":"pop"
   ,"kind":"method"
   ,"kindModifiers":"public"
   ,"type":"(): T"
   ,"fullSymbolName":"Array<T>.pop"
-  ,"docComment":""}
+  ,"docComment":"Removes the last element from an array and returns it."}
   ,{"name":"push"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(...items: Array<T>): number"
+  ,"type":"(...items: T[]): number"
   ,"fullSymbolName":"Array<T>.push"
-  ,"docComment":""}
+  ,"docComment":"Appends new elements to an array, and returns the new length of the array."}
   ,{"name":"reverse"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(): Array<T>"
+  ,"type":"(): T[]"
   ,"fullSymbolName":"Array<T>.reverse"
-  ,"docComment":""}
+  ,"docComment":"Reverses the elements in an Array. "}
   ,{"name":"shift"
   ,"kind":"method"
   ,"kindModifiers":"public"
   ,"type":"(): T"
   ,"fullSymbolName":"Array<T>.shift"
-  ,"docComment":""}
+  ,"docComment":"Removes the first element from an array and returns it."}
   ,{"name":"slice"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(start: number, end?: number): Array<T>"
+  ,"type":"(start: number, end?: number): T[]"
   ,"fullSymbolName":"Array<T>.slice"
-  ,"docComment":""}
+  ,"docComment":"Returns a section of an array."}
   ,{"name":"sort"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(compareFn?: (a: T, b: T) => number): Array<T>"
+  ,"type":"(compareFn?: (a: T, b: T) => number): T[]"
   ,"fullSymbolName":"Array<T>.sort"
-  ,"docComment":""}
+  ,"docComment":"Sorts an array."}
   ,{"name":"splice"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(start: number): Array<T> (+ 1 overload(s))"
+  ,"type":"(start: number): T[] (+ 1 overload(s))"
   ,"fullSymbolName":"Array<T>.splice"
-  ,"docComment":""}
+  ,"docComment":"Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements."}
   ,{"name":"unshift"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(...items: Array<T>): number"
+  ,"type":"(...items: T[]): number"
   ,"fullSymbolName":"Array<T>.unshift"
-  ,"docComment":""}
+  ,"docComment":"Inserts new elements at the start of an array."}
   ,{"name":"indexOf"
   ,"kind":"method"
   ,"kindModifiers":"public"
   ,"type":"(searchElement: T, fromIndex?: number): number"
   ,"fullSymbolName":"Array<T>.indexOf"
-  ,"docComment":""}
+  ,"docComment":"Returns the index of the first occurrence of a value in an array."}
   ,{"name":"lastIndexOf"
   ,"kind":"method"
   ,"kindModifiers":"public"
   ,"type":"(searchElement: T, fromIndex?: number): number"
   ,"fullSymbolName":"Array<T>.lastIndexOf"
-  ,"docComment":""}
+  ,"docComment":"Returns the index of the last occurrence of a specified value in an array."}
   ,{"name":"every"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (value: T, index: number, array: Array<T>) => boolean, thisArg?: any): boolean"
+  ,"type":"(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean"
   ,"fullSymbolName":"Array<T>.every"
-  ,"docComment":""}
+  ,"docComment":"Determines whether all the members of an array satisfy the specified test."}
   ,{"name":"some"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (value: T, index: number, array: Array<T>) => boolean, thisArg?: any): boolean"
+  ,"type":"(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean"
   ,"fullSymbolName":"Array<T>.some"
-  ,"docComment":""}
+  ,"docComment":"Determines whether the specified callback function returns true for any element of an array."}
   ,{"name":"forEach"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (value: T, index: number, array: Array<T>) => void, thisArg?: any): void"
+  ,"type":"(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void"
   ,"fullSymbolName":"Array<T>.forEach"
-  ,"docComment":""}
+  ,"docComment":"Performs the specified action for each element in an array."}
   ,{"name":"map"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"<U>(callbackfn: (value: T, index: number, array: Array<T>) => U, thisArg?: any): U[]"
+  ,"type":"<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[]"
   ,"fullSymbolName":"Array<T>.map"
-  ,"docComment":""}
+  ,"docComment":"Calls a defined callback function on each element of an array, and returns an array that contains the results."}
   ,{"name":"filter"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (value: T, index: number, array: Array<T>) => boolean, thisArg?: any): Array<T>"
+  ,"type":"(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[]"
   ,"fullSymbolName":"Array<T>.filter"
-  ,"docComment":""}
+  ,"docComment":"Returns the elements of an array that meet the condition specified in a callback function. "}
   ,{"name":"reduce"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: Array<T>) => T, initialValue?: T): T (+ 1 overload(s))"
+  ,"type":"(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: T[]) => T, initialValue?: T): T (+ 1 overload(s))"
   ,"fullSymbolName":"Array<T>.reduce"
-  ,"docComment":""}
+  ,"docComment":"Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function."}
   ,{"name":"reduceRight"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: Array<T>) => T, initialValue?: T): T (+ 1 overload(s))"
+  ,"type":"(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: T[]) => T, initialValue?: T): T (+ 1 overload(s))"
   ,"fullSymbolName":"Array<T>.reduceRight"
-  ,"docComment":""}
+  ,"docComment":"Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function."}
   ,{"name":"length"
   ,"kind":"property"
   ,"kindModifiers":"public"
   ,"type":"number"
   ,"fullSymbolName":"Array<T>.length"
-  ,"docComment":""}]}
+  ,"docComment":"Gets or sets the length of the array. This is a number one higher than the highest element defined in an array."}]}
 {"maybeInaccurate":false
   ,"isMemberCompletion":true
   ,"entries":[{"name":"toString"
@@ -852,15 +852,15 @@ node ../bin/tss.js empty.ts
   ,"entries":[{"name":"forEach"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (value: T, index: number, array: Array<T>) => void, thisArg?: any): void"
+  ,"type":"(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void"
   ,"fullSymbolName":"Array<T>.forEach"
-  ,"docComment":""}
+  ,"docComment":"Performs the specified action for each element in an array."}
   ,{"name":"filter"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (value: T, index: number, array: Array<T>) => boolean, thisArg?: any): Array<T>"
+  ,"type":"(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[]"
   ,"fullSymbolName":"Array<T>.filter"
-  ,"docComment":""}]
+  ,"docComment":"Returns the elements of an array that meet the condition specified in a callback function. "}]
   ,"prefix":"f"}
 "updated PREFIX/empty.ts"
 {"maybeInaccurate":false
@@ -868,9 +868,9 @@ node ../bin/tss.js empty.ts
   ,"entries":[{"name":"map"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"<U>(callbackfn: (value: T, index: number, array: Array<T>) => U, thisArg?: any): U[]"
+  ,"type":"<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[]"
   ,"fullSymbolName":"Array<T>.map"
-  ,"docComment":""}]
+  ,"docComment":"Calls a defined callback function on each element of an array, and returns an array that contains the results."}]
   ,"prefix":"m"}
 "updated PREFIX/empty.ts"
 {"maybeInaccurate":false
@@ -878,9 +878,9 @@ node ../bin/tss.js empty.ts
   ,"entries":[{"name":"forEach"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (value: T, index: number, array: Array<T>) => void, thisArg?: any): void"
+  ,"type":"(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void"
   ,"fullSymbolName":"Array<T>.forEach"
-  ,"docComment":""}]
+  ,"docComment":"Performs the specified action for each element in an array."}]
   ,"prefix":"fo"}
 "updated PREFIX/empty.ts"
 {"maybeInaccurate":false

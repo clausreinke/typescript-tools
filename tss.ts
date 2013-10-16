@@ -54,9 +54,11 @@ class TSS {
       }
       var snapshot = TypeScript.ScriptSnapshot.fromString(content);
 
+/* TODO
       if (!snapshot) {
           this.addDiagnostic(new TypeScript.Diagnostic(null, 0, 0, TypeScript.DiagnosticCode.Cannot_read_file_0_1, [filename, '']));
       }
+*/
 
       return snapshot;
   }
@@ -124,7 +126,7 @@ class TSS {
 
     // chase dependencies (references and imports)
     this.resolutionResult = TypeScript.ReferenceResolver
-                              .resolve([defaultLibs,file],this,this.compilationSettings);
+                              .resolve([defaultLibs,file],this,this.compilationSettings.useCaseSensitiveFileResolution);
     // TODO: what about resolution diagnostics?
     var resolvedFiles = this.resolutionResult.resolvedFiles;
 
@@ -390,22 +392,23 @@ class TSS {
 
         } else if (m = match(cmd,/^showErrors$/)) { // get processing errors
 
-          info = [].concat(this.resolutionResult.diagnostics.map(d=>{d["phase"]="Resolution";return d}),
-                           this.typescriptLS.getErrors())
-                   .map( d => {
+          info = this.resolutionResult.diagnostics
+                     .map(d=>{d["phase"]="Resolution";return d})
+                     .concat(this.typescriptLS.getErrors())
+                     .map( d => {
                            var file = d.fileName();
                            var lc   = this.typescriptLS.positionToLineCol(file,d.start());
                            var len  = this.typescriptLS.getScriptInfo(file).content.length;
                            var end  = Math.min(len,d.start()+d.length()); // NOTE: clamped to end of file (#11)
                            var lc2  = this.typescriptLS.positionToLineCol(file,end);
-                           var diagInfo = TypeScript.getDiagnosticInfoFromKey(d.diagnosticKey());
+                           var diagInfo = d.info();
                            var category = TypeScript.DiagnosticCategory[diagInfo.category];
                            return {
                             file: file,
                             start: {line: lc.line, character: lc.character},
                             end: {line: lc2.line, character: lc2.character},
                             text: /* file+"("+lc.line+"/"+lc.character+"): "+ */ d.message(),
-                            phase: d.phase,
+                            phase: d["phase"],
                             category: category
                             // ,diagnostic: d
                            };
