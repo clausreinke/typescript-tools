@@ -169,15 +169,17 @@ class TSS {
 
     var collecting = 0, on_collected_callback:()=>void, lines:string[] = [];
 
+    var commands = {};
+    function match(cmd,regexp) {
+      commands[regexp.source] = true;
+      return cmd.match(regexp);
+    }
+
     rl.on('line', input => {  // most commands are one-liners
-      var m:string[], commands = {};
+      var m:string[];
       try {
 
-        cmd = String(input.trim());
-        cmd.match = <any>((regexp:RegExp)=>{
-                      commands[regexp.source] = true;
-                      return <string[]>String.prototype.match.call(cmd,regexp);
-                    });
+        cmd = input.trim();
 
         if (collecting>0) { // multiline input, eg, source
 
@@ -188,7 +190,7 @@ class TSS {
             on_collected_callback();
           }
 
-        } else if (m = cmd.match(/^type (\d+) (\d+) (.*)$/)) {
+        } else if (m = match(cmd,/^type (\d+) (\d+) (.*)$/)) {
 
           line   = parseInt(m[1]);
           col    = parseInt(m[2]);
@@ -201,7 +203,7 @@ class TSS {
 
           this.ioHost.printLine(JSON.stringify(info).trim());
 
-        } else if (m = cmd.match(/^definition (\d+) (\d+) (.*)$/)) {
+        } else if (m = match(cmd,/^definition (\d+) (\d+) (.*)$/)) {
 
           line = parseInt(m[1]);
           col  = parseInt(m[2]);
@@ -220,7 +222,7 @@ class TSS {
           // TODO: what about multiple definitions?
           this.ioHost.printLine(JSON.stringify(info[0]||null).trim());
 
-        } else if (m = cmd.match(/^(references|occurrences|implementors) (\d+) (\d+) (.*)$/)) {
+        } else if (m = match(cmd,/^(references|occurrences|implementors) (\d+) (\d+) (.*)$/)) {
 
           line = parseInt(m[2]);
           col  = parseInt(m[3]);
@@ -250,7 +252,7 @@ class TSS {
 
           this.ioHost.printLine(JSON.stringify(info).trim());
 
-        } else if (m = cmd.match(/^structure (.*)$/)) {
+        } else if (m = match(cmd,/^structure (.*)$/)) {
 
           file = this.resolveRelativePath(m[1]);
 
@@ -265,7 +267,7 @@ class TSS {
 
           this.ioHost.printLine(JSON.stringify(info).trim());
 
-        } else if (m = cmd.match(/^completions(-brief)? (true|false) (\d+) (\d+) (.*)$/)) {
+        } else if (m = match(cmd,/^completions(-brief)? (true|false) (\d+) (\d+) (.*)$/)) {
 
           brief  = m[1];
           member = m[2]==='true';
@@ -302,7 +304,7 @@ class TSS {
 
           this.ioHost.printLine(JSON.stringify(info).trim());
 
-        } else if (m = cmd.match(/^info (\d+) (\d+) (.*)$/)) { // mostly for debugging
+        } else if (m = match(cmd,/^info (\d+) (\d+) (.*)$/)) { // mostly for debugging
 
           line = parseInt(m[1]);
           col  = parseInt(m[2]);
@@ -343,7 +345,7 @@ class TSS {
 
           this.ioHost.printLine(JSON.stringify(info).trim());
 
-        } else if (m = cmd.match(/^update( nocheck)? (\d+)( (\d+)-(\d+))? (.*)$/)) { // send non-saved source
+        } else if (m = match(cmd,/^update( nocheck)? (\d+)( (\d+)-(\d+))? (.*)$/)) { // send non-saved source
 
           file       = this.resolveRelativePath(m[6]);
           script     = this.typescriptLS.getScriptInfo(file);
@@ -386,7 +388,7 @@ class TSS {
             this.ioHost.printLine('"cannot update line range in new file"');
           }
 
-        } else if (m = cmd.match(/^showErrors$/)) { // get processing errors
+        } else if (m = match(cmd,/^showErrors$/)) { // get processing errors
 
           info = [].concat(this.resolutionResult.diagnostics.map(d=>{d["phase"]="Resolution";return d}),
                            this.typescriptLS.getErrors())
@@ -412,13 +414,13 @@ class TSS {
 
           this.ioHost.printLine(JSON.stringify(info).trim());
 
-        } else if (m = cmd.match(/^files$/)) { // list files in project
+        } else if (m = match(cmd,/^files$/)) { // list files in project
 
           info = this.typescriptLS.getScriptFileNames(); // TODO: shim/JSON vs real-ls/array
 
           this.ioHost.printLine(info.trim());
 
-        } else if (m = cmd.match(/^lastError(Dump)?$/)) { // debugging only
+        } else if (m = match(cmd,/^lastError(Dump)?$/)) { // debugging only
 
           if (this.lastError)
             if (m[1]) // commandline use
@@ -428,7 +430,7 @@ class TSS {
           else
             this.ioHost.printLine('"no last error"');
 
-        } else if (m = cmd.match(/^dump (\S+) (.*)$/)) { // debugging only
+        } else if (m = match(cmd,/^dump (\S+) (.*)$/)) { // debugging only
 
           var dump = m[1];
           file     = this.resolveRelativePath(m[2]);
@@ -443,16 +445,16 @@ class TSS {
             this.ioHost.printLine('"dumped '+file+' to '+dump+'"');
           }
 
-        } else if (m = cmd.match(/^reload$/)) { // reload current project
+        } else if (m = match(cmd,/^reload$/)) { // reload current project
 
           this.setup(this.rootFile.path);
           this.ioHost.printLine('"reloaded '+this.rootFile.path+', TSS listening.."');
 
-        } else if (m = cmd.match(/^quit$/)) {
+        } else if (m = match(cmd,/^quit$/)) {
 
           rl.close();
 
-        } else if (m = cmd.match(/^help$/)) {
+        } else if (m = match(cmd,/^help$/)) {
 
           this.ioHost.printLine(Object.keys(commands).join(EOL));
 
