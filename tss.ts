@@ -41,7 +41,7 @@ class TSS {
   public resolutionResult : TypeScript.ReferenceResolutionResult;
   public lastError;
 
-  constructor (public ioHost: IIO) { } // NOTE: call setup
+  constructor (public ioHost: IIO,public prettyJSON: boolean = false) { } // NOTE: call setup
 
   private fileNameToContent:TypeScript.StringHashTable<string>;
 
@@ -158,6 +158,18 @@ class TSS {
 
   }
 
+  private output(info) {
+    if (this.prettyJSON) {
+      this.ioHost.printLine(JSON.stringify(info,null," ").trim());
+    } else {
+      this.ioHost.printLine(JSON.stringify(info).trim());
+    }
+  }
+
+  private outputJSON(json) {
+    this.ioHost.printLine(json.trim());
+  }
+
   /** commandline server main routine: commands in, JSON info out */
   public listen() {
     var line: number;
@@ -203,7 +215,7 @@ class TSS {
           info = (this.ls.getTypeAtPosition(file, pos)||{});
           info.type = (info.memberName||"").toString();
 
-          this.ioHost.printLine(JSON.stringify(info).trim());
+          this.output(info);
 
         } else if (m = match(cmd,/^definition (\d+) (\d+) (.*)$/)) {
 
@@ -222,7 +234,7 @@ class TSS {
           }));
 
           // TODO: what about multiple definitions?
-          this.ioHost.printLine(JSON.stringify(info[0]||null).trim());
+          this.output(info[0]||null);
 
         } else if (m = match(cmd,/^(references|occurrences|implementors) (\d+) (\d+) (.*)$/)) {
 
@@ -252,7 +264,7 @@ class TSS {
             lim  : ref && this.typescriptLS.positionToLineCol(ref.fileName,ref.limChar)
           }));
 
-          this.ioHost.printLine(JSON.stringify(info).trim());
+          this.output(info);
 
         } else if (m = match(cmd,/^structure (.*)$/)) {
 
@@ -267,7 +279,7 @@ class TSS {
             lim  : loc && this.typescriptLS.positionToLineCol(loc.fileName,loc.limChar)
           }));
 
-          this.ioHost.printLine(JSON.stringify(info).trim());
+          this.output(info);
 
         } else if (m = match(cmd,/^completions(-brief)? (true|false) (\d+) (\d+) (.*)$/)) {
 
@@ -304,7 +316,7 @@ class TSS {
             })();
           }
 
-          this.ioHost.printLine(JSON.stringify(info).trim());
+          this.output(info);
 
         } else if (m = match(cmd,/^info (\d+) (\d+) (.*)$/)) { // mostly for debugging
 
@@ -345,7 +357,7 @@ class TSS {
             // member   : member,
           };
 
-          this.ioHost.printLine(JSON.stringify(info).trim());
+          this.output(info);
 
         } else if (m = match(cmd,/^update( nocheck)? (\d+)( (\d+)-(\d+))? (.*)$/)) { // send non-saved source
 
@@ -382,12 +394,12 @@ class TSS {
               on_collected_callback = undefined;
               lines = [];
 
-              this.ioHost.printLine((added ? '"added ' : '"updated ')
-                                    +(range ? 'lines'+m[3]+' in ' : '')
-                                    +file+(check ? ', ('+syn+'/'+sem+') errors' : '')+'"');
+              this.outputJSON((added ? '"added ' : '"updated ')
+                              +(range ? 'lines'+m[3]+' in ' : '')
+                              +file+(check ? ', ('+syn+'/'+sem+') errors' : '')+'"');
             };
           } else {
-            this.ioHost.printLine('"cannot update line range in new file"');
+            this.outputJSON('"cannot update line range in new file"');
           }
 
         } else if (m = match(cmd,/^showErrors$/)) { // get processing errors
@@ -415,13 +427,13 @@ class TSS {
                          }
                        );
 
-          this.ioHost.printLine(JSON.stringify(info).trim());
+          this.output(info);
 
         } else if (m = match(cmd,/^files$/)) { // list files in project
 
           info = this.typescriptLS.getScriptFileNames(); // TODO: shim/JSON vs real-ls/array
 
-          this.ioHost.printLine(info.trim());
+          this.outputJSON(info);
 
         } else if (m = match(cmd,/^lastError(Dump)?$/)) { // debugging only
 
@@ -429,9 +441,9 @@ class TSS {
             if (m[1]) // commandline use
               this.ioHost.printLine(JSON.parse(this.lastError).stack);
             else
-              this.ioHost.printLine(this.lastError);
+              this.outputJSON(this.lastError);
           else
-            this.ioHost.printLine('"no last error"');
+            this.outputJSON('"no last error"');
 
         } else if (m = match(cmd,/^dump (\S+) (.*)$/)) { // debugging only
 
@@ -445,17 +457,23 @@ class TSS {
           } else { // to file
             this.ioHost.writeFile(dump,source,false);
 
-            this.ioHost.printLine('"dumped '+file+' to '+dump+'"');
+            this.outputJSON('"dumped '+file+' to '+dump+'"');
           }
 
         } else if (m = match(cmd,/^reload$/)) { // reload current project
 
           this.setup(this.rootFile.path);
-          this.ioHost.printLine('"reloaded '+this.rootFile.path+', TSS listening.."');
+          this.outputJSON('"reloaded '+this.rootFile.path+', TSS listening.."');
 
         } else if (m = match(cmd,/^quit$/)) {
 
           rl.close();
+
+        } else if (m = match(cmd,/^prettyJSON (true|false)$/)) {
+
+          this.prettyJSON = m[1]==='true';
+
+          this.outputJSON('"pretty JSON: '+this.prettyJSON+'"');
 
         } else if (m = match(cmd,/^help$/)) {
 
@@ -463,24 +481,24 @@ class TSS {
 
         } else {
 
-          this.ioHost.printLine('"TSS command syntax error: '+cmd+'"');
+          this.outputJSON('"TSS command syntax error: '+cmd+'"');
 
         }
 
       } catch(e) {
 
           this.lastError = (JSON.stringify({msg:e.toString(),stack:e.stack})).trim();
-          this.ioHost.printLine('"TSS command processing error: '+e+'"');
+          this.outputJSON('"TSS command processing error: '+e+'"');
 
       }
 
     }).on('close', () => {
 
-          this.ioHost.printLine('"TSS closing"');
+          this.outputJSON('"TSS closing"');
 
     });
 
-    this.ioHost.printLine('"loaded '+this.rootFile.path+', TSS listening.."');
+    this.outputJSON('"loaded '+this.rootFile.path+', TSS listening.."');
 
   }
 }
