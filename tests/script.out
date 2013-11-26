@@ -1011,7 +1011,7 @@ node ../bin/tss.js issue-17.ts
 [{"ref":{"fileName":"PREFIX/issue-17-import.ts"
   ,"minChar":64
   ,"limChar":69
-  ,"isWriteAccess":true}
+  ,"isWriteAccess":false}
   ,"file":"PREFIX/issue-17-import.ts"
   ,"min":{"line":7
   ,"character":12}
@@ -1029,7 +1029,7 @@ node ../bin/tss.js issue-17.ts
 [{"ref":{"fileName":"PREFIX/issue-17-import.ts"
   ,"minChar":64
   ,"limChar":69
-  ,"isWriteAccess":true}
+  ,"isWriteAccess":false}
   ,"file":"PREFIX/issue-17-import.ts"
   ,"min":{"line":7
   ,"character":12}

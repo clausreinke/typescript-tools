@@ -12,7 +12,7 @@ function switchToForwardSlashes(path: string) {
     return path.replace(/\\/g, "/");
 }
 
-function readFile(file) { return IO.readFile(file,null) }
+function readFile(file) { return TypeScript.IO.readFile(file,null) }
 
 declare module process {
     export function nextTick(callback: () => any): void;
@@ -41,7 +41,7 @@ module Harness {
         public editRanges: { length: number; textChangeRange: TypeScript.TextChangeRange; }[] = [];
         public lineMap: TypeScript.LineMap = null;
 
-        constructor(public fileName: string, public content: string, public isOpen = true, public byteOrderMark: ByteOrderMark = ByteOrderMark.None) {
+        constructor(public fileName: string, public content: string, public isOpen = true, public byteOrderMark: TypeScript.ByteOrderMark = TypeScript.ByteOrderMark.None) {
             this.setContent(content);
         }
 
@@ -94,7 +94,7 @@ module Harness {
         }
     }
 
-    class ScriptSnapshotShim implements Services.IScriptSnapshotShim {
+    class ScriptSnapshotShim implements TypeScript.Services.IScriptSnapshotShim {
         private lineMap: TypeScript.LineMap = null;
         private textSnapshot: string;
         private version: number;
@@ -130,10 +130,10 @@ module Harness {
         }
     }
 
-    export class TypeScriptLS implements Services.ILanguageServiceShimHost {
-        private ls: Services.ILanguageServiceShim = null;
+    export class TypeScriptLS implements TypeScript.Services.ILanguageServiceShimHost {
+        private ls: TypeScript.Services.ILanguageServiceShim = null;
 
-        private fileNameToScript = new TypeScript.StringHashTable();
+        private fileNameToScript = new TypeScript.StringHashTable<ScriptInfo>();
 
         public addDefaultLibrary() {
             throw("addDefaultLibrary not implemented");
@@ -185,7 +185,7 @@ module Harness {
 
         public log(s: string): void {
             // For debugging...
-            //IO.printLine("TypeScriptLS:" + s);
+            //TypeScript.IO.printLine("TypeScriptLS:" + s);
         }
 
         // collect Diagnostics
@@ -215,7 +215,7 @@ module Harness {
             return JSON.stringify(this.fileNameToScript.getAllKeys());
         }
 
-        public getScriptSnapshot(fileName: string): Services.IScriptSnapshotShim {
+        public getScriptSnapshot(fileName: string): TypeScript.Services.IScriptSnapshotShim {
             return new ScriptSnapshotShim(this.getScriptInfo(fileName));
         }
 
@@ -227,11 +227,11 @@ module Harness {
             return this.getScriptInfo(fileName).isOpen;
         }
 
-        public getScriptByteOrderMark(fileName: string): ByteOrderMark {
+        public getScriptByteOrderMark(fileName: string): TypeScript.ByteOrderMark {
             return this.getScriptInfo(fileName).byteOrderMark;
         }
 
-        public getDiagnosticsObject(): Services.ILanguageServicesDiagnostics {
+        public getDiagnosticsObject(): TypeScript.Services.ILanguageServicesDiagnostics {
             return new LanguageServicesDiagnostics("");
         }
 
@@ -240,38 +240,38 @@ module Harness {
         }
 
         public fileExists(s: string) {
-            return IO.fileExists(s);
+            return TypeScript.IO.fileExists(s);
         }
 
         public directoryExists(s: string) {
-            return IO.directoryExists(s);
+            return TypeScript.IO.directoryExists(s);
         }
 
         public resolveRelativePath(path: string, directory: string): string {
             if (TypeScript.isRooted(path) || !directory) {
-                return IO.resolvePath(path);
+                return TypeScript.IO.resolvePath(path);
             }
             else {
-                return IO.resolvePath(IOUtils.combine(directory, path));
+                return TypeScript.IO.resolvePath(TypeScript.IOUtils.combine(directory, path));
             }
         }
 
         public getParentDirectory(path: string): string {
-            return IO.dirName(path);
+            return TypeScript.IO.dirName(path);
         }
 
         /** Return a new instance of the language service shim, up-to-date wrt to typecheck.
          *  To access the non-shim (i.e. actual) language service, use the "ls.languageService" property.
          */
-        public getLanguageService(): Services.ILanguageServiceShim {
-            var ls = new Services.TypeScriptServicesFactory().createLanguageServiceShim(this);
+        public getLanguageService(): TypeScript.Services.ILanguageServiceShim {
+            var ls = new TypeScript.Services.TypeScriptServicesFactory().createLanguageServiceShim(this);
             ls.refresh(true);
             this.ls = ls;
             return ls;
         }
 
         /** Parse file given its source text */
-        public parseSourceText(fileName: string, sourceText: TypeScript.IScriptSnapshot): TypeScript.Script {
+        public parseSourceText(fileName: string, sourceText: TypeScript.IScriptSnapshot): TypeScript.SourceUnit {
             var compilationSettings = new TypeScript.CompilationSettings();
             compilationSettings.codeGenTarget = TypeScript.LanguageVersion.EcmaScript5;
 
@@ -323,7 +323,7 @@ module Harness {
         }
 
         /** Verify that applying edits to sourceFileName result in the content of the file baselineFileName */
-        public checkEdits(sourceFileName: string, baselineFileName: string, edits: Services.TextEdit[]) {
+        public checkEdits(sourceFileName: string, baselineFileName: string, edits: TypeScript.Services.TextEdit[]) {
             var script = readFile(sourceFileName);
             var formattedScript = this.applyEdits(script.contents, edits);
             var baseline = readFile(baselineFileName).contents;
@@ -332,7 +332,7 @@ module Harness {
 
 
         /** Apply an array of text edits to a string, and return the resulting string. */
-        public applyEdits(content: string, edits: Services.TextEdit[]): string {
+        public applyEdits(content: string, edits: TypeScript.Services.TextEdit[]): string {
             var result = content;
             edits = this.normalizeEdits(edits);
 
@@ -347,11 +347,11 @@ module Harness {
         }
 
         /** Normalize an array of edits by removing overlapping entries and sorting entries on the minChar position. */
-        private normalizeEdits(edits: Services.TextEdit[]): Services.TextEdit[] {
-            var result: Services.TextEdit[] = [];
+        private normalizeEdits(edits: TypeScript.Services.TextEdit[]): TypeScript.Services.TextEdit[] {
+            var result: TypeScript.Services.TextEdit[] = [];
 
-            function mapEdits(edits: Services.TextEdit[]): { edit: Services.TextEdit; index: number; }[] {
-                var result: { edit: Services.TextEdit; index: number; }[] = [];
+            function mapEdits(edits: TypeScript.Services.TextEdit[]): { edit: TypeScript.Services.TextEdit; index: number; }[] {
+                var result: { edit: TypeScript.Services.TextEdit; index: number; }[] = [];
                 for (var i = 0; i < edits.length; i++) {
                     result.push({ edit: edits[i], index: i });
                 }
@@ -403,12 +403,12 @@ module Harness {
         }
     }
 
-    export class LanguageServicesDiagnostics implements Services.ILanguageServicesDiagnostics {
+    export class LanguageServicesDiagnostics implements TypeScript.Services.ILanguageServicesDiagnostics {
 
         constructor(private destination: string) { }
 
         public log(content: string): void {
-            IO.stderr.WriteLine(content);
+            TypeScript.IO.stderr.WriteLine(content);
             //Imitates the LanguageServicesDiagnostics object when not in Visual Studio
         }
 
