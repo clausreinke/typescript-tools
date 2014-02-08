@@ -241,7 +241,7 @@ function! TSScompleteFunc(findstart,base)
     if type(info)==type({})
       for entry in info.entries
         if entry['name'] =~ '^'.a:base
-          call add(result, {'word': entry['name'], 'menu': entry['type'], 'info': entry['docComment'] })
+          call add(result, {'word': entry['name'], 'menu': get(entry,'type',get(entry,'kind','')), 'info': get(entry,'docComment','') })
         endif
       endfor
     endif

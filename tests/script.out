@@ -727,10 +727,7 @@ node ../bin/tss.js empty.ts
   ,"docComment":""}
   ,{"name":"boolean"
   ,"kind":"primitive type"
-  ,"kindModifiers":""
-  ,"type":"boolean"
-  ,"fullSymbolName":""
-  ,"docComment":""}
+  ,"kindModifiers":""}
   ,{"name":"blur"
   ,"kind":"function"
   ,"kindModifiers":"declare"
@@ -761,10 +758,7 @@ node ../bin/tss.js empty.ts
   ,"docComment":""}
   ,{"name":"boolean"
   ,"kind":"primitive type"
-  ,"kindModifiers":""
-  ,"type":"boolean"
-  ,"fullSymbolName":""
-  ,"docComment":""}
+  ,"kindModifiers":""}
   ,{"name":"blur"
   ,"kind":"function"
   ,"kindModifiers":"declare"

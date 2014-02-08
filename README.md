@@ -83,7 +83,7 @@ TypeScript tools currently available:
   completions (true|false) <line> <pos> <file>
     // get member/non-member completions
 
-    { entries: [{name: string, type: string, docComment: string}, ...]
+    { entries: [{name: string, type?: string, docComment?: string}, ...]
     }
 
   completions-brief (true|false) <line> <pos> <file>
