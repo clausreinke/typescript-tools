@@ -125,7 +125,7 @@ node ../bin/tss.js test.ts
   ,{"name":"localeCompare"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(that: string): number (+ 2 overload(s))"
+  ,"type":"(that: string, locales: string[], options?: Intl.CollatorOptions): number (+ 2 overload(s))"
   ,"fullSymbolName":"String.localeCompare"
   ,"docComment":"Determines whether two strings are equivalent in the current locale."}
   ,{"name":"match"
@@ -149,7 +149,7 @@ node ../bin/tss.js test.ts
   ,{"name":"slice"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(start: number, end?: number): string"
+  ,"type":"(start?: number, end?: number): string"
   ,"fullSymbolName":"String.slice"
   ,"docComment":"Returns a section of a string."}
   ,{"name":"split"
@@ -293,7 +293,7 @@ var a = [];
   ,{"name":"localeCompare"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(that: string): number (+ 2 overload(s))"
+  ,"type":"(that: string, locales: string[], options?: Intl.CollatorOptions): number (+ 2 overload(s))"
   ,"fullSymbolName":"String.localeCompare"
   ,"docComment":"Determines whether two strings are equivalent in the current locale."}
   ,{"name":"match"
@@ -317,7 +317,7 @@ var a = [];
   ,{"name":"slice"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(start: number, end?: number): string"
+  ,"type":"(start?: number, end?: number): string"
   ,"fullSymbolName":"String.slice"
   ,"docComment":"Returns a section of a string."}
   ,{"name":"split"
@@ -441,7 +441,7 @@ var a = [];
   ,{"name":"slice"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(start: number, end?: number): T[]"
+  ,"type":"(start?: number, end?: number): T[]"
   ,"fullSymbolName":"Array<T>.slice"
   ,"docComment":"Returns a section of an array."}
   ,{"name":"sort"

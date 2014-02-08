@@ -1,6 +1,6 @@
 0.2.2-1 to .:
 
-  - update TS to v0.9.1-1552-g8f48eda
+  - update TS to v0.9.1-1755-g91711fe
 
   - tss.vim:
     - change `TSSstructure` to popup nagivation menu
