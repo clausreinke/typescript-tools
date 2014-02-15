@@ -1,6 +1,6 @@
 TYPESCRIPT=../typescript
 TSC=node $(TYPESCRIPT)/bin/tsc.js
-TYPESCRIPT_GIT=$(TYPESCRIPT)/.git/refs/heads/develop
+TYPESCRIPT_GIT=$(TYPESCRIPT)/.git
 TEST_SCRIPTS=tests/*.script
 TEST_SOURCES=tests/*.ts
 VERSION=$(shell git describe --tags)
