@@ -217,6 +217,8 @@ function! TSScompleteFunc(findstart,base)
   endwhile
 
   if a:findstart
+    if TSSstatus()!="None" | echoerr "TSS not running" | endif
+
     " force updates for completed fragments, while still in insert mode
     " bypass error checking (cf #13,#14)
     TSSupdate completionStart
@@ -517,13 +519,14 @@ return result
 endfunction
 
 " check typescript service
-" (None: still running; <num>: exit status)
-command! TSSstatus call TSSstatus()
+" ("None": still running; "<num>": exit status)
+command! TSSstatus echo TSSstatus()
 function! TSSstatus()
 python <<EOF
+import json
 
 rest = tss.poll()
-print rest
+vim.command("return "+json.dumps(str(rest)))
 
 EOF
 endfunction
