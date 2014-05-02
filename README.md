@@ -180,6 +180,15 @@ TypeScript tools currently available:
   directly can give enough error information for the current file -- eventually,
   you'll probably have to call `:TSSreload` to account for changes in dependencies.
 
+### Vim plugin usage tips
+
+  1. the plugin collaborates with a tss server running in the background (via python and nodejs)
+  2. the tss server will pick up source file dependencies (via import and references)
+  3. start the tss server while editing your main source file (or your main reference file), by issueing `:TSSstarthere`
+  4. now you can use the other commands (or `:TSSend`, to get rid of the background server), even while opening TS sources from the same project in different windows or tabs (but in the same Vim instance)
+
+### Vim plugin commands
+
   ```
   " echo symbol/type of item under cursor
   command! TSSsymbol

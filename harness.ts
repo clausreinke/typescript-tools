@@ -271,15 +271,13 @@ module Harness {
         }
 
         /** Parse file given its source text */
-        public parseSourceText(fileName: string, sourceText: TypeScript.IScriptSnapshot): TypeScript.SourceUnit {
+        public parseSourceText(fileName: string, sourceText: TypeScript.IScriptSnapshot): TypeScript.SourceUnitSyntax {
             var compilationSettings = new TypeScript.CompilationSettings();
             compilationSettings.codeGenTarget = TypeScript.LanguageVersion.EcmaScript5;
 
             var settings = TypeScript.ImmutableCompilationSettings.fromCompilationSettings(compilationSettings);
             var parseOptions = TypeScript.getParseOptions(settings);
-            return TypeScript.SyntaxTreeToAstVisitor.visit(
-                TypeScript.Parser.parse(fileName, TypeScript.SimpleText.fromScriptSnapshot(sourceText), TypeScript.isDTSFile(fileName), parseOptions),
-                fileName, settings, /*incrementalAST: */ true);
+            return TypeScript.Parser.parse(fileName, TypeScript.SimpleText.fromScriptSnapshot(sourceText), TypeScript.isDTSFile(fileName), parseOptions).sourceUnit();
         }
 
         /** Parse a file on disk given its fileName */

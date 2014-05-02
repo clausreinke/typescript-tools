@@ -249,7 +249,7 @@ var a = [];
   ,"character":4}
   ,"end":{"line":4
   ,"character":6}
-  ,"text":"error TS2094: The property 'to' does not exist on value of type 'String'."
+  ,"text":"error TS2094: The property 'to' does not exist on value of type 'string'."
   ,"phase":"Semantics"
   ,"category":"Error"}]
 {"maybeInaccurate":false

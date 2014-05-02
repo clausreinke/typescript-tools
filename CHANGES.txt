@@ -1,12 +1,21 @@
-0.2.2-1 to .:
+0.2.2-1 to 0.3.0:
 
-  - update TS to v0.9.1-1755-g91711fe
+  - update TS to v0.9.1-2130-g0c53b50 (develop branch, about TS v1.0 release)
+
+  - fix tss command help
+
+  - fix #23 (bin/tss executable bit)
+
+  - primitive types have no completion details #29
 
   - tss.vim:
     - change `TSSstructure` to popup nagivation menu
     - add `TSSfile`: quickly open project files, with filename completion
     - add `TSSfilesMenu`: quickly open project files, with popup navigation menu
     - add sample keymap
+    - guard against tss not running/no python
+    - only use shell on windows; fixes #18
+    - improve TSSstatus();"tss not running" handling #29
 
 0.2.1 to 0.2.2-1:             NOTE: package name changed!
 
