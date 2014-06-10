@@ -28,8 +28,8 @@ node ../bin/tss.js test.ts
   ,"docComment":""
   ,"fullSymbolName":"s"
   ,"kind":"var"
-  ,"minChar":34
-  ,"limChar":35
+  ,"minChar":32
+  ,"limChar":33
   ,"type":"string"}
 {"memberName":{"prefix":"{ "
   ,"suffix":"}"
@@ -57,12 +57,12 @@ node ../bin/tss.js test.ts
   ,"docComment":""
   ,"fullSymbolName":"x"
   ,"kind":"var"
-  ,"minChar":41
-  ,"limChar":42
+  ,"minChar":38
+  ,"limChar":39
   ,"type":"{ a: number; b: number; }"}
 {"def":{"fileName":"PREFIX/test.ts"
-  ,"minChar":24
-  ,"limChar":30
+  ,"minChar":23
+  ,"limChar":29
   ,"kind":"var"
   ,"name":"s"
   ,"containerKind":""
@@ -1003,8 +1003,8 @@ node ../bin/tss.js issue-17.ts
 // stdout
 "loaded PREFIX/issue-17.ts, TSS listening.."
 [{"ref":{"fileName":"PREFIX/issue-17-import.ts"
-  ,"minChar":64
-  ,"limChar":69
+  ,"minChar":58
+  ,"limChar":63
   ,"isWriteAccess":false}
   ,"file":"PREFIX/issue-17-import.ts"
   ,"min":{"line":7
@@ -1012,8 +1012,8 @@ node ../bin/tss.js issue-17.ts
   ,"lim":{"line":7
   ,"character":17}}
   ,{"ref":{"fileName":"PREFIX/issue-17.ts"
-  ,"minChar":86
-  ,"limChar":91
+  ,"minChar":83
+  ,"limChar":88
   ,"isWriteAccess":false}
   ,"file":"PREFIX/issue-17.ts"
   ,"min":{"line":4
@@ -1021,8 +1021,8 @@ node ../bin/tss.js issue-17.ts
   ,"lim":{"line":4
   ,"character":13}}]
 [{"ref":{"fileName":"PREFIX/issue-17-import.ts"
-  ,"minChar":64
-  ,"limChar":69
+  ,"minChar":58
+  ,"limChar":63
   ,"isWriteAccess":false}
   ,"file":"PREFIX/issue-17-import.ts"
   ,"min":{"line":7
@@ -1030,8 +1030,8 @@ node ../bin/tss.js issue-17.ts
   ,"lim":{"line":7
   ,"character":17}}
   ,{"ref":{"fileName":"PREFIX/issue-17.ts"
-  ,"minChar":86
-  ,"limChar":91
+  ,"minChar":83
+  ,"limChar":88
   ,"isWriteAccess":false}
   ,"file":"PREFIX/issue-17.ts"
   ,"min":{"line":4
