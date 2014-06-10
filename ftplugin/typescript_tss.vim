@@ -223,7 +223,8 @@ function! TSScompleteFunc(findstart,base)
     " bypass error checking (cf #13,#14)
     TSSupdate completionStart
 
-    return line[start-1] =~ "\\k" ? start-1 : -1
+    "return line[start-1] =~ "\\k" ? start-1 : -1
+    return start-1
   else
     " check if preceded by dot (won't see dot on previous line!)
     let member = (start>1 && line[start-2]==".") ? 'true' : 'false'
