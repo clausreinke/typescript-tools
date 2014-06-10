@@ -1,6 +1,6 @@
 {
   "name": "typescript-tools",
-  "version": "v0.3.0",
+  "version": "v0.3.0-2-g66c9896",
   "description": "TypeScript Services commandline server",
   "bin": {
     "tss": "bin/tss"

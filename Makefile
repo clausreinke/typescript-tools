@@ -31,3 +31,6 @@ package.json: .git/refs/heads/master
 	node -e "var pj=require('./package.json'); \
 					 pj.version='$(VERSION)';\
 					 require('fs').writeFileSync('package.json',JSON.stringify(pj,null,'  '));"
+
+eols:
+	find .  -wholename './.git' -prune -o -exec file \{\} \; | grep CRLF
