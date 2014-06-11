@@ -1,3 +1,11 @@
+0.3.0 to 0.3.1:
+
+  - update TS to v0.9.1-2505-g18875cc (develop branch)
+
+  - fix #32 (EOLs in bin)
+
+  - fix #33 (-1 return in TSScompleteFunc)
+
 0.2.2-1 to 0.3.0:
 
   - update TS to v0.9.1-2130-g0c53b50 (develop branch, about TS v1.0 release)

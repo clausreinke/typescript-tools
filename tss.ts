@@ -41,7 +41,7 @@ class TSS {
   public resolutionResult : TypeScript.ReferenceResolutionResult;
   public lastError;
 
-  constructor (public ioHost: TypeScript.IIO,public prettyJSON: boolean = false) { } // NOTE: call setup
+  constructor (public ioHost: TypeScript.IEnvironment,public prettyJSON: boolean = false) { } // NOTE: call setup
 
   private fileNameToContent:TypeScript.StringHashTable<string>;
 
@@ -74,7 +74,7 @@ class TSS {
       }
 
       // get the absolute path
-      normalizedPath = TypeScript.IO.resolvePath(normalizedPath);
+      normalizedPath = TypeScript.Environment.absolutePath(normalizedPath);
 
       // Switch to forward slashes
       normalizedPath = TypeScript.switchToForwardSlashes(normalizedPath)
@@ -84,13 +84,13 @@ class TSS {
   }
 
   fileExists(s: string):boolean {
-      return TypeScript.IO.fileExists(s);
+      return TypeScript.Environment.fileExists(s);
   }
   directoryExists(path: string): boolean {
-      return TypeScript.IO.directoryExists(path);
+      return TypeScript.Environment.directoryExists(path);
   }
   getParentDirectory(path: string): string {
-      return TypeScript.IO.dirName(path);
+      return TypeScript.Environment.directoryName(path);
   }
 
   // IDiagnosticReporter
@@ -101,11 +101,11 @@ class TSS {
               var lineMap = new TypeScript.LineMap(scriptSnapshot.getLineStartPositions, scriptSnapshot.getLength());
               var lineCol = { line: -1, character: -1 };
               lineMap.fillLineAndCharacterFromPosition(diagnostic.start(), lineCol);
-              TypeScript.IO.stderr.Write(diagnostic.fileName() + "(" + (lineCol.line + 1) + "," + (lineCol.character + 1) + "): ");
+              TypeScript.Environment.standardError.Write(diagnostic.fileName() + "(" + (lineCol.line + 1) + "," + (lineCol.character + 1) + "): ");
           }
       }
 
-      TypeScript.IO.stderr.WriteLine(diagnostic.message());  // TODO: IO vs ioHost
+      TypeScript.Environment.standardError.WriteLine(diagnostic.message());
   }
 
   /** load file and dependencies, prepare language service for queries */
@@ -118,7 +118,7 @@ class TSS {
     /*
     TypeScript.CompilerDiagnostics.debug = true;
     TypeScript.CompilerDiagnostics.diagnosticWriter = 
-      { Alert: (s: string) => { this.ioHost.printLine(s); } };
+      { Alert: (s: string) => { this.ioHost.standardError.WriteLine(s); } };
     */
 
     this.typescriptLS = new Harness.TypeScriptLS();
@@ -148,7 +148,7 @@ class TSS {
 
     // initialize languageService code units
     resolvedFiles.forEach( (code,i) => {
-      // this.ioHost.printLine(i+': '+code.path);
+      // this.ioHost.standardError.WriteLine(i+': '+code.path);
       this.typescriptLS.addScript(code.path,this.fileNameToContent.lookup(code.path));
     });
 
@@ -160,14 +160,14 @@ class TSS {
 
   private output(info) {
     if (this.prettyJSON) {
-      this.ioHost.printLine(JSON.stringify(info,null," ").trim());
+      this.ioHost.standardOut.WriteLine(JSON.stringify(info,null," ").trim());
     } else {
-      this.ioHost.printLine(JSON.stringify(info).trim());
+      this.ioHost.standardOut.WriteLine(JSON.stringify(info).trim());
     }
   }
 
   private outputJSON(json) {
-    this.ioHost.printLine(json.trim());
+    this.ioHost.standardOut.WriteLine(json.trim());
   }
 
   /** commandline server main routine: commands in, JSON info out */
@@ -442,7 +442,7 @@ class TSS {
 
           if (this.lastError)
             if (m[1]) // commandline use
-              this.ioHost.printLine(JSON.parse(this.lastError).stack);
+              this.ioHost.standardOut.WriteLine(JSON.parse(this.lastError).stack);
             else
               this.outputJSON(this.lastError);
           else
@@ -455,8 +455,8 @@ class TSS {
 
           source         = this.typescriptLS.getScriptInfo(file).content;
           if (dump==="-") { // to console
-            this.ioHost.printLine('dumping '+file);
-            this.ioHost.printLine(source);
+            this.ioHost.standardOut.WriteLine('dumping '+file);
+            this.ioHost.standardOut.WriteLine(source);
           } else { // to file
             this.ioHost.writeFile(dump,source,false);
 
@@ -481,7 +481,7 @@ class TSS {
 
         } else if (m = match(cmd,/^help$/)) {
 
-          this.ioHost.printLine(Object.keys(commands).join(EOL));
+          this.ioHost.standardOut.WriteLine(Object.keys(commands).join(EOL));
 
         } else {
 
@@ -507,11 +507,11 @@ class TSS {
   }
 }
 
-if (TypeScript.IO.arguments.indexOf("--version")!==-1) {
+if (TypeScript.Environment.arguments.indexOf("--version")!==-1) {
   console.log(require("../package.json").version);
   process.exit(0);
 }
 
-var tss = new TSS(TypeScript.IO);
-tss.setup(TypeScript.IO.arguments[0]);
+var tss = new TSS(TypeScript.Environment);
+tss.setup(TypeScript.Environment.arguments[0]);
 tss.listen();

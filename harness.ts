@@ -12,7 +12,7 @@ function switchToForwardSlashes(path: string) {
     return path.replace(/\\/g, "/");
 }
 
-function readFile(file) { return TypeScript.IO.readFile(file,null) }
+function readFile(file) { return TypeScript.Environment.readFile(file,null) }
 
 declare module process {
     export function nextTick(callback: () => any): void;
@@ -135,6 +135,9 @@ module Harness {
 
         private fileNameToScript = new TypeScript.StringHashTable<ScriptInfo>();
 
+        constructor(private cancellationToken: TypeScript.ICancellationToken = TypeScript.CancellationToken.None) {
+        }
+
         public addDefaultLibrary() {
             throw("addDefaultLibrary not implemented");
             this.addScript("lib.d.ts", null);
@@ -185,7 +188,7 @@ module Harness {
 
         public log(s: string): void {
             // For debugging...
-            //TypeScript.IO.printLine("TypeScriptLS:" + s);
+            //TypeScript.Environment.printLine("TypeScriptLS:" + s);
         }
 
         // collect Diagnostics
@@ -209,6 +212,10 @@ module Harness {
 
         public getCompilationSettings(): string/*json for Tools.CompilationSettings*/ {
             return ""; // i.e. default settings
+        }
+
+        public getCancellationToken(): TypeScript.ICancellationToken {
+            return this.cancellationToken;
         }
 
         public getScriptFileNames(): string {
@@ -240,24 +247,24 @@ module Harness {
         }
 
         public fileExists(s: string) {
-            return TypeScript.IO.fileExists(s);
+            return TypeScript.Environment.fileExists(s);
         }
 
         public directoryExists(s: string) {
-            return TypeScript.IO.directoryExists(s);
+            return TypeScript.Environment.directoryExists(s);
         }
 
         public resolveRelativePath(path: string, directory: string): string {
             if (TypeScript.isRooted(path) || !directory) {
-                return TypeScript.IO.resolvePath(path);
+                return TypeScript.Environment.absolutePath(path);
             }
             else {
-                return TypeScript.IO.resolvePath(TypeScript.IOUtils.combine(directory, path));
+                return TypeScript.Environment.absolutePath(TypeScript.IOUtils.combine(directory, path));
             }
         }
 
         public getParentDirectory(path: string): string {
-            return TypeScript.IO.dirName(path);
+            return TypeScript.Environment.directoryName(path);
         }
 
         /** Return a new instance of the language service shim, up-to-date wrt to typecheck.
@@ -276,8 +283,8 @@ module Harness {
             compilationSettings.codeGenTarget = TypeScript.LanguageVersion.EcmaScript5;
 
             var settings = TypeScript.ImmutableCompilationSettings.fromCompilationSettings(compilationSettings);
-            var parseOptions = TypeScript.getParseOptions(settings);
-            return TypeScript.Parser.parse(fileName, TypeScript.SimpleText.fromScriptSnapshot(sourceText), TypeScript.isDTSFile(fileName), parseOptions).sourceUnit();
+            var parseOptions = settings.codeGenTarget();
+            return TypeScript.Parser.parse(fileName, TypeScript.SimpleText.fromScriptSnapshot(sourceText), parseOptions, TypeScript.isDTSFile(fileName)).sourceUnit();
         }
 
         /** Parse a file on disk given its fileName */
@@ -406,7 +413,7 @@ module Harness {
         constructor(private destination: string) { }
 
         public log(content: string): void {
-            TypeScript.IO.stderr.WriteLine(content);
+            TypeScript.Environment.standardError.WriteLine(content);
             //Imitates the LanguageServicesDiagnostics object when not in Visual Studio
         }
 

@@ -1910,17 +1910,52 @@ declare module Intl {
 }
 
 interface String {
+    /**
+      * Determines whether two strings are equivalent in the current locale.
+      * @param that String to compare to target string
+      * @param locales An array of locale strings that contain one or more language or locale tags. If you include more than one locale string, list them in descending order of priority so that the first entry is the preferred locale. If you omit this parameter, the default locale of the JavaScript runtime is used. This parameter must conform to BCP 47 standards; see the Intl.Collator object for details.
+      * @param options An object that contains one or more properties that specify comparison options. see the Intl.Collator object for details.
+      */
     localeCompare(that: string, locales: string[], options?: Intl.CollatorOptions): number;
+
+    /**
+      * Determines whether two strings are equivalent in the current locale.
+      * @param that String to compare to target string
+      * @param locale Locale tag. If you omit this parameter, the default locale of the JavaScript runtime is used. This parameter must conform to BCP 47 standards; see the Intl.Collator object for details.
+      * @param options An object that contains one or more properties that specify comparison options. see the Intl.Collator object for details.
+      */
     localeCompare(that: string, locale: string, options?: Intl.CollatorOptions): number;
 }
 
 interface Number {
+    /**
+      * Converts a number to a string by using the current or specified locale. 
+      * @param locales An array of locale strings that contain one or more language or locale tags. If you include more than one locale string, list them in descending order of priority so that the first entry is the preferred locale. If you omit this parameter, the default locale of the JavaScript runtime is used.
+      * @param options An object that contains one or more properties that specify comparison options.
+      */
     toLocaleString(locales?: string[], options?: Intl.NumberFormatOptions): string;
+
+    /**
+      * Converts a number to a string by using the current or specified locale. 
+      * @param locale Locale tag. If you omit this parameter, the default locale of the JavaScript runtime is used.
+      * @param options An object that contains one or more properties that specify comparison options.
+      */
     toLocaleString(locale?: string, options?: Intl.NumberFormatOptions): string;
 }
 
 interface Date {
+    /**
+      * Converts a date to a string by using the current or specified locale.  
+      * @param locales An array of locale strings that contain one or more language or locale tags. If you include more than one locale string, list them in descending order of priority so that the first entry is the preferred locale. If you omit this parameter, the default locale of the JavaScript runtime is used.
+      * @param options An object that contains one or more properties that specify comparison options.
+      */
     toLocaleString(locales?: string[], options?: Intl.DateTimeFormatOptions): string;
+
+    /**
+      * Converts a date to a string by using the current or specified locale.  
+      * @param locale Locale tag. If you omit this parameter, the default locale of the JavaScript runtime is used.
+      * @param options An object that contains one or more properties that specify comparison options.
+      */
     toLocaleString(locale?: string, options?: Intl.DateTimeFormatOptions): string;
 }
 
@@ -4982,6 +5017,45 @@ declare var TextMetrics: {
 }
 
 interface DocumentEvent {
+    createEvent(eventInterface: "AnimationEvent"): AnimationEvent;
+    createEvent(eventInterface: "CloseEvent"): CloseEvent;
+    createEvent(eventInterface: "CompositionEvent"): CompositionEvent;
+    createEvent(eventInterface: "CustomEvent"): CustomEvent;
+    createEvent(eventInterface: "DeviceMotionEvent"): DeviceMotionEvent;
+    createEvent(eventInterface: "DeviceOrientationEvent"): DeviceOrientationEvent;
+    createEvent(eventInterface: "DragEvent"): DragEvent;
+    createEvent(eventInterface: "ErrorEvent"): ErrorEvent;
+    createEvent(eventInterface: "Event"): Event;
+    createEvent(eventInterface: "Events"): Event;
+    createEvent(eventInterface: "FocusEvent"): FocusEvent;
+    createEvent(eventInterface: "HTMLEvents"): Event;
+    createEvent(eventInterface: "IDBVersionChangeEvent"): IDBVersionChangeEvent;
+    createEvent(eventInterface: "KeyboardEvent"): KeyboardEvent;
+    createEvent(eventInterface: "LongRunningScriptDetectedEvent"): LongRunningScriptDetectedEvent;
+    createEvent(eventInterface: "MessageEvent"): MessageEvent;
+    createEvent(eventInterface: "MouseEvent"): MouseEvent;
+    createEvent(eventInterface: "MouseEvents"): MouseEvent;
+    createEvent(eventInterface: "MouseWheelEvent"): MouseWheelEvent;
+    createEvent(eventInterface: "MSGestureEvent"): MSGestureEvent;
+    createEvent(eventInterface: "MSPointerEvent"): MSPointerEvent;
+    createEvent(eventInterface: "MutationEvent"): MutationEvent;
+    createEvent(eventInterface: "MutationEvents"): MutationEvent;
+    createEvent(eventInterface: "NavigationCompletedEvent"): NavigationCompletedEvent;
+    createEvent(eventInterface: "NavigationEvent"): NavigationEvent;
+    createEvent(eventInterface: "PageTransitionEvent"): PageTransitionEvent;
+    createEvent(eventInterface: "PointerEvent"): MSPointerEvent;
+    createEvent(eventInterface: "PopStateEvent"): PopStateEvent;
+    createEvent(eventInterface: "ProgressEvent"): ProgressEvent;
+    createEvent(eventInterface: "StorageEvent"): StorageEvent;
+    createEvent(eventInterface: "SVGZoomEvents"): SVGZoomEvent;
+    createEvent(eventInterface: "TextEvent"): TextEvent;
+    createEvent(eventInterface: "TrackEvent"): TrackEvent;
+    createEvent(eventInterface: "TransitionEvent"): TransitionEvent;
+    createEvent(eventInterface: "UIEvent"): UIEvent;
+    createEvent(eventInterface: "UIEvents"): UIEvent;
+    createEvent(eventInterface: "UnviewableContentIdentifiedEvent"): UnviewableContentIdentifiedEvent;
+    createEvent(eventInterface: "WebGLContextEvent"): WebGLContextEvent;
+    createEvent(eventInterface: "WheelEvent"): WheelEvent;
     createEvent(eventInterface: string): Event;
 }
 
