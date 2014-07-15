@@ -18,6 +18,7 @@ class TSSnotrunning:
     return 0
 
 tss = TSSnotrunning()
+TSS_NOT_RUNNING_MSG='TSS not running - start with :TSSstarthere on main file'
 EOF
 
 endif
@@ -159,7 +160,11 @@ function! TSSdef(cmd)
   let info = TSScmd("definition",{})
   if type(info)!=type({}) || info.file=='null' || type(info.min)!=type({})
     \ || type(info.min.line)!=type(0) || type(info.min.character)!=type(0)
-    echoerr 'no useable definition information'
+    if type(info)==type("")
+      echoerr info
+    else
+      echoerr 'no useable definition information'
+    endif
     return info
   endif
   if a:cmd=="pedit"
@@ -222,7 +227,9 @@ function! TSScompleteFunc(findstart,base)
   endwhile
 
   if a:findstart
-    if TSSstatus()!="None" | echoerr "TSS not running" | endif
+    if TSSstatus()!="None"
+      py vim.command('echoerr "'+TSS_NOT_RUNNING_MSG+'"')
+    endif
 
     " force updates for completed fragments, while still in insert mode
     " bypass error checking (cf #13,#14)
@@ -510,7 +517,7 @@ if tss.poll()==None:
     result = '"null"'
 
 else:
-  result = '"TSS not running"'
+  result = '"'+TSS_NOT_RUNNING_MSG+'"'
 
 vim.command("let null = 'null'")
 vim.command("let true = 'true'")
@@ -542,7 +549,7 @@ if tss.poll()==None:
   rest = tss.communicate('quit')[0]
   sys.stdout.write(rest)
 else:
-  sys.stdout.write('TSS not running\n')
+  sys.stdout.write(TSS_NOT_RUNNING_MSG+'\n')
 
 EOF
 endfunction
