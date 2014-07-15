@@ -4,6 +4,22 @@ endif
 if !has("python")
   echoerr "typescript_tss.vim needs python interface"
   finish
+else
+
+python <<EOF
+import vim
+import subprocess
+import json
+import logging, platform
+TSS_LOG_FILENAME='tsstrace.log'
+
+class TSSnotrunning:
+  def poll(self):
+    return 0
+
+tss = TSSnotrunning()
+EOF
+
 endif
 let g:TSSloaded = 1
 
@@ -29,17 +45,6 @@ if !exists("g:TSSfiles")
 endif
 
 py TSS_MDN = "https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/"
-
-python <<EOF
-import logging, platform
-TSS_LOG_FILENAME='tsstrace.log'
-
-class TSSnotrunning:
-  def poll(self):
-    return 0
-
-tss = TSSnotrunning()
-EOF
 
 " sample keymapping
 " (highjacking some keys otherwise used for tags,
@@ -423,9 +428,6 @@ command! TSSstarthere call TSSstart(expand("%"))
 function! TSSstart(projectroot)
 echomsg "starting TSS, loading ".a:projectroot."..."
 python <<EOF
-import subprocess
-import vim
-import json
 
 projectroot = vim.eval("a:projectroot")
 print(vim.eval("g:TSS")+[projectroot])
@@ -524,7 +526,6 @@ endfunction
 command! TSSstatus echo TSSstatus()
 function! TSSstatus()
 python <<EOF
-import json
 
 rest = tss.poll()
 vim.command("return "+json.dumps(str(rest)))
