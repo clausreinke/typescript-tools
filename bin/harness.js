@@ -1,138 +1,117 @@
 // Copyright (c) Microsoft, Claus Reinke. All rights reserved.
 // Licensed under the Apache License, Version 2.0. 
 // See LICENSE.txt in the project root for complete license information.
-
 ///<reference path='typings/node/node.d.ts'/>
 ///<reference path='node_modules/typescript/bin/typescript.d.ts'/>
 ///<reference path='node_modules/typescript/bin/typescript_internal.d.ts'/>
-
-import ts = require("typescript");
-
+var ts = require("typescript");
 /*
 declare module process {
     export function nextTick(callback: () => any): void;
     export function on(event: string, listener: Function): any;
 }
 */
-
 // module Harness {
-    // Settings 
-    export var userSpecifiedroot = "";
-    var global = <any>Function("return this").call(null);
-
-    /** Splits the given string on \r\n or on only \n if that fails */
-    export function splitContentByNewlines(content: string) {
-        // Split up the input file by line
-        // Note: IE JS engine incorrectly handles consecutive delimiters here when using RegExp split, so
-        // we have to string-based splitting instead and try to figure out the delimiting chars
-        var lines = content.split('\r\n');
-        if (lines.length === 1) {
-            lines = content.split('\n');
-        }
-        return lines;
+// Settings 
+exports.userSpecifiedroot = "";
+var global = Function("return this").call(null);
+/** Splits the given string on \r\n or on only \n if that fails */
+function splitContentByNewlines(content) {
+    // Split up the input file by line
+    // Note: IE JS engine incorrectly handles consecutive delimiters here when using RegExp split, so
+    // we have to string-based splitting instead and try to figure out the delimiting chars
+    var lines = content.split('\r\n');
+    if (lines.length === 1) {
+        lines = content.split('\n');
     }
-
-    export class ScriptInfo {
-        public version: number = 1;
-        public editRanges: { length: number; textChangeRange: ts.TextChangeRange; }[] = [];
-        public lineMap: number[] = null;
-
-        constructor(public fileName: string, public content: string, public isOpen = true) {
-            this.setContent(content);
-        }
-
-        private setContent(content: string): void {
-            this.content = content;
-            this.lineMap = ts.computeLineStarts(content);
-        }
-
-        public updateContent(content: string): void {
-            var old_length = this.content.length;
-            this.setContent(content);
-            this.editRanges.push({
-                length: content.length,
-                textChangeRange:
-                    // NOTE: no shortcut for "update everything" (null only works in some places, #10)
-                    ts.createTextChangeRange(ts.createTextSpan(0,old_length),content.length)
-            });
-            this.version++;
-        }
-
-        public editContent(minChar: number, limChar: number, newText: string): void {
-            // Apply edits
-            var prefix = this.content.substring(0, minChar);
-            var middle = newText;
-            var suffix = this.content.substring(limChar);
-            this.setContent(prefix + middle + suffix);
-
-            // Store edit range + new length of script
-            this.editRanges.push({
-                length: this.content.length,
-                textChangeRange: 
-                  ts.createTextChangeRange( ts.createTextSpanFromBounds(minChar, limChar)
-                                          , newText.length)
-            });
-
-            // Update version #
-            this.version++;
-        }
-
-        public getTextChangeRangeBetweenVersions(startVersion: number, endVersion: number): ts.TextChangeRange {
-            if (startVersion === endVersion) {
-                // No edits!
-                return ts.unchangedTextChangeRange;
-            }
-
-            var initialEditRangeIndex = this.editRanges.length - (this.version - startVersion);
-            var lastEditRangeIndex = this.editRanges.length - (this.version - endVersion);
-
-            var entries = this.editRanges.slice(initialEditRangeIndex, lastEditRangeIndex);
-            return ts.collapseTextChangeRangesAcrossMultipleVersions(entries.map(e => e.textChangeRange));
-        }
+    return lines;
+}
+exports.splitContentByNewlines = splitContentByNewlines;
+var ScriptInfo = (function () {
+    function ScriptInfo(fileName, content, isOpen) {
+        if (isOpen === void 0) { isOpen = true; }
+        this.fileName = fileName;
+        this.content = content;
+        this.isOpen = isOpen;
+        this.version = 1;
+        this.editRanges = [];
+        this.lineMap = null;
+        this.setContent(content);
     }
-
-    class ScriptSnapshot implements ts.IScriptSnapshot {
-        private lineMap: number[] = null;
-        private textSnapshot: string;
-        private version: number;
-
-        constructor(private scriptInfo: ScriptInfo) {
-            this.textSnapshot = scriptInfo.content;
-            this.version = scriptInfo.version;
+    ScriptInfo.prototype.setContent = function (content) {
+        this.content = content;
+        this.lineMap = ts.computeLineStarts(content);
+    };
+    ScriptInfo.prototype.updateContent = function (content) {
+        var old_length = this.content.length;
+        this.setContent(content);
+        this.editRanges.push({
+            length: content.length,
+            textChangeRange: ts.createTextChangeRange(ts.createTextSpan(0, old_length), content.length)
+        });
+        this.version++;
+    };
+    ScriptInfo.prototype.editContent = function (minChar, limChar, newText) {
+        // Apply edits
+        var prefix = this.content.substring(0, minChar);
+        var middle = newText;
+        var suffix = this.content.substring(limChar);
+        this.setContent(prefix + middle + suffix);
+        // Store edit range + new length of script
+        this.editRanges.push({
+            length: this.content.length,
+            textChangeRange: ts.createTextChangeRange(ts.createTextSpanFromBounds(minChar, limChar), newText.length)
+        });
+        // Update version #
+        this.version++;
+    };
+    ScriptInfo.prototype.getTextChangeRangeBetweenVersions = function (startVersion, endVersion) {
+        if (startVersion === endVersion) {
+            // No edits!
+            return ts.unchangedTextChangeRange;
         }
-
-        public getText(start: number, end: number): string {
-            return this.textSnapshot.substring(start, end);
-        }
-
-        public getLength(): number {
-            return this.textSnapshot.length;
-        }
-
-        public getLineStartPositions(): number[] {
-            if (this.lineMap === null) {
-                this.lineMap = ts.computeLineStarts(this.textSnapshot);
-            }
-
-            return this.lineMap;
-        }
-
-        public getChangeRange(oldSnapshot: ts.IScriptSnapshot): ts.TextChangeRange {
-            return undefined;
-        }
+        var initialEditRangeIndex = this.editRanges.length - (this.version - startVersion);
+        var lastEditRangeIndex = this.editRanges.length - (this.version - endVersion);
+        var entries = this.editRanges.slice(initialEditRangeIndex, lastEditRangeIndex);
+        return ts.collapseTextChangeRangesAcrossMultipleVersions(entries.map(function (e) { return e.textChangeRange; }));
+    };
+    return ScriptInfo;
+})();
+exports.ScriptInfo = ScriptInfo;
+var ScriptSnapshot = (function () {
+    function ScriptSnapshot(scriptInfo) {
+        this.scriptInfo = scriptInfo;
+        this.lineMap = null;
+        this.textSnapshot = scriptInfo.content;
+        this.version = scriptInfo.version;
     }
-
-    class CancellationToken {
-        public static None: CancellationToken = new CancellationToken(null);
-
-        constructor(private cancellationToken: ts.CancellationToken) {
+    ScriptSnapshot.prototype.getText = function (start, end) {
+        return this.textSnapshot.substring(start, end);
+    };
+    ScriptSnapshot.prototype.getLength = function () {
+        return this.textSnapshot.length;
+    };
+    ScriptSnapshot.prototype.getLineStartPositions = function () {
+        if (this.lineMap === null) {
+            this.lineMap = ts.computeLineStarts(this.textSnapshot);
         }
-
-        public isCancellationRequested() {
-            return this.cancellationToken && this.cancellationToken.isCancellationRequested();
-        }
+        return this.lineMap;
+    };
+    ScriptSnapshot.prototype.getChangeRange = function (oldSnapshot) {
+        return undefined;
+    };
+    return ScriptSnapshot;
+})();
+var CancellationToken = (function () {
+    function CancellationToken(cancellationToken) {
+        this.cancellationToken = cancellationToken;
     }
-
+    CancellationToken.prototype.isCancellationRequested = function () {
+        return this.cancellationToken && this.cancellationToken.isCancellationRequested();
+    };
+    CancellationToken.None = new CancellationToken(null);
+    return CancellationToken;
+})();
 //    export class TypeScriptLSHost implements ts.LanguageServiceHost {
 ////        private ls: ts.ILanguageServiceShim = null;
 //
@@ -440,7 +419,6 @@ declare module process {
 //            return result;
 //        }
 //  }
-
 /*
     export class LanguageServicesDiagnostics implements ts.Services.ILanguageServicesDiagnostics {
 
@@ -453,5 +431,4 @@ declare module process {
 
     }
 */
-
 // }

@@ -1,14 +1,14 @@
-TYPESCRIPT=../typescript
+TYPESCRIPT=node_modules/typescript
 TSC=node $(TYPESCRIPT)/bin/tsc.js
-TYPESCRIPT_GIT=$(TYPESCRIPT)/.git
+TYPESCRIPT_LIB=$(TYPESCRIPT)/bin/
 TEST_SCRIPTS=tests/*.script
 TEST_SOURCES=tests/*.ts
 VERSION=$(shell git describe --tags)
 
 build: bin/tss.js bin/lib.d.ts tests/script.diff package.json tests/script.results
 
-bin/tss.js: tss.ts harness.ts $(TYPESCRIPT_GIT)
-	$(TSC) tss.ts -target es5 -out bin/tss.js 2>&1 | tee build.log
+bin/tss.js: tss.ts harness.ts $(TYPESCRIPT)/bin/typescript.d.ts $(TYPESCRIPT)/bin/typescript_internal.d.ts
+	$(TSC) tss.ts -target ES5 -m commonjs --noEmitOnError -outDir bin 2>&1 | tee build.log
 	test ! -s build.log
 
 bin/lib.d.ts: $(TYPESCRIPT)/bin/lib.d.ts

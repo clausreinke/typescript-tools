@@ -124,10 +124,7 @@ interface Object {
     propertyIsEnumerable(v: string): boolean;
 }
 
-/**
-  * Provides functionality common to all JavaScript objects.
-  */
-declare var Object: {
+interface ObjectConstructor {
     new (value?: any): Object;
     (): any;
     (value: any): any;
@@ -222,6 +219,11 @@ declare var Object: {
 }
 
 /**
+  * Provides functionality common to all JavaScript objects.
+  */
+declare var Object: ObjectConstructor;
+
+/**
   * Creates a new function.
   */
 interface Function {
@@ -255,8 +257,8 @@ interface Function {
     caller: Function;
 }
 
-declare var Function: {
-    /** 
+interface FunctionConstructor {
+    /**
       * Creates a new function.
       * @param args A list of arguments the function accepts.
       */
@@ -264,6 +266,8 @@ declare var Function: {
     (...args: string[]): Function;
     prototype: Function;
 }
+
+declare var Function: FunctionConstructor;
 
 interface IArguments {
     [index: number]: any;
@@ -317,13 +321,13 @@ interface String {
       * Matches a string with a regular expression, and returns an array containing the results of that search.
       * @param regexp A variable name or string literal containing the regular expression pattern and flags.
       */
-    match(regexp: string): string[];
+    match(regexp: string): RegExpMatchArray;
 
     /** 
       * Matches a string with a regular expression, and returns an array containing the results of that search.
       * @param regexp A regular expression object that contains the regular expression pattern and applicable flags. 
       */
-    match(regexp: RegExp): string[];
+    match(regexp: RegExp): RegExpMatchArray;
 
     /**
       * Replaces text in a string, using a regular expression or search string.
@@ -424,23 +428,30 @@ interface String {
     [index: number]: string;
 }
 
-/** 
-  * Allows manipulation and formatting of text strings and determination and location of substrings within strings. 
-  */
-declare var String: {
+interface StringConstructor {
     new (value?: any): String;
     (value?: any): string;
     prototype: String;
     fromCharCode(...codes: number[]): string;
 }
 
+/** 
+  * Allows manipulation and formatting of text strings and determination and location of substrings within strings. 
+  */
+declare var String: StringConstructor;
+
 interface Boolean {
+    /** Returns the primitive value of the specified object. */
+    valueOf(): boolean;
 }
-declare var Boolean: {
+
+interface BooleanConstructor {
     new (value?: any): Boolean;
     (value?: any): boolean;
     prototype: Boolean;
 }
+
+declare var Boolean: BooleanConstructor;
 
 interface Number {
     /**
@@ -468,8 +479,7 @@ interface Number {
     toPrecision(precision?: number): string;
 }
 
-/** An object that represents a number of any kind. All JavaScript numbers are 64-bit floating-point numbers. */
-declare var Number: {
+interface NumberConstructor {
     new (value?: any): Number;
     (value?: any): number;
     prototype: Number;
@@ -497,6 +507,13 @@ declare var Number: {
       * JavaScript displays POSITIVE_INFINITY values as infinity. 
       */
     POSITIVE_INFINITY: number;
+}
+
+/** An object that represents a number of any kind. All JavaScript numbers are 64-bit floating-point numbers. */
+declare var Number: NumberConstructor;
+
+interface TemplateStringsArray extends Array<string> {
+    raw: string[];
 }
 
 interface Math {
@@ -764,7 +781,7 @@ interface Date {
     toJSON(key?: any): string;
 }
 
-declare var Date: {
+interface DateConstructor {
     new (): Date;
     new (value: number): Date;
     new (value: string): Date;
@@ -790,38 +807,17 @@ declare var Date: {
     now(): number;
 }
 
-interface RegExpExecArray {
-    [index: number]: string;
-    length: number;
+declare var Date: DateConstructor;
 
-    index: number;
-    input: string;
-
-    toString(): string;
-    toLocaleString(): string;
-    concat(...items: string[][]): string[];
-    join(separator?: string): string;
-    pop(): string;
-    push(...items: string[]): number;
-    reverse(): string[];
-    shift(): string;
-    slice(start?: number, end?: number): string[];
-    sort(compareFn?: (a: string, b: string) => number): string[];
-    splice(start: number): string[];
-    splice(start: number, deleteCount: number, ...items: string[]): string[];
-    unshift(...items: string[]): number;
-
-    indexOf(searchElement: string, fromIndex?: number): number;
-    lastIndexOf(searchElement: string, fromIndex?: number): number;
-    every(callbackfn: (value: string, index: number, array: string[]) => boolean, thisArg?: any): boolean;
-    some(callbackfn: (value: string, index: number, array: string[]) => boolean, thisArg?: any): boolean;
-    forEach(callbackfn: (value: string, index: number, array: string[]) => void, thisArg?: any): void;
-    map(callbackfn: (value: string, index: number, array: string[]) => any, thisArg?: any): any[];
-    filter(callbackfn: (value: string, index: number, array: string[]) => boolean, thisArg?: any): string[];
-    reduce(callbackfn: (previousValue: any, currentValue: any, currentIndex: number, array: string[]) => any, initialValue?: any): any;
-    reduceRight(callbackfn: (previousValue: any, currentValue: any, currentIndex: number, array: string[]) => any, initialValue?: any): any;
+interface RegExpMatchArray extends Array<string> {
+    index?: number;
+    input?: string;
 }
 
+interface RegExpExecArray extends Array<string> {
+    index: number;
+    input: string;
+}
 
 interface RegExp {
     /** 
@@ -853,9 +849,11 @@ interface RegExp {
     // Non-standard extensions
     compile(): RegExp;
 }
-declare var RegExp: {
+
+interface RegExpConstructor {
     new (pattern: string, flags?: string): RegExp;
     (pattern: string, flags?: string): RegExp;
+    prototype: RegExp;
 
     // Non-standard extensions
     $1: string;
@@ -870,63 +868,86 @@ declare var RegExp: {
     lastMatch: string;
 }
 
+declare var RegExp: RegExpConstructor;
+
 interface Error {
     name: string;
     message: string;
 }
-declare var Error: {
+
+interface ErrorConstructor {
     new (message?: string): Error;
     (message?: string): Error;
     prototype: Error;
 }
 
+declare var Error: ErrorConstructor;
+
 interface EvalError extends Error {
 }
-declare var EvalError: {
+
+interface EvalErrorConstructor {
     new (message?: string): EvalError;
     (message?: string): EvalError;
     prototype: EvalError;
 }
 
+declare var EvalError: EvalErrorConstructor;
+
 interface RangeError extends Error {
 }
-declare var RangeError: {
+
+interface RangeErrorConstructor {
     new (message?: string): RangeError;
     (message?: string): RangeError;
     prototype: RangeError;
 }
 
+declare var RangeError: RangeErrorConstructor;
+
 interface ReferenceError extends Error {
 }
-declare var ReferenceError: {
+
+interface ReferenceErrorConstructor {
     new (message?: string): ReferenceError;
     (message?: string): ReferenceError;
     prototype: ReferenceError;
 }
 
+declare var ReferenceError: ReferenceErrorConstructor;
+
 interface SyntaxError extends Error {
 }
-declare var SyntaxError: {
+
+interface SyntaxErrorConstructor {
     new (message?: string): SyntaxError;
     (message?: string): SyntaxError;
     prototype: SyntaxError;
 }
 
+declare var SyntaxError: SyntaxErrorConstructor;
+
 interface TypeError extends Error {
 }
-declare var TypeError: {
+
+interface TypeErrorConstructor {
     new (message?: string): TypeError;
     (message?: string): TypeError;
     prototype: TypeError;
 }
 
+declare var TypeError: TypeErrorConstructor;
+
 interface URIError extends Error {
 }
-declare var URIError: {
+
+interface URIErrorConstructor {
     new (message?: string): URIError;
     (message?: string): URIError;
     prototype: URIError;
 }
+
+declare var URIError: URIErrorConstructor;
 
 interface JSON {
     /**
@@ -980,10 +1001,23 @@ declare var JSON: JSON;
 
 interface Array<T> {
     /**
+      * Gets or sets the length of the array. This is a number one higher than the highest element defined in an array.
+      */
+    length: number;
+    /**
       * Returns a string representation of an array.
       */
     toString(): string;
     toLocaleString(): string;
+    /**
+      * Appends new elements to an array, and returns the new length of the array.
+      * @param items New elements of the Array.
+      */
+    push(...items: T[]): number;
+    /**
+      * Removes the last element from an array and returns it.
+      */
+    pop(): T;
     /**
       * Combines two or more arrays.
       * @param items Additional items to add to the end of array1.
@@ -999,15 +1033,6 @@ interface Array<T> {
       * @param separator A string used to separate one element of an array from the next in the resulting String. If omitted, the array elements are separated with a comma.
       */
     join(separator?: string): string;
-    /**
-      * Removes the last element from an array and returns it.
-      */
-    pop(): T;
-    /**
-      * Appends new elements to an array, and returns the new length of the array.
-      * @param items New elements of the Array.
-      */
-    push(...items: T[]): number;
     /**
       * Reverses the elements in an Array. 
       */
@@ -1124,14 +1149,10 @@ interface Array<T> {
       */
     reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U;
 
-    /**
-      * Gets or sets the length of the array. This is a number one higher than the highest element defined in an array.
-      */
-    length: number;
-
     [n: number]: T;
 }
-declare var Array: {
+
+interface ArrayConstructor {
     new (arrayLength?: number): any[];
     new <T>(arrayLength: number): T[];
     new <T>(...items: T[]): T[];
@@ -1141,6 +1162,8 @@ declare var Array: {
     isArray(arg: any): boolean;
     prototype: Array<any>;
 }
+
+declare var Array: ArrayConstructor;
 
 /////////////////////////////
 /// IE10 ECMAScript Extensions
@@ -1157,6 +1180,11 @@ interface ArrayBuffer {
       * Read-only. The length of the ArrayBuffer (in bytes).
       */
     byteLength: number;
+
+    /**
+      * Returns a section of an ArrayBuffer.
+      */
+    slice(begin:number, end?:number): ArrayBuffer;
 }
 
 declare var ArrayBuffer: {
@@ -1201,14 +1229,14 @@ interface Int8Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Int8Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;
@@ -1259,14 +1287,14 @@ interface Uint8Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Uint8Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;
@@ -1317,14 +1345,14 @@ interface Int16Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Int16Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;
@@ -1375,14 +1403,14 @@ interface Uint16Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Uint16Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;
@@ -1433,14 +1461,14 @@ interface Int32Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Int32Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;
@@ -1491,14 +1519,14 @@ interface Uint32Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Uint32Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;
@@ -1549,14 +1577,14 @@ interface Float32Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Float32Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;
@@ -1607,14 +1635,14 @@ interface Float64Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Float64Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;
@@ -1769,6 +1797,7 @@ interface Map<K, V> {
 }
 declare var Map: {
     new <K, V>(): Map<K, V>;
+    prototype: Map<any, any>;
 }
 
 interface WeakMap<K, V> {
@@ -1780,6 +1809,7 @@ interface WeakMap<K, V> {
 }
 declare var WeakMap: {
     new <K, V>(): WeakMap<K, V>;
+    prototype: WeakMap<any, any>;
 }
 
 interface Set<T> {
@@ -1792,10 +1822,13 @@ interface Set<T> {
 }
 declare var Set: {
     new <T>(): Set<T>;
+    prototype: Set<any>;
 }
+/////////////////////////////
+/// ECMAScript Internationalization API 
+/////////////////////////////
 
 declare module Intl {
-
     interface CollatorOptions {
         usage?: string;
         localeMatcher?: string;
@@ -3826,6 +3859,44 @@ declare var Window: {
     new(): Window;
 }
 
+interface HTMLCollection extends MSHTMLCollectionExtensions {
+    /**
+      * Sets or retrieves the number of objects in a collection.
+      */
+    length: number;
+    /**
+      * Retrieves an object from various collections.
+      */
+    item(nameOrIndex?: any, optionalIndex?: any): Element;
+    /**
+      * Retrieves a select object or an object from an options collection.
+      */
+    namedItem(name: string): Element;
+    // [name: string]: Element;
+    [index: number]: Element;
+}
+declare var HTMLCollection: {
+    prototype: HTMLCollection;
+    new(): HTMLCollection;
+}
+
+interface BlobPropertyBag {
+    type?: string;
+    endings?: string;
+}
+
+interface Blob {
+    type: string;
+    size: number;
+    msDetachStream(): any;
+    slice(start?: number, end?: number, contentType?: string): Blob;
+    msClose(): void;
+}
+declare var Blob: {
+    prototype: Blob;
+    new (blobParts?: any[], options?: BlobPropertyBag): Blob;
+}
+
 interface NavigatorID {
     appVersion: string;
     appName: string;
@@ -5730,26 +5801,6 @@ interface MSCSSProperties extends CSSStyleDeclaration {
 declare var MSCSSProperties: {
     prototype: MSCSSProperties;
     new(): MSCSSProperties;
-}
-
-interface HTMLCollection extends MSHTMLCollectionExtensions {
-    /**
-      * Sets or retrieves the number of objects in a collection.
-      */
-    length: number;
-    /**
-      * Retrieves an object from various collections.
-      */
-    item(nameOrIndex?: any, optionalIndex?: any): Element;
-    /**
-      * Retrieves a select object or an object from an options collection.
-      */
-    namedItem(name: string): Element;
-    // [name: string]: Element;
-}
-declare var HTMLCollection: {
-    prototype: HTMLCollection;
-    new(): HTMLCollection;
 }
 
 interface SVGExternalResourcesRequired {
@@ -11985,18 +12036,6 @@ interface FileReader extends MSBaseReader {
 declare var FileReader: {
     prototype: FileReader;
     new(): FileReader;
-}
-
-interface Blob {
-    type: string;
-    size: number;
-    msDetachStream(): any;
-    slice(start?: number, end?: number, contentType?: string): Blob;
-    msClose(): void;
-}
-declare var Blob: {
-    prototype: Blob;
-    new(): Blob;
 }
 
 interface ApplicationCache extends EventTarget {
