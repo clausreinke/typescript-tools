@@ -2,15 +2,15 @@
 
 ## typescript-tools
 
-typescript-tools (v0.2) provides access to the TypeScript Language Services (v0.9) via a simple commandline server (tss). This makes it easy to build editor plugins supporting TypeScript. A Vim plugin (`typescript_tss.vim`) is included. If you build plugins for other editors/IDEs based on typescript-tools, please let me know, or better: announce them on our new project mailing list.
+typescript-tools (v0.4) provides access to the TypeScript Language Services (v1.4) via a simple commandline server (tss). This makes it easy to build editor plugins supporting TypeScript. A Vim plugin (`typescript_tss.vim`) is included. If you build plugins for other editors/IDEs based on typescript-tools, please let me know, or better: announce them on our new project mailing list.
 
 - Vim plugin: included in this repo (see below for list of features)
 - Emacs plugin: https://github.com/aki2o/emacs-tss
 - Sublime plugin: https://github.com/Railk/T3S
 
-There is now a project mailing list: [typescript-tools@googlegroups.com](https://groups.google.com/forum/#!aboutgroup/typescript-tools)
+There is a project mailing list: [typescript-tools@googlegroups.com](https://groups.google.com/forum/#!aboutgroup/typescript-tools), but that has seen so little use that I'm likely to close it again.
 
-I expect our mailing list to be low volume, carrying announcements, calls for help/collaboration and discussions related to typescript-tools and plugins based on it. For reporting bugs in typescript-tools itself (server or vim plugin), please use our issue tracker instead.
+For reporting bugs in typescript-tools itself (server or vim plugin), please use our issue tracker instead. That isn't all that suited for discussions, unless they revolve around features or bugs. If you want to announce an editor plugin based on typescript-tools, just file a documentation bug;-)
 
 ### Installation
 
@@ -46,17 +46,19 @@ The installation should give you a global `tss` command, which you can use direc
 
 If you want to use tss from Vim, add the `typescript-tools` directory to your Vim's `rtp`. If you want to use this from other editors/IDEs, you will need to write some code, to communicate with `tss` as an asynchronous subprocess (please let me know how it goes, especially if you release a working plugin).
 
-From-source compilation should not be necessary, as a pre-compiled `bin/tss.js` is included, as well as a `bin/lib.d.ts`. You might want to modify `bin/defaultLibs.d.ts`, if you want other declaration files included by default.
+From-source compilation should not be necessary, as a pre-compiled `bin/tss.js` is included, as well as a `bin/lib.d.ts`. You might want to modify `bin/defaultLibs.d.ts`, if you want other declaration files included by default. (TODO: get rid of defaultLibs)
 
-If you do want to compile from source, you need the typescript sources (I used the develop branch, see `CHANGES.txt` for details):
+If you do want to compile from source, you need the typescript sources (I used the master branch, see `CHANGES.txt` for details):
 
   ```
   # install git and node/npm, then
-  $ git clone https://git01.codeplex.com/typescript
+  $ git clone https://github.com/Microsoft/TypeScript.git
   $ git clone git://github.com/clausreinke/typescript-tools.git
-  $ (cd typescript; git checkout develop)
-  $ node typescript/bin/tsc.js typescript-tools/tss.ts -target es5 -out typescript-tools/bin/tss.js
+  $ cd typescript-tools
+  $ npm install ../typescript
+  $ make
   ```
+(alternatively, you can let npm trigger the cloning of the typescript dependency)
 
 TypeScript tools currently available:
 
@@ -80,14 +82,14 @@ TypeScript tools currently available:
     , lim:  { line: number, character: number }
     }
 
-  completions (true|false) <line> <pos> <file>
-    // get member/non-member completions
+  completions <line> <pos> <file>
+    // get completions
 
     { entries: [{name: string, type?: string, docComment?: string}, ...]
     }
 
-  completions-brief (true|false) <line> <pos> <file>
-    // get member/non-member completions without type/docComment details
+  completions-brief <line> <pos> <file>
+    // get completions without type/docComment details
 
     { entries: [{name: string}, ...]
     }

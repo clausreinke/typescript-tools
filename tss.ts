@@ -82,20 +82,20 @@ class TSS {
   private updateScript(fileName: string, content: string) {
       var script = this.fileNameToScript[fileName];
       if (script !== null) {
-          script.updateContent(content);
-          return;
+        script.updateContent(content);
+      } else {
+        this.fileNameToScript[fileName] = new harness.ScriptInfo(fileName, content);
       }
-
-      this.fileNameToScript[fileName] = new harness.ScriptInfo(fileName, content);
+      this.snapshots[fileName] = new harness.ScriptSnapshot(this.fileNameToScript[fileName]); 
   }
 
   private editScript(fileName: string, minChar: number, limChar: number, newText: string) {
       var script = this.fileNameToScript[fileName];
       if (script !== null) {
           script.editContent(minChar, limChar, newText);
+          this.snapshots[fileName] = new harness.ScriptSnapshot(script); 
           return;
       }
-
       throw new Error("No script with name '" + fileName + "'");
   }
 
@@ -107,7 +107,7 @@ class TSS {
         content = ts.sys.readFile(filename);
         this.fileNameToContent[filename] = content;
       }
-      var snapshot = ts.ScriptSnapshot.fromString(content);
+      var snapshot = new harness.ScriptSnapshot(new harness.ScriptInfo(filename, content));
 
 /* TODO
       if (!snapshot) {
@@ -165,6 +165,21 @@ class TSS {
   }
   */
 
+  public getErrors(): ts.Diagnostic[] {
+
+      var addPhase = phase => d => {d.phase = phase; return d};
+      var errors = [];
+      ts.forEachKey(this.fileNameToScript, file=>{
+        var syntactic = this.ls.getSyntacticDiagnostics(file);
+        var semantic = this.ls.getSemanticDiagnostics(file);
+        // this.ls.languageService.getEmitOutput(file).diagnostics);
+        errors = errors.concat(syntactic.map(addPhase("Syntax"))
+                              ,semantic.map(addPhase("Semantics")));
+      });
+      return errors;
+
+  }
+
   /** load file and dependencies, prepare language service for queries */
   public setup(file) {
     this.rootFile = file;
@@ -190,7 +205,7 @@ class TSS {
       this.fileNames.push(filename);
       this.fileNameToScript[filename] =
         new harness.ScriptInfo(filename,source.text);
-      this.snapshots[filename] = ts.ScriptSnapshot.fromString(source.text); 
+      this.snapshots[filename] = new harness.ScriptSnapshot(this.fileNameToScript[filename]); 
     });
 
     // Get a language service
@@ -206,8 +221,8 @@ class TSS {
         getCurrentDirectory : ()=>this.compilerHost.getCurrentDirectory(),
         getDefaultLibFilename : 
           (options: ts.CompilerOptions)=>this.compilerHost.getDefaultLibFilename(options),
-        log : (message)=>console.log(message), // ??
-        trace : (message)=>console.log(message), // ??
+        log : (message)=>undefined, // ??
+        trace : (message)=>undefined, // ??
         error : (message)=>console.error(message) // ??
     };
     this.ls     = ts.createLanguageService(this.lsHost,ts.createDocumentRegistry());
@@ -216,11 +231,12 @@ class TSS {
 
   }
 
-  private output(info,replacer=(k,v)=>k==="displayParts"?"--skipped--":v) {
-    if (this.prettyJSON) {
-      console.log(JSON.stringify(info,replacer," ").trim());
+  private output(info,excludes=["displayParts"]) {
+    var replacer = (k,v)=>excludes.indexOf(k)!==-1?undefined:v;
+    if (info) {
+      console.log(JSON.stringify(info,replacer,this.prettyJSON?" ":undefined).trim());
     } else {
-      console.log(JSON.stringify(info,replacer).trim());
+      console.log(JSON.stringify(info,replacer));
     }
   }
 
@@ -338,10 +354,9 @@ class TSS {
           this.output(info);
 */
 
-        } else if (m = match(cmd,/^completions(-brief)? (true|false) (\d+) (\d+) (.*)$/)) {
+        } else if (m = match(cmd,/^completions(-brief)? (true|false)? (\d+) (\d+) (.*)$/)) {
 
           brief  = m[1];
-          member = m[2]==='true';
           line   = parseInt(m[3]);
           col    = parseInt(m[4]);
           file   = this.resolveRelativePath(m[5]);
@@ -352,9 +367,16 @@ class TSS {
 
           if (info) {
             // fill in completion entry details, unless briefness requested
-            !brief && (info.entries = info.entries.map( e =>
-                                        this.ls.getCompletionEntryDetails(file,pos,e.name) || e ));
-                                        // NOTE: details null for primitive type symbols, see TS #1592
+            !brief && (info.entries = info.entries.map( e =>{
+                        var d = this.ls.getCompletionEntryDetails(file,pos,e.name);
+                        if (d) {
+                          d["type"]      =ts.displayPartsToString(d.displayParts);
+                          d["docComment"]=ts.displayPartsToString(d.documentation);
+                          return d;
+                        } else {
+                          return e;
+                        }} ));
+                        // NOTE: details null for primitive type symbols, see TS #1592
 
             (()=>{ // filter entries by prefix, determined by pos
               var languageVersion = this.compilerOptions.target;
@@ -374,7 +396,7 @@ class TSS {
             })();
           }
 
-          this.output(info);
+          this.output(info,["displayParts","documentation"]);
 
         /*
         } else if (m = match(cmd,/^info (\d+) (\d+) (.*)$/)) { // mostly for debugging
@@ -438,7 +460,7 @@ class TSS {
               } else {
                 var startLine = parseInt(m[4]);
                 var endLine   = parseInt(m[5]);
-                var maxLines  = script.lineMap.lineCount();
+                var maxLines  = script.lineMap.length;
                 var startPos  = startLine<=maxLines
                               ? (startLine<1 ? 0 : this.lineColToPosition(file,startLine,1))
                               : script.content.length;
@@ -467,9 +489,12 @@ class TSS {
         } else if (m = match(cmd,/^showErrors$/)) { // get processing errors
 
           info = this.program.getGlobalDiagnostics()
+                     /*
                      .concat(this.fileNames.map(file=>
                                     this.program.getDiagnostics(this.program.getSourceFile(file)))
                                  .reduce((l,r)=>l.concat(r)))
+                     */
+                     .concat(this.getErrors())
                      .map( d => {
                            var file = this.resolveRelativePath(d.file.filename);
                            var lc   = this.positionToLineCol(file,d.start);
@@ -481,13 +506,11 @@ class TSS {
                             start: {line: lc.line, character: lc.character},
                             end: {line: lc2.line, character: lc2.character},
                             text: /* file+"("+lc.line+"/"+lc.character+"): "+ */ d.messageText,
-                            // phase: d["phase"],
-                            category: d.category
+                            phase: d["phase"],
+                            category: ts.DiagnosticCategory[d.category]
                            };
                          }
                        );
-
-console.log(info);
 
           this.output(info);
 

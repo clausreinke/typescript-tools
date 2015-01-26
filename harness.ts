@@ -91,7 +91,7 @@ declare module process {
         }
     }
 
-    class ScriptSnapshot implements ts.IScriptSnapshot {
+    export class ScriptSnapshot implements ts.IScriptSnapshot {
         private lineMap: number[] = null;
         private textSnapshot: string;
         private version: number;
@@ -116,6 +116,18 @@ declare module process {
 
             return this.lineMap;
         }
+
+/*
+        public getChangeRange(oldScript: ts.ScriptSnapshotShim): ts.TextChangeRange {
+            var oldShim = <ScriptSnapshotShim>oldScript;
+            var range = this.scriptInfo.getTextChangeRangeBetweenVersions(oldShim.version, this.version);
+            if (range === null) {
+                return null;
+            }
+
+            return { span: { start: range.span.start, length: range.span.length }, newLength: range.newLength };
+        }
+*/
 
         public getChangeRange(oldSnapshot: ts.IScriptSnapshot): ts.TextChangeRange {
             return undefined;

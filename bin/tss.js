@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft, Claus Reinke. All rights reserved.
+// Copyright (c) Claus Reinke. All rights reserved.
 // Licensed under the Apache License, Version 2.0. 
 // See LICENSE.txt in the project root for complete license information.
 ///<reference path='typings/node/node.d.ts'/>
@@ -48,14 +48,17 @@ var TSS = (function () {
         var script = this.fileNameToScript[fileName];
         if (script !== null) {
             script.updateContent(content);
-            return;
         }
-        this.fileNameToScript[fileName] = new harness.ScriptInfo(fileName, content);
+        else {
+            this.fileNameToScript[fileName] = new harness.ScriptInfo(fileName, content);
+        }
+        this.snapshots[fileName] = new harness.ScriptSnapshot(this.fileNameToScript[fileName]);
     };
     TSS.prototype.editScript = function (fileName, minChar, limChar, newText) {
         var script = this.fileNameToScript[fileName];
         if (script !== null) {
             script.editContent(minChar, limChar, newText);
+            this.snapshots[fileName] = new harness.ScriptSnapshot(script);
             return;
         }
         throw new Error("No script with name '" + fileName + "'");
@@ -67,7 +70,7 @@ var TSS = (function () {
             content = ts.sys.readFile(filename);
             this.fileNameToContent[filename] = content;
         }
-        var snapshot = ts.ScriptSnapshot.fromString(content);
+        var snapshot = new harness.ScriptSnapshot(new harness.ScriptInfo(filename, content));
         /* TODO
               if (!snapshot) {
                   this.addDiagnostic(new ts.Diagnostic(null, 0, 0, ts.DiagnosticCode.Cannot_read_file_0_1, [filename, '']));
@@ -117,6 +120,21 @@ var TSS = (function () {
         ts.sys.standardError.WriteLine(diagnostic.message());
     }
     */
+    TSS.prototype.getErrors = function () {
+        var _this = this;
+        var addPhase = function (phase) { return function (d) {
+            d.phase = phase;
+            return d;
+        }; };
+        var errors = [];
+        ts.forEachKey(this.fileNameToScript, function (file) {
+            var syntactic = _this.ls.getSyntacticDiagnostics(file);
+            var semantic = _this.ls.getSemanticDiagnostics(file);
+            // this.ls.languageService.getEmitOutput(file).diagnostics);
+            errors = errors.concat(syntactic.map(addPhase("Syntax")), semantic.map(addPhase("Semantics")));
+        });
+        return errors;
+    };
     /** load file and dependencies, prepare language service for queries */
     TSS.prototype.setup = function (file) {
         var _this = this;
@@ -137,7 +155,7 @@ var TSS = (function () {
             var filename = _this.resolveRelativePath(source.filename);
             _this.fileNames.push(filename);
             _this.fileNameToScript[filename] = new harness.ScriptInfo(filename, source.text);
-            _this.snapshots[filename] = ts.ScriptSnapshot.fromString(source.text);
+            _this.snapshots[filename] = new harness.ScriptSnapshot(_this.fileNameToScript[filename]);
         });
         // Get a language service
         //this.lsHost = new harness.TypeScriptLSHost();
@@ -151,21 +169,22 @@ var TSS = (function () {
             //        getCancellationToken : ()=>this.compilerHost.getCancellationToken(),
             getCurrentDirectory: function () { return _this.compilerHost.getCurrentDirectory(); },
             getDefaultLibFilename: function (options) { return _this.compilerHost.getDefaultLibFilename(options); },
-            log: function (message) { return console.log(message); },
-            trace: function (message) { return console.log(message); },
+            log: function (message) { return undefined; },
+            trace: function (message) { return undefined; },
             error: function (message) { return console.error(message); } // ??
         };
         this.ls = ts.createLanguageService(this.lsHost, ts.createDocumentRegistry());
         //this.ls.refresh(); old
         //this.ls.cleanupSemanticCache(); ??
     };
-    TSS.prototype.output = function (info, replacer) {
-        if (replacer === void 0) { replacer = function (k, v) { return k === "displayParts" ? "--skipped--" : v; }; }
-        if (this.prettyJSON) {
-            console.log(JSON.stringify(info, replacer, " ").trim());
+    TSS.prototype.output = function (info, excludes) {
+        if (excludes === void 0) { excludes = ["displayParts"]; }
+        var replacer = function (k, v) { return excludes.indexOf(k) !== -1 ? undefined : v; };
+        if (info) {
+            console.log(JSON.stringify(info, replacer, this.prettyJSON ? " " : undefined).trim());
         }
         else {
-            console.log(JSON.stringify(info, replacer).trim());
+            console.log(JSON.stringify(info, replacer));
         }
     };
     TSS.prototype.outputJSON = function (json) {
@@ -245,9 +264,8 @@ var TSS = (function () {
                 else if (m = match(cmd, /^structure (.*)$/)) {
                     file = _this.resolveRelativePath(m[1]);
                 }
-                else if (m = match(cmd, /^completions(-brief)? (true|false) (\d+) (\d+) (.*)$/)) {
+                else if (m = match(cmd, /^completions(-brief)? (true|false)? (\d+) (\d+) (.*)$/)) {
                     brief = m[1];
-                    member = m[2] === 'true';
                     line = parseInt(m[3]);
                     col = parseInt(m[4]);
                     file = _this.resolveRelativePath(m[5]);
@@ -255,7 +273,17 @@ var TSS = (function () {
                     info = _this.ls.getCompletionsAtPosition(file, pos);
                     if (info) {
                         // fill in completion entry details, unless briefness requested
-                        !brief && (info.entries = info.entries.map(function (e) { return _this.ls.getCompletionEntryDetails(file, pos, e.name) || e; }));
+                        !brief && (info.entries = info.entries.map(function (e) {
+                            var d = _this.ls.getCompletionEntryDetails(file, pos, e.name);
+                            if (d) {
+                                d["type"] = ts.displayPartsToString(d.displayParts);
+                                d["docComment"] = ts.displayPartsToString(d.documentation);
+                                return d;
+                            }
+                            else {
+                                return e;
+                            }
+                        }));
                         // NOTE: details null for primitive type symbols, see TS #1592
                         (function () {
                             var languageVersion = _this.compilerOptions.target;
@@ -273,7 +301,7 @@ var TSS = (function () {
                             }
                         })();
                     }
-                    _this.output(info);
+                    _this.output(info, ["displayParts", "documentation"]);
                 }
                 else if (m = match(cmd, /^update( nocheck)? (\d+)( (\d+)-(\d+))? (.*)$/)) {
                     file = _this.resolveRelativePath(m[6]);
@@ -291,7 +319,7 @@ var TSS = (function () {
                             else {
                                 var startLine = parseInt(m[4]);
                                 var endLine = parseInt(m[5]);
-                                var maxLines = script.lineMap.lineCount();
+                                var maxLines = script.lineMap.length;
                                 var startPos = startLine <= maxLines ? (startLine < 1 ? 0 : _this.lineColToPosition(file, startLine, 1)) : script.content.length;
                                 var endPos = endLine < maxLines ? (endLine < 1 ? 0 : _this.lineColToPosition(file, endLine + 1, 0) - 1) : script.content.length;
                                 _this.editScript(file, startPos, endPos, lines.join(EOL));
@@ -311,7 +339,7 @@ var TSS = (function () {
                     }
                 }
                 else if (m = match(cmd, /^showErrors$/)) {
-                    info = _this.program.getGlobalDiagnostics().concat(_this.fileNames.map(function (file) { return _this.program.getDiagnostics(_this.program.getSourceFile(file)); }).reduce(function (l, r) { return l.concat(r); })).map(function (d) {
+                    info = _this.program.getGlobalDiagnostics().concat(_this.getErrors()).map(function (d) {
                         var file = _this.resolveRelativePath(d.file.filename);
                         var lc = _this.positionToLineCol(file, d.start);
                         var len = _this.fileNameToScript[file].content.length;
@@ -322,11 +350,10 @@ var TSS = (function () {
                             start: { line: lc.line, character: lc.character },
                             end: { line: lc2.line, character: lc2.character },
                             text: d.messageText,
-                            // phase: d["phase"],
-                            category: d.category
+                            phase: d["phase"],
+                            category: ts.DiagnosticCategory[d.category]
                         };
                     });
-                    console.log(info);
                     _this.output(info);
                 }
                 else if (m = match(cmd, /^files$/)) {

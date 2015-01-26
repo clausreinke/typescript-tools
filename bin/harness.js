@@ -97,11 +97,23 @@ var ScriptSnapshot = (function () {
         }
         return this.lineMap;
     };
+    /*
+            public getChangeRange(oldScript: ts.ScriptSnapshotShim): ts.TextChangeRange {
+                var oldShim = <ScriptSnapshotShim>oldScript;
+                var range = this.scriptInfo.getTextChangeRangeBetweenVersions(oldShim.version, this.version);
+                if (range === null) {
+                    return null;
+                }
+    
+                return { span: { start: range.span.start, length: range.span.length }, newLength: range.newLength };
+            }
+    */
     ScriptSnapshot.prototype.getChangeRange = function (oldSnapshot) {
         return undefined;
     };
     return ScriptSnapshot;
 })();
+exports.ScriptSnapshot = ScriptSnapshot;
 var CancellationToken = (function () {
     function CancellationToken(cancellationToken) {
         this.cancellationToken = cancellationToken;
