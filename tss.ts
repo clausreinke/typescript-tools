@@ -182,7 +182,7 @@ class TSS {
 
   /** load file and dependencies, prepare language service for queries */
   public setup(file) {
-    this.rootFile = file;
+    this.rootFile = this.resolveRelativePath(file);
 
     this.compilerOptions             = ts.getDefaultCompilerOptions();
     this.compilerOptions.diagnostics = true;
@@ -193,7 +193,7 @@ class TSS {
     // build program from root file,
     // chase dependencies (references and imports), normalize file names, ...
     this.compilerHost = ts.createCompilerHost(this.compilerOptions);
-    this.program      = ts.createProgram([file],this.compilerOptions,this.compilerHost);
+    this.program      = ts.createProgram([this.rootFile],this.compilerOptions,this.compilerHost);
 
     this.fileNames        = [];
     this.fileNameToScript = {};
@@ -244,6 +244,15 @@ class TSS {
     console.log(json.trim());
   }
 
+  private handleNavBarItem(file:string,item:ts.NavigationBarItem) {
+    // TODO: under which circumstances can item.spans.length be other than 1?
+    return { info: [item.kindModifiers,item.kind,item.text].join(" ")
+           , min: this.positionToLineCol(file,item.spans[0].start)
+           , lim: this.positionToLineCol(file,item.spans[0].start+item.spans[0].length)
+           , childItems: item.childItems.map(item=>this.handleNavBarItem(file,item))
+           };
+  }
+
   /** commandline server main routine: commands in, JSON info out */
   public listen() {
     var line: number;
@@ -286,8 +295,9 @@ class TSS {
 
           pos    = this.lineColToPosition(file,line,col);
 
-          info = (this.ls.getQuickInfoAtPosition(file, pos)||{});
-          info.type = ((info&&ts.displayPartsToString(info.displayParts))||"");
+          info            = (this.ls.getQuickInfoAtPosition(file, pos)||{});
+          info.type       = ((info&&ts.displayPartsToString(info.displayParts))||"");
+          info.docComment = ((info&&ts.displayPartsToString(info.documentation))||"");
 
           this.output(info);
 
@@ -341,20 +351,10 @@ class TSS {
 
           file = this.resolveRelativePath(m[1]);
 
-/* TODO the corresponding API method is gone - use getNavigationBarItems instead?
-          locs = this.ls.getNavigationBarItems(file);
+          this.output(this.ls.getNavigationBarItems(file)
+                          .map(item=>this.handleNavBarItem(file,item)));
 
-          info = locs.map( loc => ({
-            loc  : loc,
-            file : file,
-            min  : loc && this.positionToLineCol(loc.fileName,loc.textSpan.start()),
-            lim  : loc && this.positionToLineCol(loc.fileName,loc.textSpan.end())
-          }));
-
-          this.output(info);
-*/
-
-        } else if (m = match(cmd,/^completions(-brief)? (true|false)? (\d+) (\d+) (.*)$/)) {
+        } else if (m = match(cmd,/^completions(-brief)?( true| false)? (\d+) (\d+) (.*)$/)) {
 
           brief  = m[1];
           line   = parseInt(m[3]);
@@ -363,7 +363,7 @@ class TSS {
 
           pos    = this.lineColToPosition(file,line,col);
 
-          info = this.ls.getCompletionsAtPosition(file, pos);
+          info = this.ls.getCompletionsAtPosition(file, pos) || null;
 
           if (info) {
             // fill in completion entry details, unless briefness requested
@@ -397,49 +397,6 @@ class TSS {
           }
 
           this.output(info,["displayParts","documentation"]);
-
-        /*
-        } else if (m = match(cmd,/^info (\d+) (\d+) (.*)$/)) { // mostly for debugging
-
-          line = parseInt(m[1]);
-          col  = parseInt(m[2]);
-          file = this.resolveRelativePath(m[3]);
-
-          pos  = this.lsHost.lineColToPosition(file,line,col);
-
-          def  = this.ls.getDefinitionAtPosition(file, pos)[0];
-
-          // source       = this.ls.getScriptSyntaxAST(file).getSourceText();
-          // var span     = this.ls.getNameOrDottedNameSpan(file,pos,-1);
-          // var spanText = span && source.getText(span.minChar,span.limChar);
-          // member       = span && spanText.indexOf('.') !== -1;
-
-          var typeInfo = this.ls.getTypeAtPosition(file, pos);
-          var type     = typeInfo.memberName;
-          var symbol   = typeInfo.fullSymbolName;
-
-          info = { // all together now..
-            pos         : pos,
-            linecol     : this.lsHost.positionToLineCol(file,pos),
-
-            symbol      : symbol,
-            type        : (type||"").toString(),
-
-            def         : def,
-            file        : def && def.fileName,
-            min         : def && this.lsHost.positionToLineCol(def.fileName,def.minChar),
-            lim         : def && this.lsHost.positionToLineCol(def.fileName,def.limChar),
-
-            // signature: this.ls.getSignatureAtPosition(file, pos), // ??
-
-            // completions : this.ls.getCompletionsAtPosition(file, pos, member),
-
-            // spanText : spanText,
-            // member   : member,
-          };
-
-          this.output(info);
-        */
 
         } else if (m = match(cmd,/^update( nocheck)? (\d+)( (\d+)-(\d+))? (.*)$/)) { // send non-saved source
 
@@ -499,13 +456,15 @@ class TSS {
                            var file = this.resolveRelativePath(d.file.filename);
                            var lc   = this.positionToLineCol(file,d.start);
                            var len  = this.fileNameToScript[file].content.length;
-                           var end  = Math.min(len,d.start+d.length); // NOTE: clamped to end of file (#11)
+                           var end  = Math.min(len,d.start+d.length);
+                                      // NOTE: clamped to end of file (#11)
                            var lc2  = this.positionToLineCol(file,end);
                            return {
                             file: file,
                             start: {line: lc.line, character: lc.character},
                             end: {line: lc2.line, character: lc2.character},
                             text: /* file+"("+lc.line+"/"+lc.character+"): "+ */ d.messageText,
+                            code: d.code,
                             phase: d["phase"],
                             category: ts.DiagnosticCategory[d.category]
                            };
@@ -513,32 +472,6 @@ class TSS {
                        );
 
           this.output(info);
-
-// TODO
-//          info = this.resolutionResult.diagnostics
-//                     .map(d=>{d["phase"]="Resolution";return d})
-//                     .concat(this.lsHost.getErrors())
-//                     .map( d => {
-//                           var file = d.fileName();
-//                           var lc   = this.positionToLineCol(file,d.start());
-//                           var len  = this.fileNameToScript[file].content.length;
-//                           var end  = Math.min(len,d.start()+d.length()); // NOTE: clamped to end of file (#11)
-//                           var lc2  = this.positionToLineCol(file,end);
-//                           var diagInfo = d.info();
-//                           var category = ts.DiagnosticCategory[diagInfo.category];
-//                           return {
-//                            file: file,
-//                            start: {line: lc.line, character: lc.character},
-//                            end: {line: lc2.line, character: lc2.character},
-//                            text: /* file+"("+lc.line+"/"+lc.character+"): "+ */ d.message(),
-//                            phase: d["phase"],
-//                            category: category
-//                            // ,diagnostic: d
-//                           };
-//                         }
-//                       );
-//
-//          this.output(info);
 
         } else if (m = match(cmd,/^files$/)) { // list files in project
 

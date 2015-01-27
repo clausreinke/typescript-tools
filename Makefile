@@ -33,4 +33,4 @@ package.json: .git/refs/heads/master
 					 require('fs').writeFileSync('package.json',JSON.stringify(pj,null,'  '));"
 
 eols:
-	find .  -wholename './.git' -prune -o -exec file \{\} \; | grep CRLF
+	find . -wholename './.git' -prune -o -wholename './node_modules' -prune -o -exec file \{\} \; | grep CRLF

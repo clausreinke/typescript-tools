@@ -23,23 +23,27 @@ npm installation goes somewhat like this - via github:
   $ npm install -g
   ```
 
-or via the npm registry:
+or via the npm registry (the newest version isn't there yet, waiting for post-1.4.1 typescript package):
 
   ```
   $ npm install -g typescript-tools
   ```
 
-The installation should give you a global `tss` command, which you can use directly, as in this sample session (note the absolute paths, which will differ in your installation):
+The installation should give you a global `tss` command, which you can use directly, as in this sample session (note that the absolute paths will differ in your installation):
 
   ```
   $ tss tests/test.ts
-  "loaded c:/javascript/typescript/0.9/typescript-tools/tests/test.ts, TSS listening.."
-  type 4 2 c:/javascript/typescript/0.9/typescript-tools/tests/test.ts
-  {"memberName":{"prefix":"{ ","suffix":"}","delim":"; ","entries":[{"prefix":"a: ","suffix":"","delim":"","entries":[{"prefix":"number","suffix":"","delim":"","entries":[{"prefix":"","suffix":"","delim":"","entries":[]}]}]},{"prefix":"b: ","suffix":"","delim":"","entries":[{"prefix":"number","suffix":"","delim":"","entries":[{"prefix":"","suffix":"","delim":"","entries":[]}]}]}]},"docComment":"","fullSymbolName":"x","kind":"var","minChar":41,"limChar":42,"type":"{ a: number; b: number; }"}
-  > definition 4 2 c:/javascript/typescript/0.9/typescript-tools/tests/test.ts
-  {"def":{"fileName":"c:/javascript/typescript/0.9/typescript-tools/tests/test.ts","minChar":4,"limChar":17,"kind":"var","name":"x","containerKind":"","containerName":""},"file":"c:/javascript/typescript/0.9/typescript-tools/tests/test.ts","min":{"line":1,"character":5},"lim":{"line":1,"character":18}}
-  > completions true 4 4 c:/javascript/typescript/0.9/typescript-tools/tests/test.ts
-  {"maybeInaccurate":false,"isMemberCompletion":true,"entries":[{"name":"a","kind":"property","kindModifiers":"public","type":"number","fullSymbolName":"a","docComment":""},{"name":"b","kind":"property","kindModifiers":"public","type":"number","fullSymbolName":"b","docComment":""}]}
+  "loaded c:/javascript/typescript/github/typescript-tools/tests/test.ts, TSS listening.."
+
+  type 4 2 tests/test.ts
+  {"kind":"var","kindModifiers":"","textSpan":{"start":38,"length":1},"documentation":[],"type":"(var) x: {\n    a: number;\n    b: number;\n}","docComment":""}
+
+  definition 4 2 tests/test.ts
+  {"def":{"fileName":"c:/javascript/typescript/github/typescript-tools/tests/test.ts","textSpan":{"start":4,"length":13},"kind":"var","name":"x","containerName":""},"file":"c:/javascript/typescript/github/typescript-tools/tests/test.ts","min":{"line":1,"character":5},"lim":{"line":1,"character":18}}
+
+  completions 4 4 tests/test.ts
+  {"isMemberCompletion":true,"entries":[{"name":"a","kind":"property","kindModifiers":"","type":"(property) a: number","docComment":""},{"name":"b","kind":"property","kindModifiers":"","type":"(property) b: number","docComment":""}]}
+
   quit
   "TSS closing"
   ```
@@ -48,7 +52,7 @@ If you want to use tss from Vim, add the `typescript-tools` directory to your Vi
 
 From-source compilation should not be necessary, as a pre-compiled `bin/tss.js` is included, as well as a `bin/lib.d.ts`. You might want to modify `bin/defaultLibs.d.ts`, if you want other declaration files included by default. (TODO: get rid of defaultLibs)
 
-If you do want to compile from source, you need the typescript sources (I used the master branch, see `CHANGES.txt` for details):
+If you do want to compile from source:
 
   ```
   # install git and node/npm, then
@@ -58,7 +62,18 @@ If you do want to compile from source, you need the typescript sources (I used t
   $ npm install ../typescript
   $ make
   ```
-(alternatively, you can let npm trigger the cloning of the typescript dependency)
+
+Alternatively, you can let npm handle the cloning of the typescript dependency:
+
+  ```
+  # install git and node/npm, then
+  $ git clone git://github.com/clausreinke/typescript-tools.git
+  $ cd typescript-tools
+  $ npm install
+  $ make
+  ```
+
+The latter works better at the moment since we currently depend directly on the github version of the typescript package. The former gives you control over where to put the typescript clone, and how much to clone (try --depth 1), once we can drop the github dependency again.
 
 TypeScript tools currently available:
 
@@ -123,12 +138,12 @@ TypeScript tools currently available:
 
   structure <file>
     // list quick navigation items for <file>; experimental
-    // (currently, this exposes getScriptLexicalStructure data directly)
+    // (currently, this exposes getNavigationBarItems data)
 
-    [{ file: string
+    [{ info: string
      , min:  { line: number, character: number }
      , lim:  { line: number, character: number }
-     , loc: <data returned from services>
+     , childItems: <recursive>
      }]
 
   showErrors

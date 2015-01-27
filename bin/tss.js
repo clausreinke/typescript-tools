@@ -138,7 +138,7 @@ var TSS = (function () {
     /** load file and dependencies, prepare language service for queries */
     TSS.prototype.setup = function (file) {
         var _this = this;
-        this.rootFile = file;
+        this.rootFile = this.resolveRelativePath(file);
         this.compilerOptions = ts.getDefaultCompilerOptions();
         this.compilerOptions.diagnostics = true;
         this.compilerOptions.target = 1 /* ES5 */;
@@ -146,7 +146,7 @@ var TSS = (function () {
         // build program from root file,
         // chase dependencies (references and imports), normalize file names, ...
         this.compilerHost = ts.createCompilerHost(this.compilerOptions);
-        this.program = ts.createProgram([file], this.compilerOptions, this.compilerHost);
+        this.program = ts.createProgram([this.rootFile], this.compilerOptions, this.compilerHost);
         this.fileNames = [];
         this.fileNameToScript = {};
         this.snapshots = {};
@@ -190,6 +190,11 @@ var TSS = (function () {
     TSS.prototype.outputJSON = function (json) {
         console.log(json.trim());
     };
+    TSS.prototype.handleNavBarItem = function (file, item) {
+        var _this = this;
+        // TODO: under which circumstances can item.spans.length be other than 1?
+        return { info: [item.kindModifiers, item.kind, item.text].join(" "), min: this.positionToLineCol(file, item.spans[0].start), lim: this.positionToLineCol(file, item.spans[0].start + item.spans[0].length), childItems: item.childItems.map(function (item) { return _this.handleNavBarItem(file, item); }) };
+    };
     /** commandline server main routine: commands in, JSON info out */
     TSS.prototype.listen = function () {
         var _this = this;
@@ -221,6 +226,7 @@ var TSS = (function () {
                     pos = _this.lineColToPosition(file, line, col);
                     info = (_this.ls.getQuickInfoAtPosition(file, pos) || {});
                     info.type = ((info && ts.displayPartsToString(info.displayParts)) || "");
+                    info.docComment = ((info && ts.displayPartsToString(info.documentation)) || "");
                     _this.output(info);
                 }
                 else if (m = match(cmd, /^definition (\d+) (\d+) (.*)$/)) {
@@ -263,14 +269,15 @@ var TSS = (function () {
                 }
                 else if (m = match(cmd, /^structure (.*)$/)) {
                     file = _this.resolveRelativePath(m[1]);
+                    _this.output(_this.ls.getNavigationBarItems(file).map(function (item) { return _this.handleNavBarItem(file, item); }));
                 }
-                else if (m = match(cmd, /^completions(-brief)? (true|false)? (\d+) (\d+) (.*)$/)) {
+                else if (m = match(cmd, /^completions(-brief)?( true| false)? (\d+) (\d+) (.*)$/)) {
                     brief = m[1];
                     line = parseInt(m[3]);
                     col = parseInt(m[4]);
                     file = _this.resolveRelativePath(m[5]);
                     pos = _this.lineColToPosition(file, line, col);
-                    info = _this.ls.getCompletionsAtPosition(file, pos);
+                    info = _this.ls.getCompletionsAtPosition(file, pos) || null;
                     if (info) {
                         // fill in completion entry details, unless briefness requested
                         !brief && (info.entries = info.entries.map(function (e) {
@@ -343,13 +350,15 @@ var TSS = (function () {
                         var file = _this.resolveRelativePath(d.file.filename);
                         var lc = _this.positionToLineCol(file, d.start);
                         var len = _this.fileNameToScript[file].content.length;
-                        var end = Math.min(len, d.start + d.length); // NOTE: clamped to end of file (#11)
+                        var end = Math.min(len, d.start + d.length);
+                        // NOTE: clamped to end of file (#11)
                         var lc2 = _this.positionToLineCol(file, end);
                         return {
                             file: file,
                             start: { line: lc.line, character: lc.character },
                             end: { line: lc2.line, character: lc2.character },
                             text: d.messageText,
+                            code: d.code,
                             phase: d["phase"],
                             category: ts.DiagnosticCategory[d.category]
                         };
