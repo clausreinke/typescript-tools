@@ -1,6 +1,6 @@
 {
   "name": "typescript-tools",
-  "version": "v0.4.0-testing_ts1.4-1",
+  "version": "v0.4.1-testing-ts1.4",
   "description": "TypeScript Services commandline server",
   "bin": {
     "tss": "bin/tss"
@@ -18,5 +18,5 @@
   "preferGlobal": true,
   "author": "Claus Reinke",
   "license": "Apache License, Version 2.0",
-  "dependencies": "git+https://github.com/Microsoft/TypeScript.git"
+  "dependencies": "git+ssh://git@github.com:Microsoft/TypeScript.git"
 }
