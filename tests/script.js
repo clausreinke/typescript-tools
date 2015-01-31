@@ -14,7 +14,7 @@ function test(scriptName,fileName) {
   var script = fs.readFileSync(scriptName,"utf8")
                  .replace(/PREFIX/g,PREFIX);
 
-  var cmd = "node "+tss_path+" "+fileName;
+  var cmd = "node "+tss_path+" --project ."+" "+fileName;
   tests.push(scriptName);
   log[scriptName] = ["// "+scriptName,cmd];
 

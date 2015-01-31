@@ -14,7 +14,7 @@ bin/tss.js: tss.ts harness.ts $(TYPESCRIPT)/bin/typescript.d.ts $(TYPESCRIPT)/bi
 bin/lib.d.ts: $(TYPESCRIPT)/bin/lib.d.ts
 	cp $(TYPESCRIPT)/bin/lib.d.ts bin/lib.d.ts
 
-tests/script.out2: $(TEST_SCRIPTS) $(TEST_SOURCES) tests/script.js tests/script.out bin/tss.js bin/lib.d.ts
+tests/script.out2: $(TEST_SCRIPTS) $(TEST_SOURCES) tests/tsconfig.json tests/script.js tests/script.out bin/tss.js bin/lib.d.ts
 	cd tests;\
 	node script.js >script.out2;
 

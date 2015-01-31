@@ -29,6 +29,8 @@ or via the npm registry (the newest version isn't there yet, waiting for post-1.
   $ npm install -g typescript-tools
   ```
 
+From-source compilation should not be necessary, as a pre-compiled `bin/tss.js` is included, as well as a `bin/lib.d.ts`. But if you want to rebuild and test tss, you can run `make` in `typescript-tools`.
+
 The installation should give you a global `tss` command, which you can use directly, as in this sample session (note that the absolute paths will differ in your installation):
 
   ```
@@ -50,36 +52,11 @@ The installation should give you a global `tss` command, which you can use direc
 
 If you want to use tss from Vim, add the `typescript-tools` directory to your Vim's `rtp`. If you want to use this from other editors/IDEs, you will need to write some code, to communicate with `tss` as an asynchronous subprocess (please let me know how it goes, especially if you release a working plugin).
 
-From-source compilation should not be necessary, as a pre-compiled `bin/tss.js` is included, as well as a `bin/lib.d.ts`. You might want to modify `bin/defaultLibs.d.ts`, if you want other declaration files included by default. (TODO: get rid of defaultLibs)
-
-If you do want to compile from source:
-
-  ```
-  # install git and node/npm, then
-  $ git clone https://github.com/Microsoft/TypeScript.git
-  $ git clone git://github.com/clausreinke/typescript-tools.git
-  $ cd typescript-tools
-  $ npm install ../typescript
-  $ make
-  ```
-
-Alternatively, you can let npm handle the cloning of the typescript dependency:
-
-  ```
-  # install git and node/npm, then
-  $ git clone git://github.com/clausreinke/typescript-tools.git
-  $ cd typescript-tools
-  $ npm install
-  $ make
-  ```
-
-The latter works better at the moment since we currently depend directly on the github version of the typescript package. The former gives you control over where to put the typescript clone, and how much to clone (try --depth 1), once we can drop the github dependency again.
-
 TypeScript tools currently available:
 
 ## tss.ts: TypeScript Services Server
 
-  Simple commandline interface (commands in, info out) to TypeScript Services. Currently supported commands (with indication of purpose and output format) include:
+Simple commandline interface (commands in, info out) to TypeScript Services. Currently supported commands (with indication of purpose and output format) include:
 
   ```
   type <line> <pos> <file>
@@ -143,7 +120,7 @@ TypeScript tools currently available:
     [{ info: string
      , min:  { line: number, character: number }
      , lim:  { line: number, character: number }
-     , childItems: <recursive>
+     , childItems: <recursive structure>
      }]
 
   showErrors
@@ -165,11 +142,47 @@ TypeScript tools currently available:
     "TSS closing"
   ```
 
-  Start `tss` with project root file - may take several seconds to load
-  all dependencies; then enter commands and get JSON info or error messages
-  (NOTE: commands take absolute file paths, adjust example to your installation);
-  for a sample session, see `tests/` (commands in `test.script`, output in `script.out`).
+Start `tss` with project root file - may take several seconds to load all
+dependencies for larger projects; then enter commands and get JSON info or
+error messages.
 
+### configuration: tsconfig.json or commandline options
+
+tss can now be configured the same way as tsc, either via commandline options or
+via tsconfig.json files (since about TSv1.5). In both cases, only options that affect
+the language service have any effect. As a simple example, loading sources with 
+external modules generates errors
+
+```
+$ echo showErrors | bin/tss  tests/issue-17.ts
+"loaded c:/javascript/typescript/github/typescript-tools/tests/issue-17.ts, TSS
+listening.."
+showErrors
+[{"file":"c:/javascript/typescript/github/typescript-tools/tests/issue-17-import
+.ts","start":{"line":1,"character":14},"end":{"line":1,"character":18},"text":"C
+annot compile external modules unless the '--module' flag is provided.","code":1
+148,"phase":"Syntax","category":"Error"}]
+```
+
+unless a module system is selected:
+
+```
+$ echo showErrors | bin/tss --module commonjs tests/issue-17.ts
+"loaded c:/javascript/typescript/github/typescript-tools/tests/issue-17.ts, TSS
+listening.."
+showErrors
+[]
+
+$ echo showErrors | bin/tss --project tests/ tests/issue-17.ts
+"loaded c:/javascript/typescript/github/typescript-tools/tests/issue-17.ts, TSS
+listening.."
+showErrors
+[]
+
+$ cat tests/tsconfig.json
+{"compilerOptions": {"target":"ES5","module":"commonjs"} }
+
+```
 
 ## vim interface to tss.js
 

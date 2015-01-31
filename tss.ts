@@ -181,12 +181,13 @@ class TSS {
   }
 
   /** load file and dependencies, prepare language service for queries */
-  public setup(file) {
+  public setup(file,options) {
     this.rootFile = this.resolveRelativePath(file);
 
-    this.compilerOptions             = ts.getDefaultCompilerOptions();
-    this.compilerOptions.diagnostics = true;
-    this.compilerOptions.target      = ts.ScriptTarget.ES5;
+    this.compilerOptions             = options;
+    // this.compilerOptions.diagnostics = true;
+    // this.compilerOptions.target      = ts.ScriptTarget.ES5;
+    // this.compilerOptions.module      = ts.ModuleKind.CommonJS;
 
     this.fileNameToContent = {};
 
@@ -507,7 +508,7 @@ class TSS {
         } else if (m = match(cmd,/^reload$/)) { // reload current project
 
           // TODO: keep updated (in-memory-only) files?
-          this.setup(this.rootFile);
+          this.setup(this.rootFile,this.compilerOptions);
           this.outputJSON('"reloaded '+this.rootFile+', TSS listening.."');
 
         } else if (m = match(cmd,/^quit$/)) {
@@ -548,11 +549,70 @@ class TSS {
   }
 }
 
-if (ts.sys.args.indexOf("--version")!==-1) {
+// from src/compiler/tsc.ts - not yet exported from there:-(
+function findConfigFile(): string {
+  var searchPath = ts.normalizePath(ts.sys.getCurrentDirectory());
+  var filename = "tsconfig.json";
+
+  while (true) {
+     if (ts.sys.fileExists(filename)) { return filename; }
+
+     var parentPath = ts.getDirectoryPath(searchPath);
+
+     if (parentPath === searchPath) { break; }
+
+     searchPath = parentPath;
+
+     filename = "../" + filename;
+  }
+
+  return undefined;
+}
+
+var arg;
+var configFile, configObject, configObjectParsed;
+
+// NOTE: partial options support only
+var commandLine = ts.parseCommandLine(ts.sys.args);
+
+if (commandLine.options.version) {
   console.log(require("../package.json").version);
   process.exit(0);
 }
 
+if (commandLine.options.project) {
+
+  configFile = ts.normalizePath(ts.combinePaths(commandLine.options.project,"tsconfig.json"));
+
+} else if (commandLine.filenames.length===0) {
+
+  configFile = findConfigFile();
+  if (!configFile) {
+    console.error("can't find project root");
+    console.error("please specify root source file");
+    console.error("  or --project directory (containing a tsconfig.json)");
+    process.exit(1);
+  }
+}
+
+var options;
+
+if (configFile) {
+  configObject = ts.readConfigFile(configFile);
+  if (!configObject) {
+    console.error("can't read tsconfig.json at",configFile);
+    process.exit(1);
+  }
+  configObjectParsed = ts.parseConfigFile(configObject,ts.getDirectoryPath(configFile));
+  if (configObjectParsed.errors.length>0) {
+    console.error(configObjectParsed.errors);
+    process.exit(1);
+  }
+  options = ts.extend(commandLine.options,configObjectParsed.options);
+} else {
+  options = ts.extend(commandLine.options,ts.getDefaultCompilerOptions());
+}
+
 var tss = new TSS();
-tss.setup(ts.sys.args[0]);
+tss.setup(commandLine.filenames[0],options);
 tss.listen();

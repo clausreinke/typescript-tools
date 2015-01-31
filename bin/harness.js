@@ -47,7 +47,9 @@ var ScriptInfo = (function () {
         this.setContent(content);
         this.editRanges.push({
             length: content.length,
-            textChangeRange: ts.createTextChangeRange(ts.createTextSpan(0, old_length), content.length)
+            textChangeRange: 
+            // NOTE: no shortcut for "update everything" (null only works in some places, #10)
+            ts.createTextChangeRange(ts.createTextSpan(0, old_length), content.length)
         });
         this.version++;
     };
