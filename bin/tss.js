@@ -34,7 +34,7 @@ var TSS = (function () {
     */
     TSS.prototype.lineColToPosition = function (fileName, line, col) {
         var script = this.fileNameToScript[fileName];
-        return ts.getPositionFromLineAndCharacter(script.lineMap, line, col);
+        return ts.computePositionFromLineAndCharacter(script.lineMap, line, col);
     };
     /**
      * @param line 1 based index
@@ -42,7 +42,7 @@ var TSS = (function () {
     */
     TSS.prototype.positionToLineCol = function (fileName, position) {
         var script = this.fileNameToScript[fileName];
-        return ts.getLineAndCharacterOfPosition(script.lineMap, position);
+        return ts.computeLineAndCharacterOfPosition(script.lineMap, position);
     };
     TSS.prototype.updateScript = function (fileName, content) {
         var script = this.fileNameToScript[fileName];
@@ -153,7 +153,7 @@ var TSS = (function () {
         this.snapshots = {};
         //TODO: diagnostics
         this.program.getSourceFiles().forEach(function (source) {
-            var filename = _this.resolveRelativePath(source.filename);
+            var filename = _this.resolveRelativePath(source.fileName);
             _this.fileNames.push(filename);
             _this.fileNameToScript[filename] = new harness.ScriptInfo(filename, source.text);
             _this.snapshots[filename] = new harness.ScriptSnapshot(_this.fileNameToScript[filename]);
@@ -169,7 +169,7 @@ var TSS = (function () {
             //        getLocalizedDiagnosticMessages?(): any;
             //        getCancellationToken : ()=>this.compilerHost.getCancellationToken(),
             getCurrentDirectory: function () { return _this.compilerHost.getCurrentDirectory(); },
-            getDefaultLibFilename: function (options) { return _this.compilerHost.getDefaultLibFilename(options); },
+            getDefaultLibFileName: function (options) { return _this.compilerHost.getDefaultLibFileName(options); },
             log: function (message) { return undefined; },
             trace: function (message) { return undefined; },
             error: function (message) { return console.error(message); } // ??
@@ -349,7 +349,7 @@ var TSS = (function () {
                 }
                 else if (m = match(cmd, /^showErrors$/)) {
                     info = _this.program.getGlobalDiagnostics().concat(_this.getErrors()).map(function (d) {
-                        var file = _this.resolveRelativePath(d.file.filename);
+                        var file = _this.resolveRelativePath(d.file.fileName);
                         var lc = _this.positionToLineCol(file, d.start);
                         var len = _this.fileNameToScript[file].content.length;
                         var end = Math.min(len, d.start + d.length);
@@ -451,7 +451,7 @@ if (commandLine.options.version) {
 if (commandLine.options.project) {
     configFile = ts.normalizePath(ts.combinePaths(commandLine.options.project, "tsconfig.json"));
 }
-else if (commandLine.filenames.length === 0) {
+else if (commandLine.fileNames.length === 0) {
     configFile = findConfigFile();
     if (!configFile) {
         console.error("can't find project root");
@@ -478,5 +478,5 @@ else {
     options = ts.extend(commandLine.options, ts.getDefaultCompilerOptions());
 }
 var tss = new TSS();
-tss.setup(commandLine.filenames[0], options);
+tss.setup(commandLine.fileNames[0], options);
 tss.listen();

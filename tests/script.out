@@ -57,6 +57,7 @@ node ../bin/tss.js --project . test.ts
   ,"lim":{"line":1
   ,"character":18}}
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"toString"
   ,"kind":"method"
   ,"kindModifiers":"declare"
@@ -158,6 +159,7 @@ node ../bin/tss.js --project . test.ts
   ,"type":"(method) String.substr(from: number, length?: number): string"
   ,"docComment":"Gets a substring beginning at the specified location and having the specified length."}]}
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"a"
   ,"kind":"property"
   ,"kindModifiers":""
@@ -204,6 +206,7 @@ var a = [];
   ,"phase":"Semantics"
   ,"category":"Error"}]
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"toString"
   ,"kind":"method"
   ,"kindModifiers":"declare"
@@ -305,6 +308,7 @@ var a = [];
   ,"type":"(method) String.substr(from: number, length?: number): string"
   ,"docComment":"Gets a substring beginning at the specified location and having the specified length."}]}
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"a"
   ,"kind":"property"
   ,"kindModifiers":""
@@ -316,6 +320,7 @@ var a = [];
   ,"type":"(property) b: number"
   ,"docComment":""}]}
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"length"
   ,"kind":"property"
   ,"kindModifiers":"declare"
@@ -427,6 +432,7 @@ var a = [];
   ,"type":"(method) Array<any>.reduceRight(callbackfn: (previousValue: any, currentValue: any, currentIndex: number, array: any[]) => any, initialValue?: any): any (+1 overload)"
   ,"docComment":"Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function."}]}
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"length"
   ,"kind":"property"
   ,"kindModifiers":"declare"}
@@ -494,6 +500,7 @@ var a = [];
   ,"kind":"method"
   ,"kindModifiers":"declare"}]}
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"toString"
   ,"kind":"method"
   ,"kindModifiers":"declare"
@@ -618,6 +625,7 @@ node ../bin/tss.js --project . empty.ts
 "loaded PREFIX/empty.ts, TSS listening.."
 "updated PREFIX/empty.ts, (0/1) errors"
 {"isMemberCompletion":false
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"bar"
   ,"kind":"parameter"
   ,"kindModifiers":""
@@ -646,6 +654,7 @@ node ../bin/tss.js --project . empty.ts
   ,"prefix":"b"}
 "updated PREFIX/empty.ts"
 {"isMemberCompletion":false
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"bar"
   ,"kind":"parameter"
   ,"kindModifiers":""
@@ -737,6 +746,7 @@ node ../bin/tss.js --project . empty.ts
 "loaded PREFIX/empty.ts, TSS listening.."
 "updated PREFIX/empty.ts"
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"forEach"
   ,"kind":"method"
   ,"kindModifiers":"declare"
@@ -750,6 +760,7 @@ node ../bin/tss.js --project . empty.ts
   ,"prefix":"f"}
 "updated PREFIX/empty.ts"
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"map"
   ,"kind":"method"
   ,"kindModifiers":"declare"
@@ -758,6 +769,7 @@ node ../bin/tss.js --project . empty.ts
   ,"prefix":"m"}
 "updated PREFIX/empty.ts"
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"forEach"
   ,"kind":"method"
   ,"kindModifiers":"declare"
@@ -766,6 +778,7 @@ node ../bin/tss.js --project . empty.ts
   ,"prefix":"fo"}
 "updated PREFIX/empty.ts"
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"toLowerCase"
   ,"kind":"method"
   ,"kindModifiers":"declare"
@@ -784,6 +797,7 @@ node ../bin/tss.js --project . empty.ts
   ,"prefix":"toL"}
 "updated PREFIX/empty.ts"
 {"isMemberCompletion":false
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"bar"
   ,"kind":"parameter"
   ,"kindModifiers":""
@@ -814,20 +828,24 @@ node ../bin/tss.js --project . issue-15.ts
   ,"type":"(local var) bg: Background.Class"
   ,"docComment":""}
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"Class"
   ,"kind":"constructor"
   ,"kindModifiers":"export"
   ,"type":"(constructor) Background.Class(): Background.Class"
   ,"docComment":""}]}
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"Class"
   ,"kind":"constructor"
   ,"kindModifiers":"export"
   ,"type":"(constructor) Background.Class(): Background.Class"
   ,"docComment":""}]}
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[]}
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"a"
   ,"kind":"property"
   ,"kindModifiers":"public"
@@ -844,6 +862,7 @@ node ../bin/tss.js --project . issue-15.ts
   ,"type":"(method) Background.Class.init(): void"
   ,"docComment":""}]}
 {"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"test_var"
   ,"kind":"property"
   ,"kindModifiers":"public"

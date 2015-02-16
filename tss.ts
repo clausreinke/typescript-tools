@@ -66,7 +66,7 @@ class TSS {
   public lineColToPosition(fileName: string, line: number, col: number): number {
       var script: harness.ScriptInfo = this.fileNameToScript[fileName];
 
-      return ts.getPositionFromLineAndCharacter(script.lineMap,line, col);
+      return ts.computePositionFromLineAndCharacter(script.lineMap,line, col);
   }
 
   /**
@@ -76,7 +76,7 @@ class TSS {
   private positionToLineCol(fileName: string, position: number): ts.LineAndCharacter {
       var script: harness.ScriptInfo = this.fileNameToScript[fileName];
 
-      return ts.getLineAndCharacterOfPosition(script.lineMap,position);
+      return ts.computeLineAndCharacterOfPosition(script.lineMap,position);
   }
 
   private updateScript(fileName: string, content: string) {
@@ -202,7 +202,7 @@ class TSS {
     //TODO: diagnostics
 
     this.program.getSourceFiles().forEach(source=>{
-      var filename = this.resolveRelativePath(source.filename);
+      var filename = this.resolveRelativePath(source.fileName);
       this.fileNames.push(filename);
       this.fileNameToScript[filename] =
         new harness.ScriptInfo(filename,source.text);
@@ -220,8 +220,8 @@ class TSS {
 //        getLocalizedDiagnosticMessages?(): any;
 //        getCancellationToken : ()=>this.compilerHost.getCancellationToken(),
         getCurrentDirectory : ()=>this.compilerHost.getCurrentDirectory(),
-        getDefaultLibFilename : 
-          (options: ts.CompilerOptions)=>this.compilerHost.getDefaultLibFilename(options),
+        getDefaultLibFileName : 
+          (options: ts.CompilerOptions)=>this.compilerHost.getDefaultLibFileName(options),
         log : (message)=>undefined, // ??
         trace : (message)=>undefined, // ??
         error : (message)=>console.error(message) // ??
@@ -454,7 +454,7 @@ class TSS {
                      */
                      .concat(this.getErrors())
                      .map( d => {
-                           var file = this.resolveRelativePath(d.file.filename);
+                           var file = this.resolveRelativePath(d.file.fileName);
                            var lc   = this.positionToLineCol(file,d.start);
                            var len  = this.fileNameToScript[file].content.length;
                            var end  = Math.min(len,d.start+d.length);
@@ -584,7 +584,7 @@ if (commandLine.options.project) {
 
   configFile = ts.normalizePath(ts.combinePaths(commandLine.options.project,"tsconfig.json"));
 
-} else if (commandLine.filenames.length===0) {
+} else if (commandLine.fileNames.length===0) {
 
   configFile = findConfigFile();
   if (!configFile) {
@@ -614,5 +614,5 @@ if (configFile) {
 }
 
 var tss = new TSS();
-tss.setup(commandLine.filenames[0],options);
+tss.setup(commandLine.fileNames[0],options);
 tss.listen();
