@@ -113,16 +113,6 @@ Simple commandline interface (commands in, info out) to TypeScript Services. Cur
 
     [<fileName>,...]
 
-  structure <file>
-    // list quick navigation items for <file>; experimental
-    // (currently, this exposes getNavigationBarItems data)
-
-    [{ info: string
-     , min:  { line: number, character: number }
-     , lim:  { line: number, character: number }
-     , childItems: <recursive structure>
-     }]
-
   showErrors
     // show compilation errors for current project
 
@@ -235,9 +225,6 @@ $ cat tests/tsconfig.json
 
   " create location list for references
   command! TSSreferences
-
-  " navigation menu for current file structure
-  command! TSSstructure
 
   " update TSS with current file source
   command! TSSupdate

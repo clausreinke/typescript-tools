@@ -201,7 +201,14 @@ var TSS = (function () {
     TSS.prototype.handleNavBarItem = function (file, item) {
         var _this = this;
         // TODO: under which circumstances can item.spans.length be other than 1?
-        return { info: [item.kindModifiers, item.kind, item.text].join(" "), min: this.positionToLineCol(file, item.spans[0].start), lim: this.positionToLineCol(file, item.spans[0].start + item.spans[0].length), childItems: item.childItems.map(function (item) { return _this.handleNavBarItem(file, item); }) };
+        return { info: [item.kindModifiers, item.kind, item.text].filter(function (s) { return s !== ""; }).join(" "),
+            kindModifiers: item.kindModifiers,
+            kind: item.kind,
+            text: item.text,
+            min: this.positionToLineCol(file, item.spans[0].start),
+            lim: this.positionToLineCol(file, item.spans[0].start + item.spans[0].length),
+            childItems: item.childItems.map(function (item) { return _this.handleNavBarItem(file, item); })
+        };
     };
     /** commandline server main routine: commands in, JSON info out */
     TSS.prototype.listen = function () {
@@ -209,7 +216,7 @@ var TSS = (function () {
         var line;
         var col;
         var rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-        var cmd, pos, file, script, added, range, check, def, refs, locs, info, source, brief, member, navbarItems;
+        var cmd, pos, file, script, added, range, check, def, refs, locs, info, source, brief, member, navbarItems, pattern;
         var collecting = 0, on_collected_callback, lines = [];
         var commands = {};
         function match(cmd, regexp) {
@@ -285,9 +292,13 @@ var TSS = (function () {
                     });
                     _this.output(info);
                 }
-                else if (m = match(cmd, /^structure (.*)$/)) {
+                else if (m = match(cmd, /^navigationBarItems (.*)$/)) {
                     file = _this.resolveRelativePath(m[1]);
                     _this.output(_this.ls.getNavigationBarItems(file).map(function (item) { return _this.handleNavBarItem(file, item); }));
+                }
+                else if (m = match(cmd, /^navigateToItems (.*)$/)) {
+                    pattern = m[1];
+                    _this.output(_this.ls.getNavigateToItems(pattern));
                 }
                 else if (m = match(cmd, /^completions(-brief)?( true| false)? (\d+) (\d+) (.*)$/)) {
                     brief = m[1];

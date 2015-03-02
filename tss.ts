@@ -260,7 +260,10 @@ class TSS {
 
   private handleNavBarItem(file:string,item:ts.NavigationBarItem) {
     // TODO: under which circumstances can item.spans.length be other than 1?
-    return { info: [item.kindModifiers,item.kind,item.text].join(" ")
+    return { info: [item.kindModifiers,item.kind,item.text].filter(s=>s!=="").join(" ")
+           , kindModifiers : item.kindModifiers
+           , kind: item.kind
+           , text: item.text
            , min: this.positionToLineCol(file,item.spans[0].start)
            , lim: this.positionToLineCol(file,item.spans[0].start+item.spans[0].length)
            , childItems: item.childItems.map(item=>this.handleNavBarItem(file,item))
@@ -276,7 +279,7 @@ class TSS {
 
     var cmd:string, pos:number, file:string, script, added:boolean, range:boolean, check:boolean
       , def, refs:ts.ReferenceEntry[], locs:ts.DefinitionInfo[], info, source:string
-      , brief, member:boolean, navbarItems:ts.NavigationBarItem[];
+      , brief, member:boolean, navbarItems:ts.NavigationBarItem[], pattern:string;
 
     var collecting = 0, on_collected_callback:()=>void, lines:string[] = [];
 
@@ -370,12 +373,18 @@ class TSS {
 
           this.output(info);
 
-        } else if (m = match(cmd,/^structure (.*)$/)) {
+        } else if (m = match(cmd,/^navigationBarItems (.*)$/)) {
 
           file = this.resolveRelativePath(m[1]);
 
           this.output(this.ls.getNavigationBarItems(file)
                           .map(item=>this.handleNavBarItem(file,item)));
+
+        } else if (m = match(cmd,/^navigateToItems (.*)$/)) {
+
+          pattern = m[1];
+
+          this.output(this.ls.getNavigateToItems(pattern));
 
         } else if (m = match(cmd,/^completions(-brief)?( true| false)? (\d+) (\d+) (.*)$/)) {
 
