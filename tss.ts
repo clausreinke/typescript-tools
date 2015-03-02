@@ -62,21 +62,22 @@ class TSS {
   /**
    * @param line 1 based index
    * @param col 1 based index
-  */
+   */
   public lineColToPosition(fileName: string, line: number, col: number): number {
       var script: harness.ScriptInfo = this.fileNameToScript[fileName];
 
-      return ts.computePositionFromLineAndCharacter(script.lineMap,line, col);
+      return ts.computePositionOfLineAndCharacter(script.lineMap,line-1, col-1);
   }
 
   /**
-   * @param line 1 based index
-   * @param col 1 based index
-  */
+   * @returns {line,character} 1 based indices
+   */
   private positionToLineCol(fileName: string, position: number): ts.LineAndCharacter {
       var script: harness.ScriptInfo = this.fileNameToScript[fileName];
 
-      return ts.computeLineAndCharacterOfPosition(script.lineMap,position);
+      var lineChar = ts.computeLineAndCharacterOfPosition(script.lineMap,position);
+
+      return {line: lineChar.line+1, character: lineChar.character+1 };
   }
 
   private updateScript(fileName: string, content: string) {
