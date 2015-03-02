@@ -31,18 +31,29 @@ var TSS = (function () {
     /**
      * @param line 1 based index
      * @param col 1 based index
-    */
+     */
     TSS.prototype.lineColToPosition = function (fileName, line, col) {
         var script = this.fileNameToScript[fileName];
-        return ts.computePositionFromLineAndCharacter(script.lineMap, line, col);
+        return ts.computePositionOfLineAndCharacter(script.lineMap, line - 1, col - 1);
+    };
+    /**
+     * @returns {line,character} 1 based indices
+     */
+    TSS.prototype.positionToLineCol = function (fileName, position) {
+        var script = this.fileNameToScript[fileName];
+        var lineChar = ts.computeLineAndCharacterOfPosition(script.lineMap, position);
+        return { line: lineChar.line + 1, character: lineChar.character + 1 };
     };
     /**
      * @param line 1 based index
-     * @param col 1 based index
-    */
-    TSS.prototype.positionToLineCol = function (fileName, position) {
+     */
+    TSS.prototype.getLineText = function (fileName, line) {
         var script = this.fileNameToScript[fileName];
-        return ts.computeLineAndCharacterOfPosition(script.lineMap, position);
+        var lineMap = script.lineMap;
+        var lineStart = ts.computePositionOfLineAndCharacter(lineMap, line - 1, 0);
+        var lineEnd = ts.computePositionOfLineAndCharacter(lineMap, line, 0) - 1;
+        var lineText = script.content.substring(lineStart, lineEnd);
+        return lineText;
     };
     TSS.prototype.updateScript = function (fileName, content) {
         var script = this.fileNameToScript[fileName];
@@ -90,9 +101,7 @@ var TSS = (function () {
         // get the absolute path
         normalizedPath = ts.sys.resolvePath(normalizedPath);
         // Switch to forward slashes
-        normalizedPath = switchToForwardSlashes(normalizedPath).replace(/^(.:)/, function (_, drive) {
-            return drive.toLowerCase();
-        });
+        normalizedPath = switchToForwardSlashes(normalizedPath).replace(/^(.:)/, function (_, drive) { return drive.toLowerCase(); });
         return normalizedPath;
     };
     TSS.prototype.fileExists = function (s) {
@@ -122,10 +131,7 @@ var TSS = (function () {
     */
     TSS.prototype.getErrors = function () {
         var _this = this;
-        var addPhase = function (phase) { return function (d) {
-            d.phase = phase;
-            return d;
-        }; };
+        var addPhase = function (phase) { return function (d) { d.phase = phase; return d; }; };
         var errors = [];
         ts.forEachKey(this.fileNameToScript, function (file) {
             var syntactic = _this.ls.getSyntacticDiagnostics(file);
@@ -155,7 +161,8 @@ var TSS = (function () {
         this.program.getSourceFiles().forEach(function (source) {
             var filename = _this.resolveRelativePath(source.fileName);
             _this.fileNames.push(filename);
-            _this.fileNameToScript[filename] = new harness.ScriptInfo(filename, source.text);
+            _this.fileNameToScript[filename] =
+                new harness.ScriptInfo(filename, source.text);
             _this.snapshots[filename] = new harness.ScriptSnapshot(_this.fileNameToScript[filename]);
         });
         // Get a language service
@@ -260,12 +267,22 @@ var TSS = (function () {
                         default:
                             throw "cannot happen";
                     }
-                    info = refs.map(function (ref) { return ({
-                        ref: ref,
-                        file: ref && ref.fileName,
-                        min: ref && _this.positionToLineCol(ref.fileName, ref.textSpan.start),
-                        lim: ref && _this.positionToLineCol(ref.fileName, ts.textSpanEnd(ref.textSpan))
-                    }); });
+                    info = (refs || []).map(function (ref) {
+                        var start, end, fileName, lineText;
+                        if (ref) {
+                            start = _this.positionToLineCol(ref.fileName, ref.textSpan.start);
+                            end = _this.positionToLineCol(ref.fileName, ts.textSpanEnd(ref.textSpan));
+                            fileName = _this.resolveRelativePath(ref.fileName);
+                            lineText = _this.getLineText(fileName, start.line);
+                        }
+                        return {
+                            ref: ref,
+                            file: ref && ref.fileName,
+                            lineText: lineText,
+                            min: start,
+                            lim: end
+                        };
+                    });
                     _this.output(info);
                 }
                 else if (m = match(cmd, /^structure (.*)$/)) {

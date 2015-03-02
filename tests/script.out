@@ -886,6 +886,7 @@ node ../bin/tss.js --project . issue-17.ts
   ,"length":5}
   ,"isWriteAccess":true}
   ,"file":"PREFIX/issue-17-import.ts"
+  ,"lineText":"    public start(){"
   ,"min":{"line":7
   ,"character":12}
   ,"lim":{"line":7
@@ -895,6 +896,7 @@ node ../bin/tss.js --project . issue-17.ts
   ,"length":5}
   ,"isWriteAccess":false}
   ,"file":"PREFIX/issue-17.ts"
+  ,"lineText":"second.start();"
   ,"min":{"line":4
   ,"character":8}
   ,"lim":{"line":4
@@ -904,6 +906,7 @@ node ../bin/tss.js --project . issue-17.ts
   ,"length":5}
   ,"isWriteAccess":true}
   ,"file":"PREFIX/issue-17-import.ts"
+  ,"lineText":"    public start(){"
   ,"min":{"line":7
   ,"character":12}
   ,"lim":{"line":7
@@ -913,6 +916,7 @@ node ../bin/tss.js --project . issue-17.ts
   ,"length":5}
   ,"isWriteAccess":false}
   ,"file":"PREFIX/issue-17.ts"
+  ,"lineText":"second.start();"
   ,"min":{"line":4
   ,"character":8}
   ,"lim":{"line":4

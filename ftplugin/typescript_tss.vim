@@ -373,6 +373,7 @@ function! TSSreferences()
       let i['lnum']     = i['min']['line']
       let i['col']      = i['min']['character']
       let i['filename'] = i['file']
+      let i['text']     = i['lineText']
     endfor
     call setloclist(0,info)
     if len(info)!=0

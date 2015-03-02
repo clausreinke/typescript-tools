@@ -80,6 +80,18 @@ class TSS {
       return {line: lineChar.line+1, character: lineChar.character+1 };
   }
 
+  /**
+   * @param line 1 based index
+   */
+  private getLineText(fileName,line) {
+    var script    = this.fileNameToScript[fileName];
+    var lineMap   = script.lineMap;
+    var lineStart = ts.computePositionOfLineAndCharacter(lineMap,line-1,0)
+    var lineEnd   = ts.computePositionOfLineAndCharacter(lineMap,line,0)-1;
+    var lineText  = script.content.substring(lineStart,lineEnd);
+    return lineText;
+  }
+
   private updateScript(fileName: string, content: string) {
       var script = this.fileNameToScript[fileName];
       if (script !== null) {
@@ -340,12 +352,21 @@ class TSS {
               throw "cannot happen";
           }
 
-          info = refs.map( ref => ({
-            ref  : ref,
-            file : ref && ref.fileName,
-            min  : ref && this.positionToLineCol(ref.fileName,ref.textSpan.start),
-            lim  : ref && this.positionToLineCol(ref.fileName,ts.textSpanEnd(ref.textSpan))
-          }));
+          info = (refs || []).map( ref => {
+            var start, end, fileName, lineText;
+            if (ref) {
+              start    = this.positionToLineCol(ref.fileName,ref.textSpan.start);
+              end      = this.positionToLineCol(ref.fileName,ts.textSpanEnd(ref.textSpan));
+              fileName = this.resolveRelativePath(ref.fileName);
+              lineText = this.getLineText(fileName,start.line);
+            }
+            return {
+              ref      : ref,
+              file     : ref && ref.fileName,
+              lineText : lineText,
+              min      : start,
+              lim      : end
+            }} );
 
           this.output(info);
 
