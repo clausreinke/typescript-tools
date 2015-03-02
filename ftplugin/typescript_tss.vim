@@ -110,7 +110,7 @@ function! TSSsymbol(rawcmd)
   else
     let info = TSScmd(a:rawcmd,{'rawcmd':1})
   endif
-  if type(info)!=type({}) || !has_key(info,"fullSymbolName") || !has_key(info,"type")
+  if type(info)!=type({}) || !has_key(info,"type")
     if a:rawcmd==""
       echoerr 'no useable type information'
       return info
@@ -118,7 +118,7 @@ function! TSSsymbol(rawcmd)
       return ""
     endif
   endif
-  return info.fullSymbolName.":".info.type
+  return info.type
 endfunction
 
 command! TSStype echo TSStype()
@@ -198,23 +198,6 @@ endfunction
 command! -nargs=1 TSSdump echo TSScmd("dump ".<f-args>." ".expand("%:p"),{'rawcmd':1})
 
 " completions
-command! TSScomplete call TSScomplete()
-function! TSScomplete()
-  let col   = col(".")
-  let line  = getline(".")
-  " search backwards for start of identifier (iskeyword pattern)
-  let start = col
-  while start>0 && line[start-2] =~ "\\k"
-    let start -= 1
-  endwhile
-  " check if preceded by dot (won't see dot on previous line!)
-  let member = (start>1 && line[start-2]==".") ? 'true' : 'false'
-  " echomsg start.":".member
-  let info = TSScmd("completions ".member,{'col':start})
-  echo info
-  return info
-endfunction
-
 function! TSScompleteFunc(findstart,base)
   " echomsg a:findstart."|".a:base
   let col   = col(".")
