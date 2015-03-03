@@ -59,7 +59,8 @@ function! TSSkeymap()
   " :TSSsymbol
   map <buffer> _?? :TSSbrowse<cr>
   " :TSSreferences
-  map <buffer> <C-t>s :TSSstructure<cr>
+  map <buffer> <C-t>n :TSSnavigation<cr>
+  map <buffer> <C-t>t :TSSnavigateTo
   map <buffer> <C-t>u :TSSupdate<cr>
   map <buffer> <C-t>e :TSSshowErrors<cr>
   map <buffer> <C-t>p :TSSfilesMenu<cr>
@@ -384,31 +385,60 @@ function! TSSreferences()
   endif
 endfunction
 
-" create navigation menu for file structure items
-command! TSSstructure call TSSstructure()
-function! TSSstructure()
-  let info = TSScmd("structure ".expand("%:p"),{'rawcmd':1})
+function! TSSnavigationMenu(prefix,info)
+  for i in a:info
+    let prefix = a:prefix.'.'.substitute(i['info'],' ','\\\ ','g')
+    let cmd = prefix.(!empty(i['childItems'])?'.\.':'')
+                \ .' :call cursor('.i.min.line.','.i.min.character.')<cr>'
+    exe cmd
+    call TSSnavigationMenu(prefix,i['childItems'])
+  endfor
+endfunction
+
+" create navigation menu for file navigation bar items
+command! TSSnavigation call TSSnavigation()
+function! TSSnavigation()
+  let info = TSScmd("navigationBarItems ".expand("%:p"),{'rawcmd':1})
   if type(info)==type([])
-    silent! unmenu ]TSSstructure
-    for i in info
-      let l   = i.loc
-      let lck = l['containerKind']
-      let lcn = l['containerName']
-      let ln  = l['name']
-      let lk  = l['kind']
-      let lkm = l['kindModifiers']
-      let submenuheader = lk=~'module\|class\|interface' ? '.' : ''
-      let entry = (lck!=''? lcn.'.'.ln.submenuheader.':\ '.(lkm!='' ? lkm.'\ ' : '').lk
-                        \ : ln.submenuheader.':\ '.(lkm!='' ? lkm.'\ ' : '').lk)
-      let entry = substitute(entry,'\.','\.','g')
-      exe 'menu ]TSSstructure.'.entry.' :call cursor('.i.min.line.','.i.min.character.')<cr>'
-    endfor
+    silent! unmenu ]TSSnavigation
+    call TSSnavigationMenu('menu ]TSSnavigation',info)
     " TODO: mark directly before call cursor (bco tear-off menus)
     normal m'
-    popup ]TSSstructure
+    popup ]TSSnavigation
   else
     echoerr info
   endif
+endfunction
+
+" navigate to items in project
+command! -complete=customlist,TSSnavigateToItems -nargs=1 TSSnavigateTo call TSSnavigateTo(<q-args>)
+function! TSSnavigateToItems(A,L,P)
+  let items = TSScmd('navigateToItems '.a:A,{'rawcmd':1})
+  let results = []
+  silent! unmenu ]TSSnavigateTo
+  for item in items
+    let results += [item.name]
+  endfor
+  return results
+endfunction
+function! TSSnavigateTo(item)
+  let items = TSScmd('navigateToItems '.a:item,{'rawcmd':1})
+  silent! unmenu ]TSSnavigateTo
+  silent! tunmenu ]TSSnavigateTo
+  for item in items
+    let entry = (item.kind!=""?item.kind."\\ ":"").item.name
+    if item.containerName!=""
+      let entry = entry."\\ (".(item.containerKind!=""?item.containerKind."\\ ":"")
+                            \ .item.containerName.")"
+    endif
+    exe "menu ]TSSnavigateTo.".entry
+          \ ." :call TSSgoto('".item.fileName."',".item.min.line.",".item.min.character.")<cr>"
+  endfor
+  popup ]TSSnavigateTo
+endfunction
+function! TSSgoto(file,line,col)
+  exe "edit ".a:file
+  call cursor(a:line,a:col)
 endfunction
 
 "TODO: guard tss usage in later functions

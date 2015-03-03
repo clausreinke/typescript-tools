@@ -298,7 +298,12 @@ var TSS = (function () {
                 }
                 else if (m = match(cmd, /^navigateToItems (.*)$/)) {
                     pattern = m[1];
-                    _this.output(_this.ls.getNavigateToItems(pattern));
+                    info = _this.ls.getNavigateToItems(pattern).map(function (item) {
+                        item['min'] = _this.positionToLineCol(item.fileName, item.textSpan.start);
+                        item['lim'] = _this.positionToLineCol(item.fileName, item.textSpan.start + item.textSpan.length);
+                        return item;
+                    });
+                    _this.output(info);
                 }
                 else if (m = match(cmd, /^completions(-brief)?( true| false)? (\d+) (\d+) (.*)$/)) {
                     brief = m[1];

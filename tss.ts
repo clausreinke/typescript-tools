@@ -384,7 +384,17 @@ class TSS {
 
           pattern = m[1];
 
-          this.output(this.ls.getNavigateToItems(pattern));
+          info = this.ls.getNavigateToItems(pattern)
+                   .map(item=>{
+                      item['min'] = this.positionToLineCol(item.fileName
+                                                          ,item.textSpan.start);
+                      item['lim'] = this.positionToLineCol(item.fileName
+                                                          ,item.textSpan.start
+                                                          +item.textSpan.length);
+                      return item;
+                    });
+
+          this.output(info);
 
         } else if (m = match(cmd,/^completions(-brief)?( true| false)? (\d+) (\d+) (.*)$/)) {
 
