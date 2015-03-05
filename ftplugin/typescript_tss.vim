@@ -240,7 +240,9 @@ function! TSScompleteFunc(findstart,base)
     if type(info)==type({})
       for entry in info.entries
         if entry['name'] =~ '^'.a:base
-          call add(result, {'word': entry['name'], 'menu': get(entry,'type',get(entry,'kind','')), 'info': get(entry,'docComment','') })
+          let typish = get(entry,'type',get(entry,'kind',''))
+          call add(result, {'word': entry['name'], 'menu': typish
+                          \,'info': entry['name']." ".typish."\n".get(entry,'docComment','') })
         endif
       endfor
     endif
