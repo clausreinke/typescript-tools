@@ -210,10 +210,10 @@ var TSS = (function () {
                         on_collected_callback();
                     }
                 }
-                else if (m = match(cmd, /^type (\d+) (\d+) (.*)$/)) {
-                    line = parseInt(m[1]);
-                    col = parseInt(m[2]);
-                    file = _this.resolveRelativePath(m[3]);
+                else if (m = match(cmd, /^(type|quickInfo) (\d+) (\d+) (.*)$/)) {
+                    line = parseInt(m[2]);
+                    col = parseInt(m[3]);
+                    file = _this.resolveRelativePath(m[4]);
                     pos = _this.lineColToPosition(file, line, col);
                     info = (_this.ls.getQuickInfoAtPosition(file, pos) || {});
                     info.type = ((info && ts.displayPartsToString(info.displayParts)) || "");

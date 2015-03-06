@@ -278,11 +278,13 @@ class TSS {
             on_collected_callback();
           }
 
-        } else if (m = match(cmd,/^type (\d+) (\d+) (.*)$/)) {
 
-          line   = parseInt(m[1]);
-          col    = parseInt(m[2]);
-          file   = this.resolveRelativePath(m[3]);
+
+        } else if (m = match(cmd,/^(type|quickInfo) (\d+) (\d+) (.*)$/)) { // "type" deprecated
+
+          line   = parseInt(m[2]);
+          col    = parseInt(m[3]);
+          file   = this.resolveRelativePath(m[4]);
 
           pos    = this.lineColToPosition(file,line,col);
 
