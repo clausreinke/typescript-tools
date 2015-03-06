@@ -1,3 +1,26 @@
+0.3.1 to ...:
+
+  - 'type' command renamed to 'quickInfo' (follows LS API naming)
+    old version is still accepted, but deprecated
+
+  - 'navigateToItems' command is new (:TSSnavigateTo in Vim)
+
+  - 'navigationBarItems' command is new (:TSSnavigation in Vim)
+
+  - 'structure' command (:TSSstructure in Vim) is gone (try 'navigationBarItems' instead)
+
+  - Vim: add type to preview info for :TSStype and Omni-Completion (helps with #46)
+
+  - 'references' command: add 'lineText' field (#45, :TSSreferences in Vim)
+
+  - support tsconfig.json file and commandline options (#44)
+
+  - 'completions' command: boolean no longer required
+
+  - get it to compile and run with github version of TypeScript (1.5), see #39
+
+  - fix #35 (error handling and "tss not running" message)
+
 0.3.0 to 0.3.1:
 
   - update TS to v0.9.1-2505-g18875cc (develop branch)
