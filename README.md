@@ -59,8 +59,8 @@ TypeScript tools currently available:
 Simple commandline interface (commands in, info out) to TypeScript Services. Currently supported commands (with indication of purpose and output format) include:
 
   ```
-  type <line> <pos> <file>
-    // get type information
+  quickInfo <line> <pos> <file>
+    // get type information and documentation
 
     { type: string
     , docComment: string
@@ -90,6 +90,33 @@ Simple commandline interface (commands in, info out) to TypeScript Services. Cur
     // get references
 
     [{ file: string
+     , lineText: string
+     , min:  { line: number, character: number }
+     , lim:  { line: number, character: number }
+     }]
+
+  navigationBarItems <file>
+    // get list of items to navigate to in <file>
+
+    [{ info: string
+     , min:  { line: number, character: number }
+     , lim:  { line: number, character: number }
+     , childItems: ..recursive..
+     }]
+
+  navigateToItems <item>
+    // get list of matching items to navigate to in project
+    // where matching is modulo case, prefix, infix, camelCase
+    // (exposes LS API details occasionally subject to change)
+
+    [{ name: string
+     , kind: string
+     , kindModifiers: string
+     , matchKind: string
+     , isCaseSensitive: boolean
+     , fileName: string
+     , containerName: string
+     , containerKind: string
      , min:  { line: number, character: number }
      , lim:  { line: number, character: number }
      }]
@@ -196,9 +223,12 @@ $ cat tests/tsconfig.json
   See top of file `ftplugin/typescript_tss.vim` for configuration options.
 
   In practice, you'll use `:TSSstarthere`, `:TSSend`, `:TSSreload`, `TSStype`, `TSSdef*`,
-  as well as CTRL-X CTRL-O for insert mode completion. Sometimes, calling `:TSSshowErrors`
-  directly can give enough error information for the current file -- eventually,
-  you'll probably have to call `:TSSreload` to account for changes in dependencies.
+  as well as CTRL-X CTRL-O for insert mode completion. Also try the project (file) navigation
+  commands. Sometimes, calling `:TSSshowErrors` directly can give enough error
+  information for the current file -- eventually, you'll probably have to call
+  `:TSSreload` to account for changes in dependencies.
+
+  (TODO: vim plugin demo)
 
 ### Vim plugin usage tips
 
@@ -214,10 +244,7 @@ $ cat tests/tsconfig.json
   command! TSSsymbol
   command! TSStype
 
-  " browse url for ES5 global property/method under cursor
-  command! TSSbrowse
-
-  " jump to definition of item under cursor
+  " jump to or show definition of item under cursor
   command! TSSdef
   command! TSSdefpreview
   command! TSSdefsplit
@@ -237,7 +264,7 @@ $ cat tests/tsconfig.json
   " set ballooneval
   function! TSSballoon()
 
-  " completions
+  " completions (omnifunc will be set for all *.ts files)
   function! TSScompleteFunc(findstart,base)
 
   " open project file, with filename completion
@@ -247,7 +274,15 @@ $ cat tests/tsconfig.json
   command! TSSfiles
 
   " navigate to project file via popup menu
-  command! TSSfilesMenu echo TSSfilesMenu('show')
+  command! TSSfilesMenu
+
+  " create and open navigation menu for file navigation bar items
+  command! TSSnavigation
+
+  " navigate to items in project
+  " 1. narrow down symbols via completion, modulo case/prefix/infix/camelCase
+  " 2. offer remaining exact (modulo case) matches as a menu
+  command! -complete=customlist,TSSnavigateToItems -nargs=1 TSSnavigateTo
 
   " reload project sources - will ask you to save modified buffers first
   command! TSSreload

@@ -73,6 +73,7 @@ function! TSSkeymap()
   " :TSSend
 endfunction
 
+" TODO: doesn't work anymore - replace with something useful, or drop
 " browse url for ES5 global property/method under cursor
 command! TSSbrowse echo TSSbrowse()
 function! TSSbrowse()
@@ -152,7 +153,7 @@ function! TSSballoon()
   endif
 endfunction
 
-" jump to definition of item under cursor
+" jump to or show definition of item under cursor
 command! TSSdef call TSSdef("edit")
 command! TSSdefpreview call TSSdef("pedit")
 command! TSSdefsplit call TSSdef("split")
@@ -198,7 +199,7 @@ endfunction
 " dump TSS internal file source
 command! -nargs=1 TSSdump echo TSScmd("dump ".<f-args>." ".expand("%:p"),{'rawcmd':1})
 
-" completions
+" completions (omnifunc will be set for all *.ts files)
 function! TSScompleteFunc(findstart,base)
   " echomsg a:findstart."|".a:base
   let col   = col(".")
@@ -387,17 +388,18 @@ function! TSSreferences()
   endif
 endfunction
 
-function! TSSnavigationMenu(prefix,info)
-  for i in a:info
-    let prefix = a:prefix.'.'.substitute(i['info'],' ','\\\ ','g')
-    let cmd = prefix.(!empty(i['childItems'])?'.\.':'')
-                \ .' :call cursor('.i.min.line.','.i.min.character.')<cr>'
+" recursively build menu at prefix, from navigationBarItems
+function! TSSnavigationMenu(prefix,items)
+  for item in a:items
+    let prefix = a:prefix.'.'.substitute(item['info'],' ','\\\ ','g')
+    let cmd = prefix.(!empty(item['childItems'])?'.\.':'')
+                \ .' :call cursor('.item.min.line.','.item.min.character.')<cr>'
     exe cmd
-    call TSSnavigationMenu(prefix,i['childItems'])
+    call TSSnavigationMenu(prefix,item['childItems'])
   endfor
 endfunction
 
-" create navigation menu for file navigation bar items
+" create and open navigation menu for file navigation bar items
 command! TSSnavigation call TSSnavigation()
 function! TSSnavigation()
   let info = TSScmd("navigationBarItems ".expand("%:p"),{'rawcmd':1})
@@ -413,7 +415,9 @@ function! TSSnavigation()
 endfunction
 
 " navigate to items in project
-command! -complete=customlist,TSSnavigateToItems -nargs=1 TSSnavigateTo call TSSnavigateTo(<q-args>)
+" 1. narrow down symbols via completion, modulo case/prefix/infix/camelCase
+command! -complete=customlist,TSSnavigateToItems -nargs=1 TSSnavigateTo
+        \ call TSSnavigateTo(<q-args>)
 function! TSSnavigateToItems(A,L,P)
   let items = TSScmd('navigateToItems '.a:A,{'rawcmd':1})
   let results = []
@@ -423,6 +427,8 @@ function! TSSnavigateToItems(A,L,P)
   endfor
   return results
 endfunction
+
+" 2. offer remaining exact (modulo case) matches as a menu
 function! TSSnavigateTo(item)
   let items = TSScmd('navigateToItems '.a:item,{'rawcmd':1})
   silent! unmenu ]TSSnavigateTo
@@ -441,6 +447,7 @@ function! TSSnavigateTo(item)
   endfor
   popup ]TSSnavigateTo
 endfunction
+
 function! TSSgoto(file,line,col)
   exe "edit ".a:file
   call cursor(a:line,a:col)
