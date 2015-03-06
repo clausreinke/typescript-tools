@@ -133,7 +133,7 @@ function! TSStype()
     pclose
     new +setlocal\ previewwindow|setlocal\ buftype=nofile|setlocal\ noswapfile
     exe "normal z" . &previewheight . "\<cr>"
-    call append(0,split(info.docComment,"\n"))
+    call append(0,[info.type]+split(info.docComment,"\n"))
     wincmd p
   endif
   return info.type
@@ -428,6 +428,9 @@ function! TSSnavigateTo(item)
   silent! unmenu ]TSSnavigateTo
   silent! tunmenu ]TSSnavigateTo
   for item in items
+    if item.matchKind!="exact"
+      continue
+    endif
     let entry = (item.kind!=""?item.kind."\\ ":"").item.name
     if item.containerName!=""
       let entry = entry."\\ (".(item.containerKind!=""?item.containerKind."\\ ":"")
