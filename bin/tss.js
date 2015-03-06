@@ -7,11 +7,6 @@
 var ts = require("typescript");
 var harness = require("./harness");
 var defaultLibs = __dirname + "/defaultLibs.d.ts";
-// TS has its own declarations for node-specific stuff, so we
-// need to extend those instead of referencing node.d.ts
-//declare module process {
-//  export var stdin : any;
-//}
 function switchToForwardSlashes(path) {
     return path.replace(/\\/g, "/");
 }
@@ -113,22 +108,6 @@ var TSS = (function () {
     //  getParentDirectory(path: string): string {
     //      return ts.sys.directoryName(path);
     //  }
-    // IDiagnosticReporter
-    /*
-    addDiagnostic(diagnostic: ts.Diagnostic) {
-        if (diagnostic.fileName()) {
-            var scriptSnapshot = this.getScriptSnapshot(diagnostic.fileName());
-            if (scriptSnapshot) {
-                var lineMap = new ts.LineMap(scriptSnapshot.getLineStartPositions, scriptSnapshot.getLength());
-                var lineCol = { line: -1, character: -1 };
-                lineMap.fillLineAndCharacterFromPosition(diagnostic.start(), lineCol);
-                ts.sys.standardError.Write(diagnostic.fileName() + "(" + (lineCol.line + 1) + "," + (lineCol.character + 1) + "): ");
-            }
-        }
-  
-        ts.sys.standardError.WriteLine(diagnostic.message());
-    }
-    */
     TSS.prototype.getErrors = function () {
         var _this = this;
         var addPhase = function (phase) { return function (d) { d.phase = phase; return d; }; };
@@ -166,7 +145,6 @@ var TSS = (function () {
             _this.snapshots[filename] = new harness.ScriptSnapshot(_this.fileNameToScript[filename]);
         });
         // Get a language service
-        //this.lsHost = new harness.TypeScriptLSHost();
         this.lsHost = {
             getCompilationSettings: function () { return _this.compilerOptions; },
             getScriptFileNames: function () { return _this.fileNames; },
@@ -182,8 +160,6 @@ var TSS = (function () {
             error: function (message) { return console.error(message); } // ??
         };
         this.ls = ts.createLanguageService(this.lsHost, ts.createDocumentRegistry());
-        //this.ls.refresh(); old
-        //this.ls.cleanupSemanticCache(); ??
     };
     TSS.prototype.output = function (info, excludes) {
         if (excludes === void 0) { excludes = ["displayParts"]; }

@@ -13,12 +13,6 @@ import harness = require("./harness");
 declare var __dirname : string;
 var defaultLibs  = __dirname + "/defaultLibs.d.ts";
 
-// TS has its own declarations for node-specific stuff, so we
-// need to extend those instead of referencing node.d.ts
-//declare module process {
-//  export var stdin : any;
-//}
-
 function switchToForwardSlashes(path: string) {
     return path.replace(/\\/g, "/");
 }
@@ -161,23 +155,6 @@ class TSS {
 //      return ts.sys.directoryName(path);
 //  }
 
-  // IDiagnosticReporter
-  /*
-  addDiagnostic(diagnostic: ts.Diagnostic) {
-      if (diagnostic.fileName()) {
-          var scriptSnapshot = this.getScriptSnapshot(diagnostic.fileName());
-          if (scriptSnapshot) {
-              var lineMap = new ts.LineMap(scriptSnapshot.getLineStartPositions, scriptSnapshot.getLength());
-              var lineCol = { line: -1, character: -1 };
-              lineMap.fillLineAndCharacterFromPosition(diagnostic.start(), lineCol);
-              ts.sys.standardError.Write(diagnostic.fileName() + "(" + (lineCol.line + 1) + "," + (lineCol.character + 1) + "): ");
-          }
-      }
-
-      ts.sys.standardError.WriteLine(diagnostic.message());
-  }
-  */
-
   public getErrors(): ts.Diagnostic[] {
 
       var addPhase = phase => d => {d.phase = phase; return d};
@@ -223,7 +200,6 @@ class TSS {
     });
 
     // Get a language service
-    //this.lsHost = new harness.TypeScriptLSHost();
     this.lsHost = {
         getCompilationSettings : ()=>this.compilerOptions,
         getScriptFileNames : ()=>this.fileNames,
@@ -240,8 +216,6 @@ class TSS {
         error : (message)=>console.error(message) // ??
     };
     this.ls     = ts.createLanguageService(this.lsHost,ts.createDocumentRegistry());
-    //this.ls.refresh(); old
-    //this.ls.cleanupSemanticCache(); ??
 
   }
 
