@@ -432,7 +432,7 @@ var TSS = (function () {
     };
     TSS.prototype.listeningMessage = function (prefix) {
         var count = this.rootFiles.length - 1;
-        var more = count > 0 ? 'and ' + count + ' more' : '';
+        var more = count > 0 ? ' (+' + count + ' more)' : '';
         return '"' + prefix + ' ' + this.rootFiles[0] + more + ', TSS listening.."';
     };
     return TSS;
@@ -454,7 +454,7 @@ function findConfigFile() {
     }
     return undefined;
 }
-var arg;
+var fileNames;
 var configFile, configObject, configObjectParsed;
 // NOTE: partial options support only
 var commandLine = ts.parseCommandLine(ts.sys.args);
@@ -462,17 +462,14 @@ if (commandLine.options.version) {
     console.log(require("../package.json").version);
     process.exit(0);
 }
-if (commandLine.options.project) {
+if (commandLine.fileNames.length > 0) {
+    fileNames = commandLine.fileNames;
+}
+else if (commandLine.options.project) {
     configFile = ts.normalizePath(ts.combinePaths(commandLine.options.project, "tsconfig.json"));
 }
-else if (commandLine.fileNames.length === 0) {
+else {
     configFile = findConfigFile();
-    if (!configFile) {
-        console.error("can't find project root");
-        console.error("please specify root source file");
-        console.error("  or --project directory (containing a tsconfig.json)");
-        process.exit(1);
-    }
 }
 var options;
 if (configFile) {
@@ -486,11 +483,18 @@ if (configFile) {
         console.error(configObjectParsed.errors);
         process.exit(1);
     }
+    fileNames = configObjectParsed.fileNames;
     options = ts.extend(commandLine.options, configObjectParsed.options);
 }
 else {
     options = ts.extend(commandLine.options, ts.getDefaultCompilerOptions());
 }
+if (!fileNames) {
+    console.error("can't find project root");
+    console.error("please specify root source file");
+    console.error("  or --project directory (containing a tsconfig.json)");
+    process.exit(1);
+}
 var tss = new TSS();
-tss.setup(commandLine.fileNames, options);
+tss.setup(fileNames, options);
 tss.listen();
