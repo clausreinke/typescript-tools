@@ -121,18 +121,18 @@ var TSS = (function () {
         return errors;
     };
     /** load file and dependencies, prepare language service for queries */
-    TSS.prototype.setup = function (file, options) {
+    TSS.prototype.setup = function (files, options) {
         var _this = this;
-        this.rootFile = this.resolveRelativePath(file);
+        this.rootFiles = files.map(function (file) { return _this.resolveRelativePath(file); });
         this.compilerOptions = options;
         // this.compilerOptions.diagnostics = true;
         // this.compilerOptions.target      = ts.ScriptTarget.ES5;
         // this.compilerOptions.module      = ts.ModuleKind.CommonJS;
         this.fileNameToContent = {};
-        // build program from root file,
+        // build program from root files,
         // chase dependencies (references and imports), normalize file names, ...
         this.compilerHost = ts.createCompilerHost(this.compilerOptions);
-        this.program = ts.createProgram([this.rootFile], this.compilerOptions, this.compilerHost);
+        this.program = ts.createProgram(this.rootFiles, this.compilerOptions, this.compilerHost);
         this.fileNames = [];
         this.fileNameToScript = {};
         this.snapshots = {};
@@ -404,8 +404,8 @@ var TSS = (function () {
                 }
                 else if (m = match(cmd, /^reload$/)) {
                     // TODO: keep updated (in-memory-only) files?
-                    _this.setup(_this.rootFile, _this.compilerOptions);
-                    _this.outputJSON('"reloaded ' + _this.rootFile + ', TSS listening.."');
+                    _this.setup(_this.rootFiles, _this.compilerOptions);
+                    _this.outputJSON(_this.listeningMessage('reloaded'));
                 }
                 else if (m = match(cmd, /^quit$/)) {
                     rl.close();
@@ -428,7 +428,12 @@ var TSS = (function () {
         }).on('close', function () {
             _this.outputJSON('"TSS closing"');
         });
-        this.outputJSON('"loaded ' + this.rootFile + ', TSS listening.."');
+        this.outputJSON(this.listeningMessage('loaded'));
+    };
+    TSS.prototype.listeningMessage = function (prefix) {
+        var count = this.rootFiles.length - 1;
+        var more = count > 0 ? 'and ' + count + ' more' : '';
+        return '"' + prefix + ' ' + this.rootFiles[0] + more + ', TSS listening.."';
     };
     return TSS;
 })();
@@ -487,5 +492,5 @@ else {
     options = ts.extend(commandLine.options, ts.getDefaultCompilerOptions());
 }
 var tss = new TSS();
-tss.setup(commandLine.fileNames[0], options);
+tss.setup(commandLine.fileNames, options);
 tss.listen();
