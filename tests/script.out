@@ -1,5 +1,5 @@
 // test.script
-node ../bin/tss.js --project . test.ts
+node ../bin/tss.js test.ts
 // stdout
 "loaded PREFIX/test.ts, TSS listening.."
 [{"file":"PREFIX/test.ts"
@@ -532,7 +532,7 @@ var a = [];
 // stderr
 
 // issue-9.script
-node ../bin/tss.js --project . empty.ts
+node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
 "updated PREFIX/empty.ts, (1/0) errors"
@@ -562,7 +562,7 @@ node ../bin/tss.js --project . empty.ts
 // stderr
 
 // issue-10.script
-node ../bin/tss.js --project . empty.ts
+node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
 "updated PREFIX/empty.ts, (0/0) errors"
@@ -583,7 +583,7 @@ node ../bin/tss.js --project . empty.ts
 // stderr
 
 // issue-11.script
-node ../bin/tss.js --project . empty.ts
+node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
 "updated PREFIX/empty.ts, (1/1) errors"
@@ -610,7 +610,7 @@ node ../bin/tss.js --project . empty.ts
 // stderr
 
 // issue-12.script
-node ../bin/tss.js --project . empty.ts
+node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
 "updated PREFIX/empty.ts, (0/0) errors"
@@ -620,7 +620,7 @@ null
 // stderr
 
 // issue-13.script
-node ../bin/tss.js --project . empty.ts
+node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
 "updated PREFIX/empty.ts, (0/1) errors"
@@ -686,7 +686,7 @@ node ../bin/tss.js --project . empty.ts
 // stderr
 
 // partial-update.script
-node ../bin/tss.js --project . empty.ts
+node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
 "updated PREFIX/empty.ts, (0/0) errors"
@@ -741,7 +741,7 @@ bozo;
 // stderr
 
 // update-nocheck-completion-chain.script
-node ../bin/tss.js --project . empty.ts
+node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
 "updated PREFIX/empty.ts"
@@ -809,7 +809,7 @@ node ../bin/tss.js --project . empty.ts
 // stderr
 
 // issue-15.script
-node ../bin/tss.js --project . issue-15.ts
+node ../bin/tss.js -m commonjs issue-15.ts
 // stdout
 "loaded PREFIX/issue-15.ts, TSS listening.."
 "updated PREFIX/issue-15.ts"
@@ -878,7 +878,7 @@ node ../bin/tss.js --project . issue-15.ts
 // stderr
 
 // issue-17.script
-node ../bin/tss.js --project . issue-17.ts
+node ../bin/tss.js -m commonjs issue-17.ts
 // stdout
 "loaded PREFIX/issue-17.ts, TSS listening.."
 [{"ref":{"fileName":"PREFIX/issue-17-import.ts"
@@ -926,7 +926,7 @@ node ../bin/tss.js --project . issue-17.ts
 // stderr
 
 // concat-map.script
-node ../bin/tss.js --project . empty.ts
+node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
 "updated PREFIX/empty.ts, (0/0) errors"
