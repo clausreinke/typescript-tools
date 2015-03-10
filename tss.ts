@@ -88,7 +88,7 @@ class TSS {
 
   private updateScript(fileName: string, content: string) {
       var script = this.fileNameToScript[fileName];
-      if (script !== null) {
+      if (script) {
         script.updateContent(content);
       } else {
         this.fileNameToScript[fileName] = new harness.ScriptInfo(fileName, content);
@@ -98,7 +98,7 @@ class TSS {
 
   private editScript(fileName: string, minChar: number, limChar: number, newText: string) {
       var script = this.fileNameToScript[fileName];
-      if (script !== null) {
+      if (script) {
           script.editContent(minChar, limChar, newText);
           this.snapshots[fileName] = new harness.ScriptSnapshot(script); 
           return;
@@ -420,7 +420,7 @@ class TSS {
 
           file       = this.resolveRelativePath(m[6]);
           script     = this.fileNameToScript[file];
-          added      = script==null;
+          added      = !script;
           range      = !!m[3]
           check      = !m[1]
 

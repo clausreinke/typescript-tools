@@ -52,7 +52,7 @@ var TSS = (function () {
     };
     TSS.prototype.updateScript = function (fileName, content) {
         var script = this.fileNameToScript[fileName];
-        if (script !== null) {
+        if (script) {
             script.updateContent(content);
         }
         else {
@@ -62,7 +62,7 @@ var TSS = (function () {
     };
     TSS.prototype.editScript = function (fileName, minChar, limChar, newText) {
         var script = this.fileNameToScript[fileName];
-        if (script !== null) {
+        if (script) {
             script.editContent(minChar, limChar, newText);
             this.snapshots[fileName] = new harness.ScriptSnapshot(script);
             return;
@@ -323,7 +323,7 @@ var TSS = (function () {
                 else if (m = match(cmd, /^update( nocheck)? (\d+)( (\d+)-(\d+))? (.*)$/)) {
                     file = _this.resolveRelativePath(m[6]);
                     script = _this.fileNameToScript[file];
-                    added = script == null;
+                    added = !script;
                     range = !!m[3];
                     check = !m[1];
                     // TODO: handle dependency changes
