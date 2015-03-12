@@ -1,5 +1,5 @@
 // Copyright (c) Microsoft, Claus Reinke. All rights reserved.
-// Licensed under the Apache License, Version 2.0. 
+// Licensed under the Apache License, Version 2.0.
 // See LICENSE.txt in the project root for complete license information.
 
 ///<reference path='typings/node/node.d.ts'/>
@@ -44,7 +44,7 @@ export class ScriptInfo {
         // Store edit range + new length of script
         this.editRanges.push({
             length: this.content.length,
-            textChangeRange: 
+            textChangeRange:
               ts.createTextChangeRange( ts.createTextSpanFromBounds(minChar, limChar)
                                       , newText.length)
         });

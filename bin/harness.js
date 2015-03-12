@@ -1,5 +1,5 @@
 // Copyright (c) Microsoft, Claus Reinke. All rights reserved.
-// Licensed under the Apache License, Version 2.0. 
+// Licensed under the Apache License, Version 2.0.
 // See LICENSE.txt in the project root for complete license information.
 ///<reference path='typings/node/node.d.ts'/>
 ///<reference path='node_modules/typescript/bin/typescript.d.ts'/>

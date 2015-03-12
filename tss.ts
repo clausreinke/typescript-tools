@@ -1,5 +1,5 @@
 // Copyright (c) Claus Reinke. All rights reserved.
-// Licensed under the Apache License, Version 2.0. 
+// Licensed under the Apache License, Version 2.0.
 // See LICENSE.txt in the project root for complete license information.
 
 ///<reference path='typings/node/node.d.ts'/>
@@ -8,10 +8,6 @@
 
 import ts = require("typescript");
 import harness = require("./harness");
-
-// __dirname + a file to put path references in.. :-(
-declare var __dirname : string;
-var defaultLibs  = __dirname + "/defaultLibs.d.ts";
 
 function switchToForwardSlashes(path: string) {
     return path.replace(/\\/g, "/");
@@ -44,7 +40,6 @@ class TSS {
   public lsHost : ts.LanguageServiceHost;
   public ls : ts.LanguageService;
   public rootFiles : string[];
-//  public resolutionResult : ts.ReferenceResolutionResult;
   public lastError;
 
   constructor (public prettyJSON: boolean = false) { } // NOTE: call setup
@@ -93,36 +88,17 @@ class TSS {
       } else {
         this.fileNameToScript[fileName] = new harness.ScriptInfo(fileName, content);
       }
-      this.snapshots[fileName] = new harness.ScriptSnapshot(this.fileNameToScript[fileName]); 
+      this.snapshots[fileName] = new harness.ScriptSnapshot(this.fileNameToScript[fileName]);
   }
 
   private editScript(fileName: string, minChar: number, limChar: number, newText: string) {
       var script = this.fileNameToScript[fileName];
       if (script) {
           script.editContent(minChar, limChar, newText);
-          this.snapshots[fileName] = new harness.ScriptSnapshot(script); 
+          this.snapshots[fileName] = new harness.ScriptSnapshot(script);
           return;
       }
       throw new Error("No script with name '" + fileName + "'");
-  }
-
-
-  // IReferenceResolverHost methods (from HarnessCompiler, modulo test-specific code)
-  getScriptSnapshot(filename: string): ts.IScriptSnapshot {
-      var content = this.fileNameToContent[filename];
-      if (!content) {
-        content = ts.sys.readFile(filename);
-        this.fileNameToContent[filename] = content;
-      }
-      var snapshot = new harness.ScriptSnapshot(new harness.ScriptInfo(filename, content));
-
-/* TODO
-      if (!snapshot) {
-          this.addDiagnostic(new ts.Diagnostic(null, 0, 0, ts.DiagnosticCode.Cannot_read_file_0_1, [filename, '']));
-      }
-*/
-
-      return snapshot;
   }
 
   resolveRelativePath(path: string, directory?: string): string {
@@ -145,16 +121,6 @@ class TSS {
       return normalizedPath;
   }
 
-  fileExists(s: string):boolean {
-      return ts.sys.fileExists(s);
-  }
-  directoryExists(path: string): boolean {
-      return ts.sys.directoryExists(path);
-  }
-//  getParentDirectory(path: string): string {
-//      return ts.sys.directoryName(path);
-//  }
-
   public getErrors(): ts.Diagnostic[] {
 
       var addPhase = phase => d => {d.phase = phase; return d};
@@ -175,9 +141,6 @@ class TSS {
     this.rootFiles = files.map(file=>this.resolveRelativePath(file));
 
     this.compilerOptions             = options;
-    // this.compilerOptions.diagnostics = true;
-    // this.compilerOptions.target      = ts.ScriptTarget.ES5;
-    // this.compilerOptions.module      = ts.ModuleKind.CommonJS;
 
     this.fileNameToContent = {};
 
@@ -196,7 +159,7 @@ class TSS {
       this.fileNames.push(filename);
       this.fileNameToScript[filename] =
         new harness.ScriptInfo(filename,source.text);
-      this.snapshots[filename] = new harness.ScriptSnapshot(this.fileNameToScript[filename]); 
+      this.snapshots[filename] = new harness.ScriptSnapshot(this.fileNameToScript[filename]);
     });
 
     // Get a language service
@@ -209,7 +172,7 @@ class TSS {
 //        getLocalizedDiagnosticMessages?(): any;
 //        getCancellationToken : ()=>this.compilerHost.getCancellationToken(),
         getCurrentDirectory : ()=>this.compilerHost.getCurrentDirectory(),
-        getDefaultLibFileName : 
+        getDefaultLibFileName :
           (options: ts.CompilerOptions)=>this.compilerHost.getDefaultLibFileName(options),
         log : (message)=>undefined, // ??
         trace : (message)=>undefined, // ??
@@ -532,7 +495,7 @@ class TSS {
 
           rl.close();
 
-        } else if (m = match(cmd,/^prettyJSON (true|false)$/)) {
+        } else if (m = match(cmd,/^prettyJSON (true|false)$/)) { // useful for debugging
 
           this.prettyJSON = m[1]==='true';
 

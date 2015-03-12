@@ -1,12 +1,11 @@
 // Copyright (c) Claus Reinke. All rights reserved.
-// Licensed under the Apache License, Version 2.0. 
+// Licensed under the Apache License, Version 2.0.
 // See LICENSE.txt in the project root for complete license information.
 ///<reference path='typings/node/node.d.ts'/>
 ///<reference path='node_modules/typescript/bin/typescript.d.ts'/>
 ///<reference path='node_modules/typescript/bin/typescript_internal.d.ts'/>
 var ts = require("typescript");
 var harness = require("./harness");
-var defaultLibs = __dirname + "/defaultLibs.d.ts";
 function switchToForwardSlashes(path) {
     return path.replace(/\\/g, "/");
 }
@@ -69,21 +68,6 @@ var TSS = (function () {
         }
         throw new Error("No script with name '" + fileName + "'");
     };
-    // IReferenceResolverHost methods (from HarnessCompiler, modulo test-specific code)
-    TSS.prototype.getScriptSnapshot = function (filename) {
-        var content = this.fileNameToContent[filename];
-        if (!content) {
-            content = ts.sys.readFile(filename);
-            this.fileNameToContent[filename] = content;
-        }
-        var snapshot = new harness.ScriptSnapshot(new harness.ScriptInfo(filename, content));
-        /* TODO
-              if (!snapshot) {
-                  this.addDiagnostic(new ts.Diagnostic(null, 0, 0, ts.DiagnosticCode.Cannot_read_file_0_1, [filename, '']));
-              }
-        */
-        return snapshot;
-    };
     TSS.prototype.resolveRelativePath = function (path, directory) {
         var unQuotedPath = path; // better be.. ts.stripStartAndEndQuotes(path);
         var normalizedPath;
@@ -96,18 +80,10 @@ var TSS = (function () {
         // get the absolute path
         normalizedPath = ts.sys.resolvePath(normalizedPath);
         // Switch to forward slashes
-        normalizedPath = switchToForwardSlashes(normalizedPath).replace(/^(.:)/, function (_, drive) { return drive.toLowerCase(); });
+        normalizedPath = switchToForwardSlashes(normalizedPath)
+            .replace(/^(.:)/, function (_, drive) { return drive.toLowerCase(); });
         return normalizedPath;
     };
-    TSS.prototype.fileExists = function (s) {
-        return ts.sys.fileExists(s);
-    };
-    TSS.prototype.directoryExists = function (path) {
-        return ts.sys.directoryExists(path);
-    };
-    //  getParentDirectory(path: string): string {
-    //      return ts.sys.directoryName(path);
-    //  }
     TSS.prototype.getErrors = function () {
         var _this = this;
         var addPhase = function (phase) { return function (d) { d.phase = phase; return d; }; };
@@ -125,9 +101,6 @@ var TSS = (function () {
         var _this = this;
         this.rootFiles = files.map(function (file) { return _this.resolveRelativePath(file); });
         this.compilerOptions = options;
-        // this.compilerOptions.diagnostics = true;
-        // this.compilerOptions.target      = ts.ScriptTarget.ES5;
-        // this.compilerOptions.module      = ts.ModuleKind.CommonJS;
         this.fileNameToContent = {};
         // build program from root files,
         // chase dependencies (references and imports), normalize file names, ...
@@ -270,13 +243,16 @@ var TSS = (function () {
                 }
                 else if (m = match(cmd, /^navigationBarItems (.*)$/)) {
                     file = _this.resolveRelativePath(m[1]);
-                    _this.output(_this.ls.getNavigationBarItems(file).map(function (item) { return _this.handleNavBarItem(file, item); }));
+                    _this.output(_this.ls.getNavigationBarItems(file)
+                        .map(function (item) { return _this.handleNavBarItem(file, item); }));
                 }
                 else if (m = match(cmd, /^navigateToItems (.*)$/)) {
                     pattern = m[1];
-                    info = _this.ls.getNavigateToItems(pattern).map(function (item) {
+                    info = _this.ls.getNavigateToItems(pattern)
+                        .map(function (item) {
                         item['min'] = _this.positionToLineCol(item.fileName, item.textSpan.start);
-                        item['lim'] = _this.positionToLineCol(item.fileName, item.textSpan.start + item.textSpan.length);
+                        item['lim'] = _this.positionToLineCol(item.fileName, item.textSpan.start
+                            + item.textSpan.length);
                         return item;
                     });
                     _this.output(info);
@@ -306,8 +282,10 @@ var TSS = (function () {
                             var languageVersion = _this.compilerOptions.target;
                             var source = _this.fileNameToScript[file].content;
                             var startPos = pos;
-                            var idPart = function (p) { return /[0-9a-zA-Z_$]/.test(source[p]) || ts.isIdentifierPart(source.charCodeAt(p), languageVersion); };
-                            var idStart = function (p) { return /[a-zA-Z_$]/.test(source[p]) || ts.isIdentifierStart(source.charCodeAt(p), languageVersion); };
+                            var idPart = function (p) { return /[0-9a-zA-Z_$]/.test(source[p])
+                                || ts.isIdentifierPart(source.charCodeAt(p), languageVersion); };
+                            var idStart = function (p) { return /[a-zA-Z_$]/.test(source[p])
+                                || ts.isIdentifierStart(source.charCodeAt(p), languageVersion); };
                             while ((--startPos >= 0) && idPart(startPos))
                                 ;
                             if ((++startPos < pos) && idStart(startPos)) {
@@ -337,9 +315,12 @@ var TSS = (function () {
                                 var startLine = parseInt(m[4]);
                                 var endLine = parseInt(m[5]);
                                 var maxLines = script.lineMap.length;
-                                var startPos = startLine <= maxLines ? (startLine < 1 ? 0 : _this.lineColToPosition(file, startLine, 1)) : script.content.length;
-                                var endPos = endLine < maxLines ? (endLine < 1 ? 0 : _this.lineColToPosition(file, endLine + 1, 0) - 1) //??CHECK
-                                 : script.content.length;
+                                var startPos = startLine <= maxLines
+                                    ? (startLine < 1 ? 0 : _this.lineColToPosition(file, startLine, 1))
+                                    : script.content.length;
+                                var endPos = endLine < maxLines
+                                    ? (endLine < 1 ? 0 : _this.lineColToPosition(file, endLine + 1, 0) - 1) //??CHECK
+                                    : script.content.length;
                                 _this.editScript(file, startPos, endPos, lines.join(EOL));
                             }
                             var syn, sem;
@@ -349,7 +330,9 @@ var TSS = (function () {
                             }
                             on_collected_callback = undefined;
                             lines = [];
-                            _this.outputJSON((added ? '"added ' : '"updated ') + (range ? 'lines' + m[3] + ' in ' : '') + file + (check ? ', (' + syn + '/' + sem + ') errors' : '') + '"');
+                            _this.outputJSON((added ? '"added ' : '"updated ')
+                                + (range ? 'lines' + m[3] + ' in ' : '')
+                                + file + (check ? ', (' + syn + '/' + sem + ') errors' : '') + '"');
                         };
                     }
                     else {
@@ -357,7 +340,9 @@ var TSS = (function () {
                     }
                 }
                 else if (m = match(cmd, /^showErrors$/)) {
-                    info = _this.program.getGlobalDiagnostics().concat(_this.getErrors()).map(function (d) {
+                    info = _this.program.getGlobalDiagnostics()
+                        .concat(_this.getErrors())
+                        .map(function (d) {
                         var file = _this.resolveRelativePath(d.file.fileName);
                         var lc = _this.positionToLineCol(file, d.start);
                         var len = _this.fileNameToScript[file].content.length;
