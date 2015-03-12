@@ -183,6 +183,29 @@ var TSS = (function () {
                         on_collected_callback();
                     }
                 }
+                else if (m = match(cmd, /^signature (\d+) (\d+) (.*)$/)) {
+                    (function () {
+                        line = parseInt(m[1]);
+                        col = parseInt(m[2]);
+                        file = _this.resolveRelativePath(m[3]);
+                        pos = _this.lineColToPosition(file, line, col);
+                        info = _this.ls.getSignatureHelpItems(file, pos);
+                        var param = function (p) { return ({ name: p.name,
+                            isOptional: p.isOptional,
+                            type: ts.displayPartsToString(p.displayParts) || "",
+                            docComment: ts.displayPartsToString(p.documentation) || ""
+                        }); };
+                        var items = info && info.items
+                            .map(function (item) { return ({ prefix: ts.displayPartsToString(item.prefixDisplayParts) || "",
+                            separator: ts.displayPartsToString(item.separatorDisplayParts) || "",
+                            suffix: ts.displayPartsToString(item.suffixDisplayParts) || "",
+                            parameters: item.parameters.map(param),
+                            docComment: ts.displayPartsToString(item.documentation) || ""
+                        }); });
+                        info && (info.items = items);
+                        _this.output(info);
+                    })();
+                }
                 else if (m = match(cmd, /^(type|quickInfo) (\d+) (\d+) (.*)$/)) {
                     line = parseInt(m[2]);
                     col = parseInt(m[3]);

@@ -241,7 +241,34 @@ class TSS {
             on_collected_callback();
           }
 
+        } else if (m = match(cmd,/^signature (\d+) (\d+) (.*)$/)) { // only within call parameters?
 
+          (()=>{
+            line   = parseInt(m[1]);
+            col    = parseInt(m[2]);
+            file   = this.resolveRelativePath(m[3]);
+
+            pos    = this.lineColToPosition(file,line,col);
+
+            info   = this.ls.getSignatureHelpItems(file,pos);
+
+            var param = p=>({name:p.name
+                            ,isOptional:p.isOptional
+                            ,type:ts.displayPartsToString(p.displayParts)||""
+                            ,docComment:ts.displayPartsToString(p.documentation)||""
+                            });
+
+            info && (info.items = info.items
+                                      .map(item=>({prefix: ts.displayPartsToString(item.prefixDisplayParts)||""
+                                                  ,separator: ts.displayPartsToString(item.separatorDisplayParts)||""
+                                                  ,suffix: ts.displayPartsToString(item.suffixDisplayParts)||""
+                                                  ,parameters: item.parameters.map(param)
+                                                  ,docComment: ts.displayPartsToString(item.documentation)||""
+                                                  }))
+            );
+
+            this.output(info);
+          })();
 
         } else if (m = match(cmd,/^(type|quickInfo) (\d+) (\d+) (.*)$/)) { // "type" deprecated
 
