@@ -354,13 +354,18 @@ function! TSSshowErrors()
 
   let info = TSScmd("showErrors",{'rawcmd':1})
   if type(info)==type([])
+    let qflist = []
     for i in info
-      let i['lnum']     = i['start']['line']
-      let i['col']      = i['start']['character']
-      let i['filename'] = i['file']
+      let chain = split(i.text,'\(\r\)\?\n')
+      for msg in chain
+        let qflist = add(qflist,{ 'lnum': i['start']['line']
+                             \ ,  'col': i['start']['character']
+                             \ ,  'filename': i['file']
+                             \ ,  'text': msg })
+      endfor
     endfor
-    call setqflist(info)
-    if len(info)!=0
+    call setqflist(qflist)
+    if len(qflist)!=0
       copen
     endif
   else
