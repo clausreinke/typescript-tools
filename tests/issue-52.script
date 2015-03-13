@@ -1,0 +1,5 @@
+update 3 PREFIX/empty.ts
+var U = {"wer": 33, "ttz": {"werwer": 77, "oo": [1,2,3]}}
+
+U.ttz = 3;
+showErrors
