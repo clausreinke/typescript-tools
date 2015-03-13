@@ -29,24 +29,22 @@ var readline:Readline = require("./readline");
 
 var EOL = require("os").EOL;
 
-/** TypeScript Services Server,
-    an interactive commandline tool
-    for getting info on .ts projects */
-class TSS {
-  public compilerOptions: ts.CompilerOptions;
-  public compilerHost: ts.CompilerHost;
-  public program: ts.Program;
-  public fileNames: string[];
-  public lsHost : ts.LanguageServiceHost;
-  public ls : ts.LanguageService;
-  public rootFiles : string[];
-  public lastError;
+class FileCache {
+  public fileNames: string[] = [];
+  public snapshots:ts.Map<ts.IScriptSnapshot> = {};
+  public fileNameToScript:ts.Map<harness.ScriptInfo> = {};
 
-  constructor (public prettyJSON: boolean = false) { } // NOTE: call setup
+  public getFileNames() { return this.fileNames; }
 
-  private fileNameToContent:ts.Map<string>;
-  private snapshots:ts.Map<ts.IScriptSnapshot>;
-  private fileNameToScript:ts.Map<harness.ScriptInfo>;
+  public getScriptInfo(fileName) { return this.fileNameToScript[fileName]; }
+
+  public getScriptSnapshot(fileName) { return this.snapshots[fileName]; }
+
+  public addFile(fileName,text) {
+    this.fileNames.push(fileName);
+    this.fileNameToScript[fileName] = new harness.ScriptInfo(fileName,text);
+    this.snapshots[fileName]        = new harness.ScriptSnapshot(this.getScriptInfo(fileName));
+  }
 
   /**
    * @param line 1 based index
@@ -61,7 +59,7 @@ class TSS {
   /**
    * @returns {line,character} 1 based indices
    */
-  private positionToLineCol(fileName: string, position: number): ts.LineAndCharacter {
+  public positionToLineCol(fileName: string, position: number): ts.LineAndCharacter {
       var script: harness.ScriptInfo = this.fileNameToScript[fileName];
 
       var lineChar = ts.computeLineAndCharacterOfPosition(script.lineMap,position);
@@ -72,7 +70,7 @@ class TSS {
   /**
    * @param line 1 based index
    */
-  private getLineText(fileName,line) {
+  public getLineText(fileName,line) {
     var script    = this.fileNameToScript[fileName];
     var lineMap   = script.lineMap;
     var lineStart = ts.computePositionOfLineAndCharacter(lineMap,line-1,0)
@@ -81,17 +79,17 @@ class TSS {
     return lineText;
   }
 
-  private updateScript(fileName: string, content: string) {
+  public updateScript(fileName: string, content: string) {
       var script = this.fileNameToScript[fileName];
       if (script) {
         script.updateContent(content);
+        this.snapshots[fileName] = new harness.ScriptSnapshot(script);
       } else {
-        this.fileNameToScript[fileName] = new harness.ScriptInfo(fileName, content);
+        this.addFile(fileName,content);
       }
-      this.snapshots[fileName] = new harness.ScriptSnapshot(this.fileNameToScript[fileName]);
   }
 
-  private editScript(fileName: string, minChar: number, limChar: number, newText: string) {
+  public editScript(fileName: string, minChar: number, limChar: number, newText: string) {
       var script = this.fileNameToScript[fileName];
       if (script) {
           script.editContent(minChar, limChar, newText);
@@ -100,8 +98,25 @@ class TSS {
       }
       throw new Error("No script with name '" + fileName + "'");
   }
+}
 
-  resolveRelativePath(path: string, directory?: string): string {
+/** TypeScript Services Server,
+    an interactive commandline tool
+    for getting info on .ts projects */
+class TSS {
+  public compilerOptions: ts.CompilerOptions;
+  public compilerHost: ts.CompilerHost;
+  public program: ts.Program;
+  public lsHost : ts.LanguageServiceHost;
+  public ls : ts.LanguageService;
+  public rootFiles : string[];
+  public lastError;
+
+  constructor (public prettyJSON: boolean = false) { } // NOTE: call setup
+
+  private fileCache: FileCache;
+
+  private resolveRelativePath(path: string, directory?: string): string {
       var unQuotedPath = path; // better be.. ts.stripStartAndEndQuotes(path);
       var normalizedPath: string;
 
@@ -125,10 +140,10 @@ class TSS {
 
       var addPhase = phase => d => {d.phase = phase; return d};
       var errors = [];
-      ts.forEachKey(this.fileNameToScript, file=>{
+      this.fileCache.getFileNames().map( file=>{
         var syntactic = this.ls.getSyntacticDiagnostics(file);
         var semantic = this.ls.getSemanticDiagnostics(file);
-        // this.ls.languageService.getEmitOutput(file).diagnostics);
+        // this.ls.languageService.getEmitOutput(file).diagnostics;
         errors = errors.concat(syntactic.map(addPhase("Syntax"))
                               ,semantic.map(addPhase("Semantics")));
       });
@@ -142,43 +157,34 @@ class TSS {
 
     this.compilerOptions             = options;
 
-    this.fileNameToContent = {};
-
     // build program from root files,
     // chase dependencies (references and imports), normalize file names, ...
     this.compilerHost = ts.createCompilerHost(this.compilerOptions);
     this.program      = ts.createProgram(this.rootFiles,this.compilerOptions,this.compilerHost);
 
-    this.fileNames        = [];
-    this.fileNameToScript = {};
-    this.snapshots        = {};
+    this.fileCache        = new FileCache();
     //TODO: diagnostics
 
     this.program.getSourceFiles().forEach(source=>{
-      var filename = this.resolveRelativePath(source.fileName);
-      this.fileNames.push(filename);
-      this.fileNameToScript[filename] =
-        new harness.ScriptInfo(filename,source.text);
-      this.snapshots[filename] = new harness.ScriptSnapshot(this.fileNameToScript[filename]);
+      var fileName = this.resolveRelativePath(source.fileName);
+      this.fileCache.addFile(fileName,source.text);
     });
 
     // Get a language service
     this.lsHost = {
         getCompilationSettings : ()=>this.compilerOptions,
-        getScriptFileNames : ()=>this.fileNames,
-        getScriptVersion : (fileName: string)=>this.fileNameToScript[fileName].version.toString(),
-        getScriptIsOpen : (fileName: string)=>this.fileNameToScript[fileName].isOpen,
-        getScriptSnapshot : (fileName: string)=>this.snapshots[fileName],
-//        getLocalizedDiagnosticMessages?(): any;
-//        getCancellationToken : ()=>this.compilerHost.getCancellationToken(),
-        getCurrentDirectory : ()=>this.compilerHost.getCurrentDirectory(),
+        getScriptFileNames : ()=>this.fileCache.getFileNames(),
+        getScriptVersion : (fileName: string)=>this.fileCache.getScriptInfo(fileName).version.toString(),
+        getScriptIsOpen : (fileName: string)=>this.fileCache.getScriptInfo(fileName).isOpen,
+        getScriptSnapshot : (fileName: string)=>this.fileCache.getScriptSnapshot(fileName),
+        getCurrentDirectory : ()=>ts.sys.getCurrentDirectory(),
         getDefaultLibFileName :
-          (options: ts.CompilerOptions)=>this.compilerHost.getDefaultLibFileName(options),
+          (options: ts.CompilerOptions)=>ts.getDefaultLibFileName(options),
         log : (message)=>undefined, // ??
         trace : (message)=>undefined, // ??
         error : (message)=>console.error(message) // ??
     };
-    this.ls     = ts.createLanguageService(this.lsHost,ts.createDocumentRegistry());
+    this.ls = ts.createLanguageService(this.lsHost,ts.createDocumentRegistry());
 
   }
 
@@ -201,8 +207,8 @@ class TSS {
            , kindModifiers : item.kindModifiers
            , kind: item.kind
            , text: item.text
-           , min: this.positionToLineCol(file,item.spans[0].start)
-           , lim: this.positionToLineCol(file,item.spans[0].start+item.spans[0].length)
+           , min: this.fileCache.positionToLineCol(file,item.spans[0].start)
+           , lim: this.fileCache.positionToLineCol(file,item.spans[0].start+item.spans[0].length)
            , childItems: item.childItems.map(item=>this.handleNavBarItem(file,item))
            };
   }
@@ -248,7 +254,7 @@ class TSS {
             col    = parseInt(m[2]);
             file   = this.resolveRelativePath(m[3]);
 
-            pos    = this.lineColToPosition(file,line,col);
+            pos    = this.fileCache.lineColToPosition(file,line,col);
 
             info   = this.ls.getSignatureHelpItems(file,pos);
 
@@ -276,7 +282,7 @@ class TSS {
           col    = parseInt(m[3]);
           file   = this.resolveRelativePath(m[4]);
 
-          pos    = this.lineColToPosition(file,line,col);
+          pos    = this.fileCache.lineColToPosition(file,line,col);
 
           info            = (this.ls.getQuickInfoAtPosition(file, pos)||{});
           info.type       = ((info&&ts.displayPartsToString(info.displayParts))||"");
@@ -290,14 +296,14 @@ class TSS {
           col  = parseInt(m[2]);
           file = this.resolveRelativePath(m[3]);
 
-          pos  = this.lineColToPosition(file,line,col);
+          pos  = this.fileCache.lineColToPosition(file,line,col);
           locs = this.ls.getDefinitionAtPosition(file, pos); // NOTE: multiple definitions
 
           info = locs.map( def => ({
             def  : def,
             file : def && def.fileName,
-            min  : def && this.positionToLineCol(def.fileName,def.textSpan.start),
-            lim  : def && this.positionToLineCol(def.fileName,ts.textSpanEnd(def.textSpan))
+            min  : def && this.fileCache.positionToLineCol(def.fileName,def.textSpan.start),
+            lim  : def && this.fileCache.positionToLineCol(def.fileName,ts.textSpanEnd(def.textSpan))
           }));
 
           // TODO: what about multiple definitions?
@@ -309,7 +315,7 @@ class TSS {
           col  = parseInt(m[3]);
           file = this.resolveRelativePath(m[4]);
 
-          pos  = this.lineColToPosition(file,line,col);
+          pos  = this.fileCache.lineColToPosition(file,line,col);
           switch (m[1]) {
             case "references":
               refs = this.ls.getReferencesAtPosition(file, pos);
@@ -324,10 +330,10 @@ class TSS {
           info = (refs || []).map( ref => {
             var start, end, fileName, lineText;
             if (ref) {
-              start    = this.positionToLineCol(ref.fileName,ref.textSpan.start);
-              end      = this.positionToLineCol(ref.fileName,ts.textSpanEnd(ref.textSpan));
+              start    = this.fileCache.positionToLineCol(ref.fileName,ref.textSpan.start);
+              end      = this.fileCache.positionToLineCol(ref.fileName,ts.textSpanEnd(ref.textSpan));
               fileName = this.resolveRelativePath(ref.fileName);
-              lineText = this.getLineText(fileName,start.line);
+              lineText = this.fileCache.getLineText(fileName,start.line);
             }
             return {
               ref      : ref,
@@ -352,11 +358,11 @@ class TSS {
 
           info = this.ls.getNavigateToItems(pattern)
                    .map(item=>{
-                      item['min'] = this.positionToLineCol(item.fileName
-                                                          ,item.textSpan.start);
-                      item['lim'] = this.positionToLineCol(item.fileName
-                                                          ,item.textSpan.start
-                                                          +item.textSpan.length);
+                      item['min'] = this.fileCache.positionToLineCol(item.fileName
+                                                                    ,item.textSpan.start);
+                      item['lim'] = this.fileCache.positionToLineCol(item.fileName
+                                                                    ,item.textSpan.start
+                                                                    +item.textSpan.length);
                       return item;
                     });
 
@@ -369,7 +375,7 @@ class TSS {
           col    = parseInt(m[4]);
           file   = this.resolveRelativePath(m[5]);
 
-          pos    = this.lineColToPosition(file,line,col);
+          pos    = this.fileCache.lineColToPosition(file,line,col);
 
           info = this.ls.getCompletionsAtPosition(file, pos) || null;
 
@@ -388,7 +394,7 @@ class TSS {
 
             (()=>{ // filter entries by prefix, determined by pos
               var languageVersion = this.compilerOptions.target;
-              var source   = this.fileNameToScript[file].content;
+              var source   = this.fileCache.getScriptInfo(file).content;
               var startPos = pos;
               var idPart   = p => /[0-9a-zA-Z_$]/.test(source[p])
                                || ts.isIdentifierPart(source.charCodeAt(p),languageVersion);
@@ -409,7 +415,7 @@ class TSS {
         } else if (m = match(cmd,/^update( nocheck)? (\d+)( (\d+)-(\d+))? (.*)$/)) { // send non-saved source
 
           file       = this.resolveRelativePath(m[6]);
-          script     = this.fileNameToScript[file];
+          script     = this.fileCache.getScriptInfo(file);
           added      = !script;
           range      = !!m[3]
           check      = !m[1]
@@ -421,19 +427,19 @@ class TSS {
             on_collected_callback = () => {
 
               if (!range) {
-                this.updateScript(file,lines.join(EOL));
+                this.fileCache.updateScript(file,lines.join(EOL));
               } else {
                 var startLine = parseInt(m[4]);
                 var endLine   = parseInt(m[5]);
                 var maxLines  = script.lineMap.length;
                 var startPos  = startLine<=maxLines
-                              ? (startLine<1 ? 0 : this.lineColToPosition(file,startLine,1))
+                              ? (startLine<1 ? 0 : this.fileCache.lineColToPosition(file,startLine,1))
                               : script.content.length;
                 var endPos    = endLine<maxLines
-                              ? (endLine<1 ? 0 : this.lineColToPosition(file,endLine+1,0)-1) //??CHECK
+                              ? (endLine<1 ? 0 : this.fileCache.lineColToPosition(file,endLine+1,0)-1) //??CHECK
                               : script.content.length;
 
-                this.editScript(file, startPos, endPos, lines.join(EOL));
+                this.fileCache.editScript(file, startPos, endPos, lines.join(EOL));
               }
               var syn:number,sem:number;
               if (check) {
@@ -453,20 +459,20 @@ class TSS {
 
         } else if (m = match(cmd,/^showErrors$/)) { // get processing errors
 
-          info = this.program.getGlobalDiagnostics()
+          info = this.ls.getProgram().getGlobalDiagnostics()
                      /*
-                     .concat(this.fileNames.map(file=>
+                     .concat(this.fileCache.getFileNames().map(file=>
                                     this.program.getDiagnostics(this.program.getSourceFile(file)))
                                  .reduce((l,r)=>l.concat(r)))
                      */
                      .concat(this.getErrors())
                      .map( d => {
                            var file = this.resolveRelativePath(d.file.fileName);
-                           var lc   = this.positionToLineCol(file,d.start);
-                           var len  = this.fileNameToScript[file].content.length;
+                           var lc   = this.fileCache.positionToLineCol(file,d.start);
+                           var len  = this.fileCache.getScriptInfo(file).content.length;
                            var end  = Math.min(len,d.start+d.length);
                                       // NOTE: clamped to end of file (#11)
-                           var lc2  = this.positionToLineCol(file,end);
+                           var lc2  = this.fileCache.positionToLineCol(file,end);
                            return {
                             file: file,
                             start: {line: lc.line, character: lc.character},
@@ -502,7 +508,7 @@ class TSS {
           var dump = m[1];
           file     = this.resolveRelativePath(m[2]);
 
-          source         = this.fileNameToScript[file].content;
+          source         = this.fileCache.getScriptInfo(file).content;
           if (dump==="-") { // to console
             console.log('dumping '+file);
             console.log(source);

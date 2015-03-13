@@ -14,26 +14,32 @@ function switchToForwardSlashes(path) {
 // fixed version should be in nodejs from about v0.9.9/v0.8.19?
 var readline = require("./readline");
 var EOL = require("os").EOL;
-/** TypeScript Services Server,
-    an interactive commandline tool
-    for getting info on .ts projects */
-var TSS = (function () {
-    function TSS(prettyJSON) {
-        if (prettyJSON === void 0) { prettyJSON = false; }
-        this.prettyJSON = prettyJSON;
-    } // NOTE: call setup
+var FileCache = (function () {
+    function FileCache() {
+        this.fileNames = [];
+        this.snapshots = {};
+        this.fileNameToScript = {};
+    }
+    FileCache.prototype.getFileNames = function () { return this.fileNames; };
+    FileCache.prototype.getScriptInfo = function (fileName) { return this.fileNameToScript[fileName]; };
+    FileCache.prototype.getScriptSnapshot = function (fileName) { return this.snapshots[fileName]; };
+    FileCache.prototype.addFile = function (fileName, text) {
+        this.fileNames.push(fileName);
+        this.fileNameToScript[fileName] = new harness.ScriptInfo(fileName, text);
+        this.snapshots[fileName] = new harness.ScriptSnapshot(this.getScriptInfo(fileName));
+    };
     /**
      * @param line 1 based index
      * @param col 1 based index
      */
-    TSS.prototype.lineColToPosition = function (fileName, line, col) {
+    FileCache.prototype.lineColToPosition = function (fileName, line, col) {
         var script = this.fileNameToScript[fileName];
         return ts.computePositionOfLineAndCharacter(script.lineMap, line - 1, col - 1);
     };
     /**
      * @returns {line,character} 1 based indices
      */
-    TSS.prototype.positionToLineCol = function (fileName, position) {
+    FileCache.prototype.positionToLineCol = function (fileName, position) {
         var script = this.fileNameToScript[fileName];
         var lineChar = ts.computeLineAndCharacterOfPosition(script.lineMap, position);
         return { line: lineChar.line + 1, character: lineChar.character + 1 };
@@ -41,7 +47,7 @@ var TSS = (function () {
     /**
      * @param line 1 based index
      */
-    TSS.prototype.getLineText = function (fileName, line) {
+    FileCache.prototype.getLineText = function (fileName, line) {
         var script = this.fileNameToScript[fileName];
         var lineMap = script.lineMap;
         var lineStart = ts.computePositionOfLineAndCharacter(lineMap, line - 1, 0);
@@ -49,17 +55,17 @@ var TSS = (function () {
         var lineText = script.content.substring(lineStart, lineEnd);
         return lineText;
     };
-    TSS.prototype.updateScript = function (fileName, content) {
+    FileCache.prototype.updateScript = function (fileName, content) {
         var script = this.fileNameToScript[fileName];
         if (script) {
             script.updateContent(content);
+            this.snapshots[fileName] = new harness.ScriptSnapshot(script);
         }
         else {
-            this.fileNameToScript[fileName] = new harness.ScriptInfo(fileName, content);
+            this.addFile(fileName, content);
         }
-        this.snapshots[fileName] = new harness.ScriptSnapshot(this.fileNameToScript[fileName]);
     };
-    TSS.prototype.editScript = function (fileName, minChar, limChar, newText) {
+    FileCache.prototype.editScript = function (fileName, minChar, limChar, newText) {
         var script = this.fileNameToScript[fileName];
         if (script) {
             script.editContent(minChar, limChar, newText);
@@ -68,6 +74,16 @@ var TSS = (function () {
         }
         throw new Error("No script with name '" + fileName + "'");
     };
+    return FileCache;
+})();
+/** TypeScript Services Server,
+    an interactive commandline tool
+    for getting info on .ts projects */
+var TSS = (function () {
+    function TSS(prettyJSON) {
+        if (prettyJSON === void 0) { prettyJSON = false; }
+        this.prettyJSON = prettyJSON;
+    } // NOTE: call setup
     TSS.prototype.resolveRelativePath = function (path, directory) {
         var unQuotedPath = path; // better be.. ts.stripStartAndEndQuotes(path);
         var normalizedPath;
@@ -88,10 +104,10 @@ var TSS = (function () {
         var _this = this;
         var addPhase = function (phase) { return function (d) { d.phase = phase; return d; }; };
         var errors = [];
-        ts.forEachKey(this.fileNameToScript, function (file) {
+        this.fileCache.getFileNames().map(function (file) {
             var syntactic = _this.ls.getSyntacticDiagnostics(file);
             var semantic = _this.ls.getSemanticDiagnostics(file);
-            // this.ls.languageService.getEmitOutput(file).diagnostics);
+            // this.ls.languageService.getEmitOutput(file).diagnostics;
             errors = errors.concat(syntactic.map(addPhase("Syntax")), semantic.map(addPhase("Semantics")));
         });
         return errors;
@@ -101,33 +117,25 @@ var TSS = (function () {
         var _this = this;
         this.rootFiles = files.map(function (file) { return _this.resolveRelativePath(file); });
         this.compilerOptions = options;
-        this.fileNameToContent = {};
         // build program from root files,
         // chase dependencies (references and imports), normalize file names, ...
         this.compilerHost = ts.createCompilerHost(this.compilerOptions);
         this.program = ts.createProgram(this.rootFiles, this.compilerOptions, this.compilerHost);
-        this.fileNames = [];
-        this.fileNameToScript = {};
-        this.snapshots = {};
+        this.fileCache = new FileCache();
         //TODO: diagnostics
         this.program.getSourceFiles().forEach(function (source) {
-            var filename = _this.resolveRelativePath(source.fileName);
-            _this.fileNames.push(filename);
-            _this.fileNameToScript[filename] =
-                new harness.ScriptInfo(filename, source.text);
-            _this.snapshots[filename] = new harness.ScriptSnapshot(_this.fileNameToScript[filename]);
+            var fileName = _this.resolveRelativePath(source.fileName);
+            _this.fileCache.addFile(fileName, source.text);
         });
         // Get a language service
         this.lsHost = {
             getCompilationSettings: function () { return _this.compilerOptions; },
-            getScriptFileNames: function () { return _this.fileNames; },
-            getScriptVersion: function (fileName) { return _this.fileNameToScript[fileName].version.toString(); },
-            getScriptIsOpen: function (fileName) { return _this.fileNameToScript[fileName].isOpen; },
-            getScriptSnapshot: function (fileName) { return _this.snapshots[fileName]; },
-            //        getLocalizedDiagnosticMessages?(): any;
-            //        getCancellationToken : ()=>this.compilerHost.getCancellationToken(),
-            getCurrentDirectory: function () { return _this.compilerHost.getCurrentDirectory(); },
-            getDefaultLibFileName: function (options) { return _this.compilerHost.getDefaultLibFileName(options); },
+            getScriptFileNames: function () { return _this.fileCache.getFileNames(); },
+            getScriptVersion: function (fileName) { return _this.fileCache.getScriptInfo(fileName).version.toString(); },
+            getScriptIsOpen: function (fileName) { return _this.fileCache.getScriptInfo(fileName).isOpen; },
+            getScriptSnapshot: function (fileName) { return _this.fileCache.getScriptSnapshot(fileName); },
+            getCurrentDirectory: function () { return ts.sys.getCurrentDirectory(); },
+            getDefaultLibFileName: function (options) { return ts.getDefaultLibFileName(options); },
             log: function (message) { return undefined; },
             trace: function (message) { return undefined; },
             error: function (message) { return console.error(message); } // ??
@@ -154,8 +162,8 @@ var TSS = (function () {
             kindModifiers: item.kindModifiers,
             kind: item.kind,
             text: item.text,
-            min: this.positionToLineCol(file, item.spans[0].start),
-            lim: this.positionToLineCol(file, item.spans[0].start + item.spans[0].length),
+            min: this.fileCache.positionToLineCol(file, item.spans[0].start),
+            lim: this.fileCache.positionToLineCol(file, item.spans[0].start + item.spans[0].length),
             childItems: item.childItems.map(function (item) { return _this.handleNavBarItem(file, item); })
         };
     };
@@ -188,21 +196,20 @@ var TSS = (function () {
                         line = parseInt(m[1]);
                         col = parseInt(m[2]);
                         file = _this.resolveRelativePath(m[3]);
-                        pos = _this.lineColToPosition(file, line, col);
+                        pos = _this.fileCache.lineColToPosition(file, line, col);
                         info = _this.ls.getSignatureHelpItems(file, pos);
                         var param = function (p) { return ({ name: p.name,
                             isOptional: p.isOptional,
                             type: ts.displayPartsToString(p.displayParts) || "",
                             docComment: ts.displayPartsToString(p.documentation) || ""
                         }); };
-                        var items = info && info.items
+                        info && (info.items = info.items
                             .map(function (item) { return ({ prefix: ts.displayPartsToString(item.prefixDisplayParts) || "",
                             separator: ts.displayPartsToString(item.separatorDisplayParts) || "",
                             suffix: ts.displayPartsToString(item.suffixDisplayParts) || "",
                             parameters: item.parameters.map(param),
                             docComment: ts.displayPartsToString(item.documentation) || ""
-                        }); });
-                        info && (info.items = items);
+                        }); }));
                         _this.output(info);
                     })();
                 }
@@ -210,7 +217,7 @@ var TSS = (function () {
                     line = parseInt(m[2]);
                     col = parseInt(m[3]);
                     file = _this.resolveRelativePath(m[4]);
-                    pos = _this.lineColToPosition(file, line, col);
+                    pos = _this.fileCache.lineColToPosition(file, line, col);
                     info = (_this.ls.getQuickInfoAtPosition(file, pos) || {});
                     info.type = ((info && ts.displayPartsToString(info.displayParts)) || "");
                     info.docComment = ((info && ts.displayPartsToString(info.documentation)) || "");
@@ -220,13 +227,13 @@ var TSS = (function () {
                     line = parseInt(m[1]);
                     col = parseInt(m[2]);
                     file = _this.resolveRelativePath(m[3]);
-                    pos = _this.lineColToPosition(file, line, col);
+                    pos = _this.fileCache.lineColToPosition(file, line, col);
                     locs = _this.ls.getDefinitionAtPosition(file, pos); // NOTE: multiple definitions
                     info = locs.map(function (def) { return ({
                         def: def,
                         file: def && def.fileName,
-                        min: def && _this.positionToLineCol(def.fileName, def.textSpan.start),
-                        lim: def && _this.positionToLineCol(def.fileName, ts.textSpanEnd(def.textSpan))
+                        min: def && _this.fileCache.positionToLineCol(def.fileName, def.textSpan.start),
+                        lim: def && _this.fileCache.positionToLineCol(def.fileName, ts.textSpanEnd(def.textSpan))
                     }); });
                     // TODO: what about multiple definitions?
                     _this.output(info[0] || null);
@@ -235,7 +242,7 @@ var TSS = (function () {
                     line = parseInt(m[2]);
                     col = parseInt(m[3]);
                     file = _this.resolveRelativePath(m[4]);
-                    pos = _this.lineColToPosition(file, line, col);
+                    pos = _this.fileCache.lineColToPosition(file, line, col);
                     switch (m[1]) {
                         case "references":
                             refs = _this.ls.getReferencesAtPosition(file, pos);
@@ -249,10 +256,10 @@ var TSS = (function () {
                     info = (refs || []).map(function (ref) {
                         var start, end, fileName, lineText;
                         if (ref) {
-                            start = _this.positionToLineCol(ref.fileName, ref.textSpan.start);
-                            end = _this.positionToLineCol(ref.fileName, ts.textSpanEnd(ref.textSpan));
+                            start = _this.fileCache.positionToLineCol(ref.fileName, ref.textSpan.start);
+                            end = _this.fileCache.positionToLineCol(ref.fileName, ts.textSpanEnd(ref.textSpan));
                             fileName = _this.resolveRelativePath(ref.fileName);
-                            lineText = _this.getLineText(fileName, start.line);
+                            lineText = _this.fileCache.getLineText(fileName, start.line);
                         }
                         return {
                             ref: ref,
@@ -273,8 +280,8 @@ var TSS = (function () {
                     pattern = m[1];
                     info = _this.ls.getNavigateToItems(pattern)
                         .map(function (item) {
-                        item['min'] = _this.positionToLineCol(item.fileName, item.textSpan.start);
-                        item['lim'] = _this.positionToLineCol(item.fileName, item.textSpan.start
+                        item['min'] = _this.fileCache.positionToLineCol(item.fileName, item.textSpan.start);
+                        item['lim'] = _this.fileCache.positionToLineCol(item.fileName, item.textSpan.start
                             + item.textSpan.length);
                         return item;
                     });
@@ -285,7 +292,7 @@ var TSS = (function () {
                     line = parseInt(m[3]);
                     col = parseInt(m[4]);
                     file = _this.resolveRelativePath(m[5]);
-                    pos = _this.lineColToPosition(file, line, col);
+                    pos = _this.fileCache.lineColToPosition(file, line, col);
                     info = _this.ls.getCompletionsAtPosition(file, pos) || null;
                     if (info) {
                         // fill in completion entry details, unless briefness requested
@@ -303,7 +310,7 @@ var TSS = (function () {
                         // NOTE: details null for primitive type symbols, see TS #1592
                         (function () {
                             var languageVersion = _this.compilerOptions.target;
-                            var source = _this.fileNameToScript[file].content;
+                            var source = _this.fileCache.getScriptInfo(file).content;
                             var startPos = pos;
                             var idPart = function (p) { return /[0-9a-zA-Z_$]/.test(source[p])
                                 || ts.isIdentifierPart(source.charCodeAt(p), languageVersion); };
@@ -323,7 +330,7 @@ var TSS = (function () {
                 }
                 else if (m = match(cmd, /^update( nocheck)? (\d+)( (\d+)-(\d+))? (.*)$/)) {
                     file = _this.resolveRelativePath(m[6]);
-                    script = _this.fileNameToScript[file];
+                    script = _this.fileCache.getScriptInfo(file);
                     added = !script;
                     range = !!m[3];
                     check = !m[1];
@@ -332,19 +339,19 @@ var TSS = (function () {
                         collecting = parseInt(m[2]);
                         on_collected_callback = function () {
                             if (!range) {
-                                _this.updateScript(file, lines.join(EOL));
+                                _this.fileCache.updateScript(file, lines.join(EOL));
                             }
                             else {
                                 var startLine = parseInt(m[4]);
                                 var endLine = parseInt(m[5]);
                                 var maxLines = script.lineMap.length;
                                 var startPos = startLine <= maxLines
-                                    ? (startLine < 1 ? 0 : _this.lineColToPosition(file, startLine, 1))
+                                    ? (startLine < 1 ? 0 : _this.fileCache.lineColToPosition(file, startLine, 1))
                                     : script.content.length;
                                 var endPos = endLine < maxLines
-                                    ? (endLine < 1 ? 0 : _this.lineColToPosition(file, endLine + 1, 0) - 1) //??CHECK
+                                    ? (endLine < 1 ? 0 : _this.fileCache.lineColToPosition(file, endLine + 1, 0) - 1) //??CHECK
                                     : script.content.length;
-                                _this.editScript(file, startPos, endPos, lines.join(EOL));
+                                _this.fileCache.editScript(file, startPos, endPos, lines.join(EOL));
                             }
                             var syn, sem;
                             if (check) {
@@ -363,15 +370,15 @@ var TSS = (function () {
                     }
                 }
                 else if (m = match(cmd, /^showErrors$/)) {
-                    info = _this.program.getGlobalDiagnostics()
+                    info = _this.ls.getProgram().getGlobalDiagnostics()
                         .concat(_this.getErrors())
                         .map(function (d) {
                         var file = _this.resolveRelativePath(d.file.fileName);
-                        var lc = _this.positionToLineCol(file, d.start);
-                        var len = _this.fileNameToScript[file].content.length;
+                        var lc = _this.fileCache.positionToLineCol(file, d.start);
+                        var len = _this.fileCache.getScriptInfo(file).content.length;
                         var end = Math.min(len, d.start + d.length);
                         // NOTE: clamped to end of file (#11)
-                        var lc2 = _this.positionToLineCol(file, end);
+                        var lc2 = _this.fileCache.positionToLineCol(file, end);
                         return {
                             file: file,
                             start: { line: lc.line, character: lc.character },
@@ -400,7 +407,7 @@ var TSS = (function () {
                 else if (m = match(cmd, /^dump (\S+) (.*)$/)) {
                     var dump = m[1];
                     file = _this.resolveRelativePath(m[2]);
-                    source = _this.fileNameToScript[file].content;
+                    source = _this.fileCache.getScriptInfo(file).content;
                     if (dump === "-") {
                         console.log('dumping ' + file);
                         console.log(source);
