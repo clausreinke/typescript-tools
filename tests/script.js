@@ -23,7 +23,8 @@ function test(scriptName,fileName,options) {
                 ,function(error, stdout, stderr) {
                    log[scriptName].push("// stdout");
                    log[scriptName].push(stdout.replace(new RegExp(PREFIX,"g"),"PREFIX")
-                                              .replace(/(,"|,{)/g,'\n  $1'));
+                                              .replace(/(,"|,{)/g,'\n  $1')
+                                              .replace(/\\r\\n/g,'\\n'));
                    log[scriptName].push("// stderr");
                    log[scriptName].push(stderr);
                    if (error) log[scriptName].push("// error: "+error);
@@ -51,3 +52,4 @@ test("update-nocheck-completion-chain.script","empty.ts");
 test("issue-15.script","issue-15.ts","-m commonjs");
 test("issue-17.script","issue-17.ts","-m commonjs");
 test("concat-map.script","empty.ts");
+test("issue-52.script","empty.ts");

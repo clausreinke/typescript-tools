@@ -112,6 +112,14 @@ var TSS = (function () {
         });
         return errors;
     };
+    TSS.prototype.messageChain = function (message) {
+        if (typeof message === "string") {
+            return [message];
+        }
+        else {
+            return [message.messageText].concat(message.next ? this.messageChain(message.next) : []);
+        }
+    };
     /** load file and dependencies, prepare language service for queries */
     TSS.prototype.setup = function (files, options) {
         var _this = this;
@@ -383,7 +391,7 @@ var TSS = (function () {
                             file: file,
                             start: { line: lc.line, character: lc.character },
                             end: { line: lc2.line, character: lc2.character },
-                            text: d.messageText,
+                            text: _this.messageChain(d.messageText).join(EOL),
                             code: d.code,
                             phase: d["phase"],
                             category: ts.DiagnosticCategory[d.category]

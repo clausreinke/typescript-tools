@@ -151,6 +151,14 @@ class TSS {
 
   }
 
+  private messageChain(message:string|ts.DiagnosticMessageChain) {
+    if (typeof message==="string") {
+      return [message];
+    } else {
+      return [message.messageText].concat(message.next?this.messageChain(message.next):[]);
+    }
+  }
+
   /** load file and dependencies, prepare language service for queries */
   public setup(files,options) {
     this.rootFiles = files.map(file=>this.resolveRelativePath(file));
@@ -477,7 +485,7 @@ class TSS {
                             file: file,
                             start: {line: lc.line, character: lc.character},
                             end: {line: lc2.line, character: lc2.character},
-                            text: /* file+"("+lc.line+"/"+lc.character+"): "+ */ d.messageText,
+                            text: this.messageChain(d.messageText).join(EOL),
                             code: d.code,
                             phase: d["phase"],
                             category: ts.DiagnosticCategory[d.category]

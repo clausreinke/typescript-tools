@@ -935,3 +935,21 @@ node ../bin/tss.js empty.ts
 
 // stderr
 
+// issue-52.script
+node ../bin/tss.js empty.ts
+// stdout
+"loaded PREFIX/empty.ts, TSS listening.."
+"updated PREFIX/empty.ts, (0/1) errors"
+[{"file":"PREFIX/empty.ts"
+  ,"start":{"line":3
+  ,"character":1}
+  ,"end":{"line":3
+  ,"character":6}
+  ,"text":"Type 'number' is not assignable to type '{ \"werwer\": number; \"oo\": number[]; }'.\nProperty '\"werwer\"' is missing in type 'Number'."
+  ,"code":2322
+  ,"phase":"Semantics"
+  ,"category":"Error"}]
+"TSS closing"
+
+// stderr
+
