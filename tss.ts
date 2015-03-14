@@ -29,6 +29,7 @@ var readline:Readline = require("./readline");
 
 var EOL = require("os").EOL;
 
+/** holds list of fileNames, ScriptInfos and ScriptSnapshots for LS host */
 class FileCache {
   public fileNames: string[] = [];
   public snapshots:ts.Map<ts.IScriptSnapshot> = {};
@@ -36,31 +37,71 @@ class FileCache {
 
   public getFileNames() { return this.fileNames; }
 
-  public getScriptInfo(fileName) { return this.fileNameToScript[fileName]; }
+  /**
+   * @param fileName resolved name of possibly cached file
+   */
+  public getScriptInfo(fileName) {
+    if (!this.fileNameToScript[fileName]) {
+      this.fetchFile(fileName);
+    }
+    return this.fileNameToScript[fileName];
+  }
 
-  public getScriptSnapshot(fileName) { return this.snapshots[fileName]; }
+  /**
+   * @param fileName resolved name of possibly cached file
+   */
+  public getScriptSnapshot(fileName) {
+    // console.log("getScriptSnapshot",fileName);
+    if (!this.snapshots[fileName]) {
+      this.fetchFile(fileName);
+    }
+    return this.snapshots[fileName];
+  }
 
-  public addFile(fileName,text) {
-    this.fileNames.push(fileName);
+  /**
+   * @param fileName resolved file name
+   * @param text file contents
+   * @param isDefaultLib should fileName be listed first?
+   */
+  public addFile(fileName,text,isDefaultLib=false) {
+    if (isDefaultLib) {
+      this.fileNames.push(fileName);
+    } else {
+      this.fileNames.unshift(fileName);
+    }
     this.fileNameToScript[fileName] = new harness.ScriptInfo(fileName,text);
     this.snapshots[fileName]        = new harness.ScriptSnapshot(this.getScriptInfo(fileName));
   }
 
   /**
+   * @param fileName resolved file name
+   */
+  public fetchFile(fileName) {
+    // console.log("fetchFile:",fileName);
+    if (ts.sys.fileExists(fileName)) {
+      this.addFile(fileName,ts.sys.readFile(fileName));
+    } else {
+      // console.error ("tss: cannot fetch file: "+fileName);
+    }
+  }
+
+  /**
+   * @param fileName resolved name of cached file
    * @param line 1 based index
    * @param col 1 based index
    */
   public lineColToPosition(fileName: string, line: number, col: number): number {
-      var script: harness.ScriptInfo = this.fileNameToScript[fileName];
+      var script: harness.ScriptInfo = this.getScriptInfo(fileName);
 
       return ts.computePositionOfLineAndCharacter(script.lineMap,line-1, col-1);
   }
 
   /**
+   * @param fileName resolved name of cached file
    * @returns {line,character} 1 based indices
    */
   public positionToLineCol(fileName: string, position: number): ts.LineAndCharacter {
-      var script: harness.ScriptInfo = this.fileNameToScript[fileName];
+      var script: harness.ScriptInfo = this.getScriptInfo(fileName);
 
       var lineChar = ts.computeLineAndCharacterOfPosition(script.lineMap,position);
 
@@ -68,10 +109,11 @@ class FileCache {
   }
 
   /**
+   * @param fileName resolved name of cached file
    * @param line 1 based index
    */
   public getLineText(fileName,line) {
-    var script    = this.fileNameToScript[fileName];
+    var script    = this.getScriptInfo(fileName);
     var lineMap   = script.lineMap;
     var lineStart = ts.computePositionOfLineAndCharacter(lineMap,line-1,0)
     var lineEnd   = ts.computePositionOfLineAndCharacter(lineMap,line,0)-1;
@@ -79,8 +121,12 @@ class FileCache {
     return lineText;
   }
 
+  /**
+   * @param fileName resolved name of possibly cached file
+   * @param content new file contents
+   */
   public updateScript(fileName: string, content: string) {
-      var script = this.fileNameToScript[fileName];
+      var script = this.getScriptInfo(fileName);
       if (script) {
         script.updateContent(content);
         this.snapshots[fileName] = new harness.ScriptSnapshot(script);
@@ -89,8 +135,14 @@ class FileCache {
       }
   }
 
+  /**
+   * @param fileName resolved name of cached file
+   * @param minChar first char of edit range
+   * @param limChar first char after edit range
+   * @param newText new file contents
+   */
   public editScript(fileName: string, minChar: number, limChar: number, newText: string) {
-      var script = this.fileNameToScript[fileName];
+      var script = this.getScriptInfo(fileName);
       if (script) {
           script.editContent(minChar, limChar, newText);
           this.snapshots[fileName] = new harness.ScriptSnapshot(script);
@@ -106,7 +158,6 @@ class FileCache {
 class TSS {
   public compilerOptions: ts.CompilerOptions;
   public compilerHost: ts.CompilerHost;
-  public program: ts.Program;
   public lsHost : ts.LanguageServiceHost;
   public ls : ts.LanguageService;
   public rootFiles : string[];
@@ -136,6 +187,7 @@ class TSS {
       return normalizedPath;
   }
 
+  /** collect syntactic and semantic diagnostics for all project files */
   public getErrors(): ts.Diagnostic[] {
 
       var addPhase = phase => d => {d.phase = phase; return d};
@@ -151,6 +203,7 @@ class TSS {
 
   }
 
+  /** flatten messageChain into string|string[] */
   private messageChain(message:string|ts.DiagnosticMessageChain) {
     if (typeof message==="string") {
       return [message];
@@ -161,24 +214,32 @@ class TSS {
 
   /** load file and dependencies, prepare language service for queries */
   public setup(files,options) {
+    this.fileCache = new FileCache();
+
     this.rootFiles = files.map(file=>this.resolveRelativePath(file));
 
-    this.compilerOptions             = options;
+    this.compilerOptions = options;
+    this.compilerHost    = ts.createCompilerHost(options);
 
-    // build program from root files,
-    // chase dependencies (references and imports), normalize file names, ...
-    this.compilerHost = ts.createCompilerHost(this.compilerOptions);
-    this.program      = ts.createProgram(this.rootFiles,this.compilerOptions,this.compilerHost);
-
-    this.fileCache        = new FileCache();
     //TODO: diagnostics
 
-    this.program.getSourceFiles().forEach(source=>{
-      var fileName = this.resolveRelativePath(source.fileName);
-      this.fileCache.addFile(fileName,source.text);
+    // prime fileCache with root files and defaultLib
+    var seenNoDefaultLib = options.noLib;
+    this.rootFiles.forEach(file=>{
+      var source = this.compilerHost.getSourceFile(file,options.target);
+      seenNoDefaultLib = seenNoDefaultLib || source.hasNoDefaultLib;
+      this.fileCache.addFile(file,source.text);
     });
+    if (!seenNoDefaultLib) {
+      var defaultLibFileName = this.compilerHost.getDefaultLibFileName(options);
+      var source = this.compilerHost.getSourceFile(defaultLibFileName,options.target);
+      this.fileCache.addFile(defaultLibFileName,source.text);
+    }
 
     // Get a language service
+    // internally builds programs from root files,
+    // chases dependencies (references and imports), ...
+    // (NOTE: files are processed on demand, loaded via lsHost, cached in fileCache)
     this.lsHost = {
         getCompilationSettings : ()=>this.compilerOptions,
         getScriptFileNames : ()=>this.fileCache.getFileNames(),
@@ -196,6 +257,11 @@ class TSS {
 
   }
 
+  /** output value/object as JSON, excluding irrelevant properties,
+   *  with optional pretty-printing controlled by this.prettyJSON
+   *  @param info thing to output
+   *  @param excludes Array of property keys to exclude
+   */
   private output(info,excludes=["displayParts"]) {
     var replacer = (k,v)=>excludes.indexOf(k)!==-1?undefined:v;
     if (info) {
@@ -209,6 +275,7 @@ class TSS {
     console.log(json.trim());
   }
 
+  /** recursively prepare navigationBarItems for JSON output */
   private handleNavBarItem(file:string,item:ts.NavigationBarItem) {
     // TODO: under which circumstances can item.spans.length be other than 1?
     return { info: [item.kindModifiers,item.kind,item.text].filter(s=>s!=="").join(" ")
@@ -428,8 +495,6 @@ class TSS {
           range      = !!m[3]
           check      = !m[1]
 
-          // TODO: handle dependency changes
-
           if (!added || !range) {
             collecting = parseInt(m[2]);
             on_collected_callback = () => {
@@ -468,11 +533,6 @@ class TSS {
         } else if (m = match(cmd,/^showErrors$/)) { // get processing errors
 
           info = this.ls.getProgram().getGlobalDiagnostics()
-                     /*
-                     .concat(this.fileCache.getFileNames().map(file=>
-                                    this.program.getDiagnostics(this.program.getSourceFile(file)))
-                                 .reduce((l,r)=>l.concat(r)))
-                     */
                      .concat(this.getErrors())
                      .map( d => {
                            if (d.file) {

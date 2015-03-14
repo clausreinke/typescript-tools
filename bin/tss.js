@@ -14,6 +14,7 @@ function switchToForwardSlashes(path) {
 // fixed version should be in nodejs from about v0.9.9/v0.8.19?
 var readline = require("./readline");
 var EOL = require("os").EOL;
+/** holds list of fileNames, ScriptInfos and ScriptSnapshots for LS host */
 var FileCache = (function () {
     function FileCache() {
         this.fileNames = [];
@@ -21,42 +22,88 @@ var FileCache = (function () {
         this.fileNameToScript = {};
     }
     FileCache.prototype.getFileNames = function () { return this.fileNames; };
-    FileCache.prototype.getScriptInfo = function (fileName) { return this.fileNameToScript[fileName]; };
-    FileCache.prototype.getScriptSnapshot = function (fileName) { return this.snapshots[fileName]; };
-    FileCache.prototype.addFile = function (fileName, text) {
-        this.fileNames.push(fileName);
+    /**
+     * @param fileName resolved name of possibly cached file
+     */
+    FileCache.prototype.getScriptInfo = function (fileName) {
+        if (!this.fileNameToScript[fileName]) {
+            this.fetchFile(fileName);
+        }
+        return this.fileNameToScript[fileName];
+    };
+    /**
+     * @param fileName resolved name of possibly cached file
+     */
+    FileCache.prototype.getScriptSnapshot = function (fileName) {
+        // console.log("getScriptSnapshot",fileName);
+        if (!this.snapshots[fileName]) {
+            this.fetchFile(fileName);
+        }
+        return this.snapshots[fileName];
+    };
+    /**
+     * @param fileName resolved file name
+     * @param text file contents
+     * @param isDefaultLib should fileName be listed first?
+     */
+    FileCache.prototype.addFile = function (fileName, text, isDefaultLib) {
+        if (isDefaultLib === void 0) { isDefaultLib = false; }
+        if (isDefaultLib) {
+            this.fileNames.push(fileName);
+        }
+        else {
+            this.fileNames.unshift(fileName);
+        }
         this.fileNameToScript[fileName] = new harness.ScriptInfo(fileName, text);
         this.snapshots[fileName] = new harness.ScriptSnapshot(this.getScriptInfo(fileName));
     };
     /**
+     * @param fileName resolved file name
+     */
+    FileCache.prototype.fetchFile = function (fileName) {
+        // console.log("fetchFile:",fileName);
+        if (ts.sys.fileExists(fileName)) {
+            this.addFile(fileName, ts.sys.readFile(fileName));
+        }
+        else {
+        }
+    };
+    /**
+     * @param fileName resolved name of cached file
      * @param line 1 based index
      * @param col 1 based index
      */
     FileCache.prototype.lineColToPosition = function (fileName, line, col) {
-        var script = this.fileNameToScript[fileName];
+        var script = this.getScriptInfo(fileName);
         return ts.computePositionOfLineAndCharacter(script.lineMap, line - 1, col - 1);
     };
     /**
+     * @param fileName resolved name of cached file
      * @returns {line,character} 1 based indices
      */
     FileCache.prototype.positionToLineCol = function (fileName, position) {
-        var script = this.fileNameToScript[fileName];
+        var script = this.getScriptInfo(fileName);
         var lineChar = ts.computeLineAndCharacterOfPosition(script.lineMap, position);
         return { line: lineChar.line + 1, character: lineChar.character + 1 };
     };
     /**
+     * @param fileName resolved name of cached file
      * @param line 1 based index
      */
     FileCache.prototype.getLineText = function (fileName, line) {
-        var script = this.fileNameToScript[fileName];
+        var script = this.getScriptInfo(fileName);
         var lineMap = script.lineMap;
         var lineStart = ts.computePositionOfLineAndCharacter(lineMap, line - 1, 0);
         var lineEnd = ts.computePositionOfLineAndCharacter(lineMap, line, 0) - 1;
         var lineText = script.content.substring(lineStart, lineEnd);
         return lineText;
     };
+    /**
+     * @param fileName resolved name of possibly cached file
+     * @param content new file contents
+     */
     FileCache.prototype.updateScript = function (fileName, content) {
-        var script = this.fileNameToScript[fileName];
+        var script = this.getScriptInfo(fileName);
         if (script) {
             script.updateContent(content);
             this.snapshots[fileName] = new harness.ScriptSnapshot(script);
@@ -65,8 +112,14 @@ var FileCache = (function () {
             this.addFile(fileName, content);
         }
     };
+    /**
+     * @param fileName resolved name of cached file
+     * @param minChar first char of edit range
+     * @param limChar first char after edit range
+     * @param newText new file contents
+     */
     FileCache.prototype.editScript = function (fileName, minChar, limChar, newText) {
-        var script = this.fileNameToScript[fileName];
+        var script = this.getScriptInfo(fileName);
         if (script) {
             script.editContent(minChar, limChar, newText);
             this.snapshots[fileName] = new harness.ScriptSnapshot(script);
@@ -100,6 +153,7 @@ var TSS = (function () {
             .replace(/^(.:)/, function (_, drive) { return drive.toLowerCase(); });
         return normalizedPath;
     };
+    /** collect syntactic and semantic diagnostics for all project files */
     TSS.prototype.getErrors = function () {
         var _this = this;
         var addPhase = function (phase) { return function (d) { d.phase = phase; return d; }; };
@@ -112,6 +166,7 @@ var TSS = (function () {
         });
         return errors;
     };
+    /** flatten messageChain into string|string[] */
     TSS.prototype.messageChain = function (message) {
         if (typeof message === "string") {
             return [message];
@@ -123,19 +178,27 @@ var TSS = (function () {
     /** load file and dependencies, prepare language service for queries */
     TSS.prototype.setup = function (files, options) {
         var _this = this;
+        this.fileCache = new FileCache();
         this.rootFiles = files.map(function (file) { return _this.resolveRelativePath(file); });
         this.compilerOptions = options;
-        // build program from root files,
-        // chase dependencies (references and imports), normalize file names, ...
-        this.compilerHost = ts.createCompilerHost(this.compilerOptions);
-        this.program = ts.createProgram(this.rootFiles, this.compilerOptions, this.compilerHost);
-        this.fileCache = new FileCache();
+        this.compilerHost = ts.createCompilerHost(options);
         //TODO: diagnostics
-        this.program.getSourceFiles().forEach(function (source) {
-            var fileName = _this.resolveRelativePath(source.fileName);
-            _this.fileCache.addFile(fileName, source.text);
+        // prime fileCache with root files and defaultLib
+        var seenNoDefaultLib = options.noLib;
+        this.rootFiles.forEach(function (file) {
+            var source = _this.compilerHost.getSourceFile(file, options.target);
+            seenNoDefaultLib = seenNoDefaultLib || source.hasNoDefaultLib;
+            _this.fileCache.addFile(file, source.text);
         });
+        if (!seenNoDefaultLib) {
+            var defaultLibFileName = this.compilerHost.getDefaultLibFileName(options);
+            var source = this.compilerHost.getSourceFile(defaultLibFileName, options.target);
+            this.fileCache.addFile(defaultLibFileName, source.text);
+        }
         // Get a language service
+        // internally builds programs from root files,
+        // chases dependencies (references and imports), ...
+        // (NOTE: files are processed on demand, loaded via lsHost, cached in fileCache)
         this.lsHost = {
             getCompilationSettings: function () { return _this.compilerOptions; },
             getScriptFileNames: function () { return _this.fileCache.getFileNames(); },
@@ -150,6 +213,11 @@ var TSS = (function () {
         };
         this.ls = ts.createLanguageService(this.lsHost, ts.createDocumentRegistry());
     };
+    /** output value/object as JSON, excluding irrelevant properties,
+     *  with optional pretty-printing controlled by this.prettyJSON
+     *  @param info thing to output
+     *  @param excludes Array of property keys to exclude
+     */
     TSS.prototype.output = function (info, excludes) {
         if (excludes === void 0) { excludes = ["displayParts"]; }
         var replacer = function (k, v) { return excludes.indexOf(k) !== -1 ? undefined : v; };
@@ -163,6 +231,7 @@ var TSS = (function () {
     TSS.prototype.outputJSON = function (json) {
         console.log(json.trim());
     };
+    /** recursively prepare navigationBarItems for JSON output */
     TSS.prototype.handleNavBarItem = function (file, item) {
         var _this = this;
         // TODO: under which circumstances can item.spans.length be other than 1?
@@ -342,7 +411,6 @@ var TSS = (function () {
                     added = !script;
                     range = !!m[3];
                     check = !m[1];
-                    // TODO: handle dependency changes
                     if (!added || !range) {
                         collecting = parseInt(m[2]);
                         on_collected_callback = function () {

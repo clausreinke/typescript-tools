@@ -881,6 +881,8 @@ node ../bin/tss.js -m commonjs issue-15.ts
 node ../bin/tss.js -m commonjs issue-17.ts
 // stdout
 "loaded PREFIX/issue-17.ts, TSS listening.."
+["c:/javascript/typescript/github/typescript-tools/node_modules/typescript/bin/lib.d.ts"
+  ,"PREFIX/issue-17.ts"]
 [{"ref":{"fileName":"PREFIX/issue-17-import.ts"
   ,"textSpan":{"start":58
   ,"length":5}
@@ -921,6 +923,10 @@ node ../bin/tss.js -m commonjs issue-17.ts
   ,"character":8}
   ,"lim":{"line":4
   ,"character":13}}]
+["PREFIX/issue-17-import.ts"
+  ,"c:/javascript/typescript/github/typescript-tools/node_modules/typescript/bin/lib.d.ts"
+  ,"PREFIX/issue-17.ts"]
+"no last error"
 "TSS closing"
 
 // stderr
