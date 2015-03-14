@@ -475,21 +475,34 @@ class TSS {
                      */
                      .concat(this.getErrors())
                      .map( d => {
-                           var file = this.resolveRelativePath(d.file.fileName);
-                           var lc   = this.fileCache.positionToLineCol(file,d.start);
-                           var len  = this.fileCache.getScriptInfo(file).content.length;
-                           var end  = Math.min(len,d.start+d.length);
-                                      // NOTE: clamped to end of file (#11)
-                           var lc2  = this.fileCache.positionToLineCol(file,end);
-                           return {
-                            file: file,
-                            start: {line: lc.line, character: lc.character},
-                            end: {line: lc2.line, character: lc2.character},
-                            text: this.messageChain(d.messageText).join(EOL),
-                            code: d.code,
-                            phase: d["phase"],
-                            category: ts.DiagnosticCategory[d.category]
-                           };
+                           if (d.file) {
+
+                             var file = this.resolveRelativePath(d.file.fileName);
+                             var lc   = this.fileCache.positionToLineCol(file,d.start);
+                             var len  = this.fileCache.getScriptInfo(file).content.length;
+                             var end  = Math.min(len,d.start+d.length);
+                                        // NOTE: clamped to end of file (#11)
+                             var lc2  = this.fileCache.positionToLineCol(file,end);
+                             return {
+                              file: file,
+                              start: {line: lc.line, character: lc.character},
+                              end: {line: lc2.line, character: lc2.character},
+                              text: this.messageChain(d.messageText).join(EOL),
+                              code: d.code,
+                              phase: d["phase"],
+                              category: ts.DiagnosticCategory[d.category]
+                             };
+
+                           } else { // global diagnostics have no file
+
+                             return {
+                              text: this.messageChain(d.messageText).join(EOL),
+                              code: d.code,
+                              phase: d["phase"],
+                              category: ts.DiagnosticCategory[d.category]
+                             };
+
+                           }
                          }
                        );
 

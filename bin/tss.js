@@ -381,21 +381,31 @@ var TSS = (function () {
                     info = _this.ls.getProgram().getGlobalDiagnostics()
                         .concat(_this.getErrors())
                         .map(function (d) {
-                        var file = _this.resolveRelativePath(d.file.fileName);
-                        var lc = _this.fileCache.positionToLineCol(file, d.start);
-                        var len = _this.fileCache.getScriptInfo(file).content.length;
-                        var end = Math.min(len, d.start + d.length);
-                        // NOTE: clamped to end of file (#11)
-                        var lc2 = _this.fileCache.positionToLineCol(file, end);
-                        return {
-                            file: file,
-                            start: { line: lc.line, character: lc.character },
-                            end: { line: lc2.line, character: lc2.character },
-                            text: _this.messageChain(d.messageText).join(EOL),
-                            code: d.code,
-                            phase: d["phase"],
-                            category: ts.DiagnosticCategory[d.category]
-                        };
+                        if (d.file) {
+                            var file = _this.resolveRelativePath(d.file.fileName);
+                            var lc = _this.fileCache.positionToLineCol(file, d.start);
+                            var len = _this.fileCache.getScriptInfo(file).content.length;
+                            var end = Math.min(len, d.start + d.length);
+                            // NOTE: clamped to end of file (#11)
+                            var lc2 = _this.fileCache.positionToLineCol(file, end);
+                            return {
+                                file: file,
+                                start: { line: lc.line, character: lc.character },
+                                end: { line: lc2.line, character: lc2.character },
+                                text: _this.messageChain(d.messageText).join(EOL),
+                                code: d.code,
+                                phase: d["phase"],
+                                category: ts.DiagnosticCategory[d.category]
+                            };
+                        }
+                        else {
+                            return {
+                                text: _this.messageChain(d.messageText).join(EOL),
+                                code: d.code,
+                                phase: d["phase"],
+                                category: ts.DiagnosticCategory[d.category]
+                            };
+                        }
                     });
                     _this.output(info);
                 }

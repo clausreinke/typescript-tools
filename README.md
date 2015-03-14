@@ -142,10 +142,11 @@ Simple commandline interface (commands in, info out) to TypeScript Services. Cur
 
   showErrors
     // show compilation errors for current project
+    // (NOTE: global errors have no file/start/end fields)
 
-    [{file:  string
-     ,start: {line: number, character: number}
-     ,end:   {line: number, character: number}
+    [{file?:  string
+     ,start?: {line: number, character: number}
+     ,end?:   {line: number, character: number}
      ,text:  string
      ,phase: string
      ,category: string
