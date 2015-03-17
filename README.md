@@ -1,3 +1,5 @@
+*NOTE: development, including TypeScript v1.5 support, currently takes place in the [testing_ts1.4](https://github.com/clausreinke/typescript-tools/tree/testing_ts1.4) branch.*
+
 (if you are upgrading from an older version, see CHANGES.txt)
 
 ## typescript-tools
@@ -254,3 +256,4 @@ TypeScript tools currently available:
   "  since we support jump to definition directly)
   function! TSSkeymap()
   ```
+{ 
