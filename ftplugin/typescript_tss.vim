@@ -461,15 +461,15 @@ endfunction
 "TODO: guard tss usage in later functions
 " start typescript service process asynchronously, via python
 " NOTE: one reason for shell=True is to avoid popup console window;
-command! -nargs=1 TSSstart call TSSstart(<f-args>)
+command! -nargs=* TSSstart call TSSstart(<f-args>)
 command! TSSstarthere call TSSstart(expand("%"))
-function! TSSstart(projectroot)
-echomsg "starting TSS, loading ".a:projectroot."..."
+function! TSSstart(...)
+echomsg "starting TSS..."
 python <<EOF
 
-projectroot = vim.eval("a:projectroot")
-print(vim.eval("g:TSS")+[projectroot])
-tss = subprocess.Popen(vim.eval("g:TSS")+[projectroot]
+cmd = vim.eval("g:TSS")+vim.eval("a:000")
+print(cmd)
+tss = subprocess.Popen(cmd
                       ,bufsize=0
                       ,stdin=subprocess.PIPE
                       ,stdout=subprocess.PIPE

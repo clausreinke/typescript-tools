@@ -289,7 +289,7 @@ $ cat tests/tsconfig.json
   command! TSSreload
 
   " start typescript service process (asynchronously, via python)
-  command! -nargs=1 TSSstart
+  command! -nargs=* TSSstart
   command! TSSstarthere
 
   " pass a command to typescript service, get answer
