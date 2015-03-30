@@ -162,10 +162,10 @@ function! TSSdef(cmd)
   let info = TSScmd("definition",{})
   if type(info)!=type({}) || info.file=='null' || type(info.min)!=type({})
     \ || type(info.min.line)!=type(0) || type(info.min.character)!=type(0)
-    if type(info)==type("")
-      echoerr info
-    else
+    if type(info)==type("") && info=='null'
       echoerr 'no useable definition information'
+    else
+      echoerr string(info)
     endif
     return info
   endif

@@ -374,7 +374,7 @@ class TSS {
           pos  = this.fileCache.lineColToPosition(file,line,col);
           locs = this.ls.getDefinitionAtPosition(file, pos); // NOTE: multiple definitions
 
-          info = locs.map( def => ({
+          info = locs && locs.map( def => ({
             def  : def,
             file : def && def.fileName,
             min  : def && this.fileCache.positionToLineCol(def.fileName,def.textSpan.start),
@@ -382,7 +382,7 @@ class TSS {
           }));
 
           // TODO: what about multiple definitions?
-          this.output(info[0]||null);
+          this.output((locs && info[0])||null);
 
         } else if (m = match(cmd,/^(references|occurrences) (\d+) (\d+) (.*)$/)) {
 

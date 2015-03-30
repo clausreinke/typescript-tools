@@ -306,14 +306,14 @@ var TSS = (function () {
                     file = _this.resolveRelativePath(m[3]);
                     pos = _this.fileCache.lineColToPosition(file, line, col);
                     locs = _this.ls.getDefinitionAtPosition(file, pos); // NOTE: multiple definitions
-                    info = locs.map(function (def) { return ({
+                    info = locs && locs.map(function (def) { return ({
                         def: def,
                         file: def && def.fileName,
                         min: def && _this.fileCache.positionToLineCol(def.fileName, def.textSpan.start),
                         lim: def && _this.fileCache.positionToLineCol(def.fileName, ts.textSpanEnd(def.textSpan))
                     }); });
                     // TODO: what about multiple definitions?
-                    _this.output(info[0] || null);
+                    _this.output((locs && info[0]) || null);
                 }
                 else if (m = match(cmd, /^(references|occurrences) (\d+) (\d+) (.*)$/)) {
                     line = parseInt(m[2]);
