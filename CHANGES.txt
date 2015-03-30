@@ -1,7 +1,9 @@
-0.3.1 to ...:
+0.3.1 to 0.4.x:
+
+  - get it to compile and run with github version of TypeScript (1.5), see #39
 
   - 'type' command renamed to 'quickInfo' (follows LS API naming)
-    old version is still accepted, but deprecated
+    (old version is still accepted, but deprecated)
 
   - 'navigateToItems' command is new (:TSSnavigateTo in Vim)
 
@@ -9,17 +11,29 @@
 
   - 'structure' command (:TSSstructure in Vim) is gone (try 'navigationBarItems' instead)
 
-  - Vim: add type to preview info for :TSStype and Omni-Completion (helps with #46)
+  - 'signature' command is new
 
   - 'references' command: add 'lineText' field (#45, :TSSreferences in Vim)
 
-  - support tsconfig.json file and commandline options (#44)
-
   - 'completions' command: boolean no longer required
 
-  - get it to compile and run with github version of TypeScript (1.5), see #39
+  - support tsconfig.json file and commandline options (#44,#49)
+
+  - improve dependency chasing:
+    - don't build a Program before creating language service
+    - support loading new files after language service has started
+
+  - Vim: add type to preview info for :TSStype and Omni-Completion (helps with #46)
 
   - fix #35 (error handling and "tss not running" message)
+
+  - fix script lookup existence check (#47)
+
+  - accept multiple root files (#49)
+
+  - follow LS API change in 'showErrors' ('text' field can be a message chain, #52)
+
+  - API fix 'showErrors': global  errors have no file-related fields
 
 0.3.0 to 0.3.1:
 
