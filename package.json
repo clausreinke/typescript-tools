@@ -1,6 +1,6 @@
 {
   "name": "typescript-tools",
-  "version": "v0.4.4-testing-ts1.4",
+  "version": "v0.4.5-testing-ts1.5",
   "description": "TypeScript Services commandline server",
   "bin": {
     "tss": "bin/tss"
@@ -19,6 +19,6 @@
   "author": "Claus Reinke",
   "license": "Apache License, Version 2.0",
   "dependencies": {
-    "typescript": "Microsoft/TypeScript"
+    "typescript": "1.5.0-alpha"
   }
 }

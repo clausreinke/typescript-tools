@@ -673,7 +673,7 @@ var fileNames;
 var configFile, configObject, configObjectParsed;
 
 // NOTE: partial options support only
-var commandLine = ts.parseCommandLine(ts.sys.args);
+var commandLine = ts["parseCommandLine"](ts.sys.args);
 
 if (commandLine.options.version) {
   console.log(require("../package.json").version);

@@ -1,6 +1,6 @@
-0.3.1 to 0.4.x:
+0.3.1 to 0.4.5:
 
-  - get it to compile and run with github version of TypeScript (1.5), see #39
+  - get it to compile and run with github version of TypeScript (1.5-alpha), see #39
 
   - 'type' command renamed to 'quickInfo' (follows LS API naming)
     (old version is still accepted, but deprecated)

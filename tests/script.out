@@ -25,14 +25,14 @@ node ../bin/tss.js test.ts
   ,"textSpan":{"start":32
   ,"length":1}
   ,"documentation":[]
-  ,"type":"(var) s: string"
+  ,"type":"var s: string"
   ,"docComment":""}
 {"kind":"var"
   ,"kindModifiers":""
   ,"textSpan":{"start":38
   ,"length":1}
   ,"documentation":[]
-  ,"type":"(var) x: {\n    a: number;\n    b: number;\n}"
+  ,"type":"var x: {\n    a: number;\n    b: number;\n}"
   ,"docComment":""}
 {"def":{"fileName":"PREFIX/test.ts"
   ,"textSpan":{"start":23
@@ -157,7 +157,12 @@ node ../bin/tss.js test.ts
   ,"kind":"method"
   ,"kindModifiers":"declare"
   ,"type":"(method) String.substr(from: number, length?: number): string"
-  ,"docComment":"Gets a substring beginning at the specified location and having the specified length."}]}
+  ,"docComment":"Gets a substring beginning at the specified location and having the specified length."}
+  ,{"name":"valueOf"
+  ,"kind":"method"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.valueOf(): string"
+  ,"docComment":"Returns the primitive value of the specified object. "}]}
 {"isMemberCompletion":true
   ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"a"
@@ -306,7 +311,12 @@ var a = [];
   ,"kind":"method"
   ,"kindModifiers":"declare"
   ,"type":"(method) String.substr(from: number, length?: number): string"
-  ,"docComment":"Gets a substring beginning at the specified location and having the specified length."}]}
+  ,"docComment":"Gets a substring beginning at the specified location and having the specified length."}
+  ,{"name":"valueOf"
+  ,"kind":"method"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.valueOf(): string"
+  ,"docComment":"Returns the primitive value of the specified object. "}]}
 {"isMemberCompletion":true
   ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"a"
@@ -634,12 +644,12 @@ node ../bin/tss.js empty.ts
   ,{"name":"blur"
   ,"kind":"function"
   ,"kindModifiers":"declare"
-  ,"type":"(function) blur(): void"
+  ,"type":"function blur(): void"
   ,"docComment":""}
   ,{"name":"btoa"
   ,"kind":"function"
   ,"kindModifiers":"declare"
-  ,"type":"(function) btoa(rawString: string): string"
+  ,"type":"function btoa(rawString: string): string"
   ,"docComment":""}
   ,{"name":"break"
   ,"kind":"keyword"
@@ -663,12 +673,12 @@ node ../bin/tss.js empty.ts
   ,{"name":"blur"
   ,"kind":"function"
   ,"kindModifiers":"declare"
-  ,"type":"(function) blur(): void"
+  ,"type":"function blur(): void"
   ,"docComment":""}
   ,{"name":"btoa"
   ,"kind":"function"
   ,"kindModifiers":"declare"
-  ,"type":"(function) btoa(rawString: string): string"
+  ,"type":"function btoa(rawString: string): string"
   ,"docComment":""}
   ,{"name":"break"
   ,"kind":"keyword"
@@ -832,18 +842,16 @@ node ../bin/tss.js -m commonjs issue-15.ts
   ,"entries":[{"name":"Class"
   ,"kind":"constructor"
   ,"kindModifiers":"export"
-  ,"type":"(constructor) Background.Class(): Background.Class"
+  ,"type":"constructor Background.Class(): Background.Class"
   ,"docComment":""}]}
 {"isMemberCompletion":true
   ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"Class"
   ,"kind":"constructor"
   ,"kindModifiers":"export"
-  ,"type":"(constructor) Background.Class(): Background.Class"
+  ,"type":"constructor Background.Class(): Background.Class"
   ,"docComment":""}]}
-{"isMemberCompletion":true
-  ,"isNewIdentifierLocation":false
-  ,"entries":[]}
+null
 {"isMemberCompletion":true
   ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"a"
