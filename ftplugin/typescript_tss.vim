@@ -59,7 +59,8 @@ function! TSSkeymap()
   " :TSSsymbol
   map <buffer> _?? :TSSbrowse<cr>
   " :TSSreferences
-  map <buffer> <C-t>s :TSSstructure<cr>
+  map <buffer> <C-t>n :TSSnavigation<cr>
+  map <buffer> <C-t>t :TSSnavigateTo
   map <buffer> <C-t>u :TSSupdate<cr>
   map <buffer> <C-t>e :TSSshowErrors<cr>
   map <buffer> <C-t>p :TSSfilesMenu<cr>
@@ -72,6 +73,7 @@ function! TSSkeymap()
   " :TSSend
 endfunction
 
+" TODO: doesn't work anymore - replace with something useful, or drop
 " browse url for ES5 global property/method under cursor
 command! TSSbrowse echo TSSbrowse()
 function! TSSbrowse()
@@ -110,7 +112,7 @@ function! TSSsymbol(rawcmd)
   else
     let info = TSScmd(a:rawcmd,{'rawcmd':1})
   endif
-  if type(info)!=type({}) || !has_key(info,"fullSymbolName") || !has_key(info,"type")
+  if type(info)!=type({}) || !has_key(info,"type")
     if a:rawcmd==""
       echoerr 'no useable type information'
       return info
@@ -118,7 +120,7 @@ function! TSSsymbol(rawcmd)
       return ""
     endif
   endif
-  return info.fullSymbolName.":".info.type
+  return info.type
 endfunction
 
 command! TSStype echo TSStype()
@@ -132,7 +134,7 @@ function! TSStype()
     pclose
     new +setlocal\ previewwindow|setlocal\ buftype=nofile|setlocal\ noswapfile
     exe "normal z" . &previewheight . "\<cr>"
-    call append(0,split(info.docComment,"\n"))
+    call append(0,[info.type]+split(info.docComment,"\n"))
     wincmd p
   endif
   return info.type
@@ -151,7 +153,7 @@ function! TSSballoon()
   endif
 endfunction
 
-" jump to definition of item under cursor
+" jump to or show definition of item under cursor
 command! TSSdef call TSSdef("edit")
 command! TSSdefpreview call TSSdef("pedit")
 command! TSSdefsplit call TSSdef("split")
@@ -160,10 +162,10 @@ function! TSSdef(cmd)
   let info = TSScmd("definition",{})
   if type(info)!=type({}) || info.file=='null' || type(info.min)!=type({})
     \ || type(info.min.line)!=type(0) || type(info.min.character)!=type(0)
-    if type(info)==type("")
-      echoerr info
-    else
+    if type(info)==type("") && info=='null'
       echoerr 'no useable definition information'
+    else
+      echoerr string(info)
     endif
     return info
   endif
@@ -197,24 +199,7 @@ endfunction
 " dump TSS internal file source
 command! -nargs=1 TSSdump echo TSScmd("dump ".<f-args>." ".expand("%:p"),{'rawcmd':1})
 
-" completions
-command! TSScomplete call TSScomplete()
-function! TSScomplete()
-  let col   = col(".")
-  let line  = getline(".")
-  " search backwards for start of identifier (iskeyword pattern)
-  let start = col
-  while start>0 && line[start-2] =~ "\\k"
-    let start -= 1
-  endwhile
-  " check if preceded by dot (won't see dot on previous line!)
-  let member = (start>1 && line[start-2]==".") ? 'true' : 'false'
-  " echomsg start.":".member
-  let info = TSScmd("completions ".member,{'col':start})
-  echo info
-  return info
-endfunction
-
+" completions (omnifunc will be set for all *.ts files)
 function! TSScompleteFunc(findstart,base)
   " echomsg a:findstart."|".a:base
   let col   = col(".")
@@ -256,7 +241,9 @@ function! TSScompleteFunc(findstart,base)
     if type(info)==type({})
       for entry in info.entries
         if entry['name'] =~ '^'.a:base
-          call add(result, {'word': entry['name'], 'menu': get(entry,'type',get(entry,'kind','')), 'info': get(entry,'docComment','') })
+          let typish = get(entry,'type',get(entry,'kind',''))
+          call add(result, {'word': entry['name'], 'menu': typish
+                          \,'info': entry['name']." ".typish."\n".get(entry,'docComment','') })
         endif
       endfor
     endif
@@ -367,13 +354,18 @@ function! TSSshowErrors()
 
   let info = TSScmd("showErrors",{'rawcmd':1})
   if type(info)==type([])
+    let qflist = []
     for i in info
-      let i['lnum']     = i['start']['line']
-      let i['col']      = i['start']['character']
-      let i['filename'] = i['file']
+      let chain = split(i.text,'\(\r\)\?\n')
+      for msg in chain
+        let qflist = add(qflist,{ 'lnum': i['start']['line']
+                             \ ,  'col': i['start']['character']
+                             \ ,  'filename': i['file']
+                             \ ,  'text': msg })
+      endfor
     endfor
-    call setqflist(info)
-    if len(info)!=0
+    call setqflist(qflist)
+    if len(qflist)!=0
       copen
     endif
   else
@@ -390,6 +382,7 @@ function! TSSreferences()
       let i['lnum']     = i['min']['line']
       let i['col']      = i['min']['character']
       let i['filename'] = i['file']
+      let i['text']     = i['lineText']
     endfor
     call setloclist(0,info)
     if len(info)!=0
@@ -400,45 +393,83 @@ function! TSSreferences()
   endif
 endfunction
 
-" create navigation menu for file structure items
-command! TSSstructure call TSSstructure()
-function! TSSstructure()
-  let info = TSScmd("structure ".expand("%:p"),{'rawcmd':1})
+" recursively build menu at prefix, from navigationBarItems
+function! TSSnavigationMenu(prefix,items)
+  for item in a:items
+    let prefix = a:prefix.'.'.substitute(item['info'],' ','\\\ ','g')
+    let cmd = prefix.(!empty(item['childItems'])?'.\.':'')
+                \ .' :call cursor('.item.min.line.','.item.min.character.')<cr>'
+    exe cmd
+    call TSSnavigationMenu(prefix,item['childItems'])
+  endfor
+endfunction
+
+" create and open navigation menu for file navigation bar items
+command! TSSnavigation call TSSnavigation()
+function! TSSnavigation()
+  let info = TSScmd("navigationBarItems ".expand("%:p"),{'rawcmd':1})
   if type(info)==type([])
-    silent! unmenu ]TSSstructure
-    for i in info
-      let l   = i.loc
-      let lck = l['containerKind']
-      let lcn = l['containerName']
-      let ln  = l['name']
-      let lk  = l['kind']
-      let lkm = l['kindModifiers']
-      let submenuheader = lk=~'module\|class\|interface' ? '.' : ''
-      let entry = (lck!=''? lcn.'.'.ln.submenuheader.':\ '.(lkm!='' ? lkm.'\ ' : '').lk
-                        \ : ln.submenuheader.':\ '.(lkm!='' ? lkm.'\ ' : '').lk)
-      let entry = substitute(entry,'\.','\.','g')
-      exe 'menu ]TSSstructure.'.entry.' :call cursor('.i.min.line.','.i.min.character.')<cr>'
-    endfor
+    silent! unmenu ]TSSnavigation
+    call TSSnavigationMenu('menu ]TSSnavigation',info)
     " TODO: mark directly before call cursor (bco tear-off menus)
     normal m'
-    popup ]TSSstructure
+    popup ]TSSnavigation
   else
     echoerr info
   endif
 endfunction
 
+" navigate to items in project
+" 1. narrow down symbols via completion, modulo case/prefix/infix/camelCase
+command! -complete=customlist,TSSnavigateToItems -nargs=1 TSSnavigateTo
+        \ call TSSnavigateTo(<q-args>)
+function! TSSnavigateToItems(A,L,P)
+  let items = TSScmd('navigateToItems '.a:A,{'rawcmd':1})
+  let results = []
+  silent! unmenu ]TSSnavigateTo
+  for item in items
+    let results += [item.name]
+  endfor
+  return results
+endfunction
+
+" 2. offer remaining exact (modulo case) matches as a menu
+function! TSSnavigateTo(item)
+  let items = TSScmd('navigateToItems '.a:item,{'rawcmd':1})
+  silent! unmenu ]TSSnavigateTo
+  silent! tunmenu ]TSSnavigateTo
+  for item in items
+    if item.matchKind!="exact"
+      continue
+    endif
+    let entry = (item.kind!=""?item.kind."\\ ":"").item.name
+    if item.containerName!=""
+      let entry = entry."\\ (".(item.containerKind!=""?item.containerKind."\\ ":"")
+                            \ .item.containerName.")"
+    endif
+    exe "menu ]TSSnavigateTo.".entry
+          \ ." :call TSSgoto('".item.fileName."',".item.min.line.",".item.min.character.")<cr>"
+  endfor
+  popup ]TSSnavigateTo
+endfunction
+
+function! TSSgoto(file,line,col)
+  exe "edit ".a:file
+  call cursor(a:line,a:col)
+endfunction
+
 "TODO: guard tss usage in later functions
 " start typescript service process asynchronously, via python
 " NOTE: one reason for shell=True is to avoid popup console window;
-command! -nargs=1 TSSstart call TSSstart(<f-args>)
+command! -nargs=* TSSstart call TSSstart(<f-args>)
 command! TSSstarthere call TSSstart(expand("%"))
-function! TSSstart(projectroot)
-echomsg "starting TSS, loading ".a:projectroot."..."
+function! TSSstart(...)
+echomsg "starting TSS..."
 python <<EOF
 
-projectroot = vim.eval("a:projectroot")
-print(vim.eval("g:TSS")+[projectroot])
-tss = subprocess.Popen(vim.eval("g:TSS")+[projectroot]
+cmd = vim.eval("g:TSS")+vim.eval("a:000")
+print(cmd)
+tss = subprocess.Popen(cmd
                       ,bufsize=0
                       ,stdin=subprocess.PIPE
                       ,stdout=subprocess.PIPE

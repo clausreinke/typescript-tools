@@ -7,7 +7,8 @@ node ../bin/tss.js test.ts
   ,"character":5}
   ,"end":{"line":3
   ,"character":6}
-  ,"text":"error TS1003: Identifier expected."
+  ,"text":"Identifier expected."
+  ,"code":1003
   ,"phase":"Syntax"
   ,"category":"Error"}
   ,{"file":"PREFIX/test.ts"
@@ -15,57 +16,29 @@ node ../bin/tss.js test.ts
   ,"character":5}
   ,"end":{"line":4
   ,"character":6}
-  ,"text":"error TS1003: Identifier expected."
+  ,"text":"Identifier expected."
+  ,"code":1003
   ,"phase":"Syntax"
   ,"category":"Error"}]
-{"memberName":{"prefix":"string"
-  ,"suffix":""
-  ,"delim":""
-  ,"entries":[{"prefix":""
-  ,"suffix":""
-  ,"delim":""
-  ,"entries":[]}]}
-  ,"docComment":""
-  ,"fullSymbolName":"s"
-  ,"kind":"var"
-  ,"minChar":32
-  ,"limChar":33
-  ,"type":"string"}
-{"memberName":{"prefix":"{ "
-  ,"suffix":"}"
-  ,"delim":"; "
-  ,"entries":[{"prefix":"a: "
-  ,"suffix":""
-  ,"delim":""
-  ,"entries":[{"prefix":"number"
-  ,"suffix":""
-  ,"delim":""
-  ,"entries":[{"prefix":""
-  ,"suffix":""
-  ,"delim":""
-  ,"entries":[]}]}]}
-  ,{"prefix":"b: "
-  ,"suffix":""
-  ,"delim":""
-  ,"entries":[{"prefix":"number"
-  ,"suffix":""
-  ,"delim":""
-  ,"entries":[{"prefix":""
-  ,"suffix":""
-  ,"delim":""
-  ,"entries":[]}]}]}]}
-  ,"docComment":""
-  ,"fullSymbolName":"x"
-  ,"kind":"var"
-  ,"minChar":38
-  ,"limChar":39
-  ,"type":"{ a: number; b: number; }"}
+{"kind":"var"
+  ,"kindModifiers":""
+  ,"textSpan":{"start":32
+  ,"length":1}
+  ,"documentation":[]
+  ,"type":"var s: string"
+  ,"docComment":""}
+{"kind":"var"
+  ,"kindModifiers":""
+  ,"textSpan":{"start":38
+  ,"length":1}
+  ,"documentation":[]
+  ,"type":"var x: {\n    a: number;\n    b: number;\n}"
+  ,"docComment":""}
 {"def":{"fileName":"PREFIX/test.ts"
-  ,"minChar":23
-  ,"limChar":29
+  ,"textSpan":{"start":23
+  ,"length":6}
   ,"kind":"var"
   ,"name":"s"
-  ,"containerKind":""
   ,"containerName":""}
   ,"file":"PREFIX/test.ts"
   ,"min":{"line":2
@@ -73,152 +46,134 @@ node ../bin/tss.js test.ts
   ,"lim":{"line":2
   ,"character":11}}
 {"def":{"fileName":"PREFIX/test.ts"
-  ,"minChar":4
-  ,"limChar":17
+  ,"textSpan":{"start":4
+  ,"length":13}
   ,"kind":"var"
   ,"name":"x"
-  ,"containerKind":""
   ,"containerName":""}
   ,"file":"PREFIX/test.ts"
   ,"min":{"line":1
   ,"character":5}
   ,"lim":{"line":1
   ,"character":18}}
-{"maybeInaccurate":false
-  ,"isMemberCompletion":true
+{"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"toString"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toString"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toString(): string"
   ,"docComment":"Returns a string representation of a string. "}
   ,{"name":"charAt"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(pos: number): string"
-  ,"fullSymbolName":"String.charAt"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.charAt(pos: number): string"
   ,"docComment":"Returns the character at the specified index."}
   ,{"name":"charCodeAt"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(index: number): number"
-  ,"fullSymbolName":"String.charCodeAt"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.charCodeAt(index: number): number"
   ,"docComment":"Returns the Unicode value of the character at the specified location."}
   ,{"name":"concat"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(...strings: string[]): string"
-  ,"fullSymbolName":"String.concat"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.concat(...strings: string[]): string"
   ,"docComment":"Returns a string that contains the concatenation of two or more strings."}
   ,{"name":"indexOf"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(searchString: string, position?: number): number"
-  ,"fullSymbolName":"String.indexOf"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.indexOf(searchString: string, position?: number): number"
   ,"docComment":"Returns the position of the first occurrence of a substring. "}
   ,{"name":"lastIndexOf"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(searchString: string, position?: number): number"
-  ,"fullSymbolName":"String.lastIndexOf"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.lastIndexOf(searchString: string, position?: number): number"
   ,"docComment":"Returns the last occurrence of a substring in the string."}
   ,{"name":"localeCompare"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(that: string, locales: string[], options?: Intl.CollatorOptions): number (+ 2 overload(s))"
-  ,"fullSymbolName":"String.localeCompare"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.localeCompare(that: string): number (+2 overloads)"
   ,"docComment":"Determines whether two strings are equivalent in the current locale."}
   ,{"name":"match"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(regexp: string): string[] (+ 1 overload(s))"
-  ,"fullSymbolName":"String.match"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.match(regexp: string): RegExpMatchArray (+1 overload)"
   ,"docComment":"Matches a string with a regular expression, and returns an array containing the results of that search."}
   ,{"name":"replace"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(searchValue: string, replaceValue: string): string (+ 3 overload(s))"
-  ,"fullSymbolName":"String.replace"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.replace(searchValue: string, replaceValue: string): string (+3 overloads)"
   ,"docComment":"Replaces text in a string, using a regular expression or search string."}
   ,{"name":"search"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(regexp: string): number (+ 1 overload(s))"
-  ,"fullSymbolName":"String.search"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.search(regexp: string): number (+1 overload)"
   ,"docComment":"Finds the first substring match in a regular expression search."}
   ,{"name":"slice"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(start?: number, end?: number): string"
-  ,"fullSymbolName":"String.slice"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.slice(start?: number, end?: number): string"
   ,"docComment":"Returns a section of a string."}
   ,{"name":"split"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(separator: string, limit?: number): string[] (+ 1 overload(s))"
-  ,"fullSymbolName":"String.split"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.split(separator: string, limit?: number): string[] (+1 overload)"
   ,"docComment":"Split a string into substrings using the specified separator and return them as an array."}
   ,{"name":"substring"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(start: number, end?: number): string"
-  ,"fullSymbolName":"String.substring"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.substring(start: number, end?: number): string"
   ,"docComment":"Returns the substring at the specified location within a String object. "}
   ,{"name":"toLowerCase"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toLowerCase"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toLowerCase(): string"
   ,"docComment":"Converts all the alphabetic characters in a string to lowercase. "}
   ,{"name":"toLocaleLowerCase"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toLocaleLowerCase"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toLocaleLowerCase(): string"
   ,"docComment":"Converts all alphabetic characters to lowercase, taking into account the host environment's current locale. "}
   ,{"name":"toUpperCase"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toUpperCase"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toUpperCase(): string"
   ,"docComment":"Converts all the alphabetic characters in a string to uppercase. "}
   ,{"name":"toLocaleUpperCase"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toLocaleUpperCase"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toLocaleUpperCase(): string"
   ,"docComment":"Returns a string where all alphabetic characters have been converted to uppercase, taking into account the host environment's current locale. "}
   ,{"name":"trim"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.trim"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.trim(): string"
   ,"docComment":"Removes the leading and trailing white space and line terminator characters from a string. "}
   ,{"name":"length"
   ,"kind":"property"
-  ,"kindModifiers":"public"
-  ,"type":"number"
-  ,"fullSymbolName":"String.length"
+  ,"kindModifiers":"declare"
+  ,"type":"(property) String.length: number"
   ,"docComment":"Returns the length of a String object. "}
   ,{"name":"substr"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(from: number, length?: number): string"
-  ,"fullSymbolName":"String.substr"
-  ,"docComment":"Gets a substring beginning at the specified location and having the specified length."}]}
-{"maybeInaccurate":false
-  ,"isMemberCompletion":true
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.substr(from: number, length?: number): string"
+  ,"docComment":"Gets a substring beginning at the specified location and having the specified length."}
+  ,{"name":"valueOf"
+  ,"kind":"method"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.valueOf(): string"
+  ,"docComment":"Returns the primitive value of the specified object. "}]}
+{"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"a"
   ,"kind":"property"
-  ,"kindModifiers":"public"
-  ,"type":"number"
-  ,"fullSymbolName":"a"
+  ,"kindModifiers":""
+  ,"type":"(property) a: number"
   ,"docComment":""}
   ,{"name":"b"
   ,"kind":"property"
-  ,"kindModifiers":"public"
-  ,"type":"number"
-  ,"fullSymbolName":"b"
+  ,"kindModifiers":""
+  ,"type":"(property) b: number"
   ,"docComment":""}]}
 "updated PREFIX/test.ts, (2/1) errors"
 dumping PREFIX/test.ts
@@ -233,7 +188,8 @@ var a = [];
   ,"character":5}
   ,"end":{"line":5
   ,"character":6}
-  ,"text":"error TS1003: Identifier expected."
+  ,"text":"Identifier expected."
+  ,"code":1003
   ,"phase":"Syntax"
   ,"category":"Error"}
   ,{"file":"PREFIX/test.ts"
@@ -241,7 +197,8 @@ var a = [];
   ,"character":5}
   ,"end":{"line":6
   ,"character":6}
-  ,"text":"error TS1003: Identifier expected."
+  ,"text":"Identifier expected."
+  ,"code":1003
   ,"phase":"Syntax"
   ,"category":"Error"}
   ,{"file":"PREFIX/test.ts"
@@ -249,378 +206,335 @@ var a = [];
   ,"character":4}
   ,"end":{"line":4
   ,"character":6}
-  ,"text":"error TS2094: Property 'to' does not exist on value of type 'string'."
+  ,"text":"Property 'to' does not exist on type 'string'."
+  ,"code":2339
   ,"phase":"Semantics"
   ,"category":"Error"}]
-{"maybeInaccurate":false
-  ,"isMemberCompletion":true
+{"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"toString"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toString"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toString(): string"
   ,"docComment":"Returns a string representation of a string. "}
   ,{"name":"charAt"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(pos: number): string"
-  ,"fullSymbolName":"String.charAt"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.charAt(pos: number): string"
   ,"docComment":"Returns the character at the specified index."}
   ,{"name":"charCodeAt"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(index: number): number"
-  ,"fullSymbolName":"String.charCodeAt"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.charCodeAt(index: number): number"
   ,"docComment":"Returns the Unicode value of the character at the specified location."}
   ,{"name":"concat"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(...strings: string[]): string"
-  ,"fullSymbolName":"String.concat"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.concat(...strings: string[]): string"
   ,"docComment":"Returns a string that contains the concatenation of two or more strings."}
   ,{"name":"indexOf"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(searchString: string, position?: number): number"
-  ,"fullSymbolName":"String.indexOf"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.indexOf(searchString: string, position?: number): number"
   ,"docComment":"Returns the position of the first occurrence of a substring. "}
   ,{"name":"lastIndexOf"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(searchString: string, position?: number): number"
-  ,"fullSymbolName":"String.lastIndexOf"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.lastIndexOf(searchString: string, position?: number): number"
   ,"docComment":"Returns the last occurrence of a substring in the string."}
   ,{"name":"localeCompare"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(that: string, locales: string[], options?: Intl.CollatorOptions): number (+ 2 overload(s))"
-  ,"fullSymbolName":"String.localeCompare"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.localeCompare(that: string): number (+2 overloads)"
   ,"docComment":"Determines whether two strings are equivalent in the current locale."}
   ,{"name":"match"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(regexp: string): string[] (+ 1 overload(s))"
-  ,"fullSymbolName":"String.match"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.match(regexp: string): RegExpMatchArray (+1 overload)"
   ,"docComment":"Matches a string with a regular expression, and returns an array containing the results of that search."}
   ,{"name":"replace"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(searchValue: string, replaceValue: string): string (+ 3 overload(s))"
-  ,"fullSymbolName":"String.replace"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.replace(searchValue: string, replaceValue: string): string (+3 overloads)"
   ,"docComment":"Replaces text in a string, using a regular expression or search string."}
   ,{"name":"search"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(regexp: string): number (+ 1 overload(s))"
-  ,"fullSymbolName":"String.search"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.search(regexp: string): number (+1 overload)"
   ,"docComment":"Finds the first substring match in a regular expression search."}
   ,{"name":"slice"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(start?: number, end?: number): string"
-  ,"fullSymbolName":"String.slice"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.slice(start?: number, end?: number): string"
   ,"docComment":"Returns a section of a string."}
   ,{"name":"split"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(separator: string, limit?: number): string[] (+ 1 overload(s))"
-  ,"fullSymbolName":"String.split"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.split(separator: string, limit?: number): string[] (+1 overload)"
   ,"docComment":"Split a string into substrings using the specified separator and return them as an array."}
   ,{"name":"substring"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(start: number, end?: number): string"
-  ,"fullSymbolName":"String.substring"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.substring(start: number, end?: number): string"
   ,"docComment":"Returns the substring at the specified location within a String object. "}
   ,{"name":"toLowerCase"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toLowerCase"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toLowerCase(): string"
   ,"docComment":"Converts all the alphabetic characters in a string to lowercase. "}
   ,{"name":"toLocaleLowerCase"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toLocaleLowerCase"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toLocaleLowerCase(): string"
   ,"docComment":"Converts all alphabetic characters to lowercase, taking into account the host environment's current locale. "}
   ,{"name":"toUpperCase"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toUpperCase"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toUpperCase(): string"
   ,"docComment":"Converts all the alphabetic characters in a string to uppercase. "}
   ,{"name":"toLocaleUpperCase"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toLocaleUpperCase"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toLocaleUpperCase(): string"
   ,"docComment":"Returns a string where all alphabetic characters have been converted to uppercase, taking into account the host environment's current locale. "}
   ,{"name":"trim"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.trim"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.trim(): string"
   ,"docComment":"Removes the leading and trailing white space and line terminator characters from a string. "}
   ,{"name":"length"
   ,"kind":"property"
-  ,"kindModifiers":"public"
-  ,"type":"number"
-  ,"fullSymbolName":"String.length"
+  ,"kindModifiers":"declare"
+  ,"type":"(property) String.length: number"
   ,"docComment":"Returns the length of a String object. "}
   ,{"name":"substr"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(from: number, length?: number): string"
-  ,"fullSymbolName":"String.substr"
-  ,"docComment":"Gets a substring beginning at the specified location and having the specified length."}]}
-{"maybeInaccurate":false
-  ,"isMemberCompletion":true
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.substr(from: number, length?: number): string"
+  ,"docComment":"Gets a substring beginning at the specified location and having the specified length."}
+  ,{"name":"valueOf"
+  ,"kind":"method"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.valueOf(): string"
+  ,"docComment":"Returns the primitive value of the specified object. "}]}
+{"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"a"
   ,"kind":"property"
-  ,"kindModifiers":"public"
-  ,"type":"number"
-  ,"fullSymbolName":"a"
+  ,"kindModifiers":""
+  ,"type":"(property) a: number"
   ,"docComment":""}
   ,{"name":"b"
   ,"kind":"property"
-  ,"kindModifiers":"public"
-  ,"type":"number"
-  ,"fullSymbolName":"b"
+  ,"kindModifiers":""
+  ,"type":"(property) b: number"
   ,"docComment":""}]}
-{"maybeInaccurate":false
-  ,"isMemberCompletion":true
-  ,"entries":[{"name":"toString"
+{"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
+  ,"entries":[{"name":"length"
+  ,"kind":"property"
+  ,"kindModifiers":"declare"
+  ,"type":"(property) Array<any>.length: number"
+  ,"docComment":"Gets or sets the length of the array. This is a number one higher than the highest element defined in an array."}
+  ,{"name":"toString"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"Array<T>.toString"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.toString(): string"
   ,"docComment":"Returns a string representation of an array."}
   ,{"name":"toLocaleString"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"Array<T>.toLocaleString"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.toLocaleString(): string"
   ,"docComment":""}
+  ,{"name":"push"
+  ,"kind":"method"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.push(...items: any[]): number"
+  ,"docComment":"Appends new elements to an array, and returns the new length of the array."}
+  ,{"name":"pop"
+  ,"kind":"method"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.pop(): any"
+  ,"docComment":"Removes the last element from an array and returns it."}
   ,{"name":"concat"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"<U extends T[]>(...items: U[]): T[] (+ 1 overload(s))"
-  ,"fullSymbolName":"Array<T>.concat"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.concat<U>(...items: U[]): any[] (+1 overload)"
   ,"docComment":"Combines two or more arrays."}
   ,{"name":"join"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(separator?: string): string"
-  ,"fullSymbolName":"Array<T>.join"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.join(separator?: string): string"
   ,"docComment":"Adds all the elements of an array separated by the specified separator string."}
-  ,{"name":"pop"
-  ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): T"
-  ,"fullSymbolName":"Array<T>.pop"
-  ,"docComment":"Removes the last element from an array and returns it."}
-  ,{"name":"push"
-  ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(...items: T[]): number"
-  ,"fullSymbolName":"Array<T>.push"
-  ,"docComment":"Appends new elements to an array, and returns the new length of the array."}
   ,{"name":"reverse"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): T[]"
-  ,"fullSymbolName":"Array<T>.reverse"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.reverse(): any[]"
   ,"docComment":"Reverses the elements in an Array. "}
   ,{"name":"shift"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): T"
-  ,"fullSymbolName":"Array<T>.shift"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.shift(): any"
   ,"docComment":"Removes the first element from an array and returns it."}
   ,{"name":"slice"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(start?: number, end?: number): T[]"
-  ,"fullSymbolName":"Array<T>.slice"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.slice(start?: number, end?: number): any[]"
   ,"docComment":"Returns a section of an array."}
   ,{"name":"sort"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(compareFn?: (a: T, b: T) => number): T[]"
-  ,"fullSymbolName":"Array<T>.sort"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.sort(compareFn?: (a: any, b: any) => number): any[]"
   ,"docComment":"Sorts an array."}
   ,{"name":"splice"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(start: number): T[] (+ 1 overload(s))"
-  ,"fullSymbolName":"Array<T>.splice"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.splice(start: number): any[] (+1 overload)"
   ,"docComment":"Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements."}
   ,{"name":"unshift"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(...items: T[]): number"
-  ,"fullSymbolName":"Array<T>.unshift"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.unshift(...items: any[]): number"
   ,"docComment":"Inserts new elements at the start of an array."}
   ,{"name":"indexOf"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(searchElement: T, fromIndex?: number): number"
-  ,"fullSymbolName":"Array<T>.indexOf"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.indexOf(searchElement: any, fromIndex?: number): number"
   ,"docComment":"Returns the index of the first occurrence of a value in an array."}
   ,{"name":"lastIndexOf"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(searchElement: T, fromIndex?: number): number"
-  ,"fullSymbolName":"Array<T>.lastIndexOf"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.lastIndexOf(searchElement: any, fromIndex?: number): number"
   ,"docComment":"Returns the index of the last occurrence of a specified value in an array."}
   ,{"name":"every"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean"
-  ,"fullSymbolName":"Array<T>.every"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.every(callbackfn: (value: any, index: number, array: any[]) => boolean, thisArg?: any): boolean"
   ,"docComment":"Determines whether all the members of an array satisfy the specified test."}
   ,{"name":"some"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean"
-  ,"fullSymbolName":"Array<T>.some"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.some(callbackfn: (value: any, index: number, array: any[]) => boolean, thisArg?: any): boolean"
   ,"docComment":"Determines whether the specified callback function returns true for any element of an array."}
   ,{"name":"forEach"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void"
-  ,"fullSymbolName":"Array<T>.forEach"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.forEach(callbackfn: (value: any, index: number, array: any[]) => void, thisArg?: any): void"
   ,"docComment":"Performs the specified action for each element in an array."}
   ,{"name":"map"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[]"
-  ,"fullSymbolName":"Array<T>.map"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.map<U>(callbackfn: (value: any, index: number, array: any[]) => U, thisArg?: any): U[]"
   ,"docComment":"Calls a defined callback function on each element of an array, and returns an array that contains the results."}
   ,{"name":"filter"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[]"
-  ,"fullSymbolName":"Array<T>.filter"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.filter(callbackfn: (value: any, index: number, array: any[]) => boolean, thisArg?: any): any[]"
   ,"docComment":"Returns the elements of an array that meet the condition specified in a callback function. "}
   ,{"name":"reduce"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: T[]) => T, initialValue?: T): T (+ 1 overload(s))"
-  ,"fullSymbolName":"Array<T>.reduce"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.reduce(callbackfn: (previousValue: any, currentValue: any, currentIndex: number, array: any[]) => any, initialValue?: any): any (+1 overload)"
   ,"docComment":"Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function."}
   ,{"name":"reduceRight"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: T[]) => T, initialValue?: T): T (+ 1 overload(s))"
-  ,"fullSymbolName":"Array<T>.reduceRight"
-  ,"docComment":"Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function."}
-  ,{"name":"length"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.reduceRight(callbackfn: (previousValue: any, currentValue: any, currentIndex: number, array: any[]) => any, initialValue?: any): any (+1 overload)"
+  ,"docComment":"Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function."}]}
+{"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
+  ,"entries":[{"name":"length"
   ,"kind":"property"
-  ,"kindModifiers":"public"
-  ,"type":"number"
-  ,"fullSymbolName":"Array<T>.length"
-  ,"docComment":"Gets or sets the length of the array. This is a number one higher than the highest element defined in an array."}]}
-{"maybeInaccurate":false
-  ,"isMemberCompletion":true
-  ,"entries":[{"name":"toString"
+  ,"kindModifiers":"declare"}
+  ,{"name":"toString"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"toLocaleString"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
-  ,{"name":"concat"
-  ,"kind":"method"
-  ,"kindModifiers":"public"}
-  ,{"name":"join"
-  ,"kind":"method"
-  ,"kindModifiers":"public"}
-  ,{"name":"pop"
-  ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"push"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
+  ,{"name":"pop"
+  ,"kind":"method"
+  ,"kindModifiers":"declare"}
+  ,{"name":"concat"
+  ,"kind":"method"
+  ,"kindModifiers":"declare"}
+  ,{"name":"join"
+  ,"kind":"method"
+  ,"kindModifiers":"declare"}
   ,{"name":"reverse"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"shift"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"slice"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"sort"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"splice"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"unshift"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"indexOf"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"lastIndexOf"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"every"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"some"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"forEach"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"map"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"filter"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"reduce"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
+  ,"kindModifiers":"declare"}
   ,{"name":"reduceRight"
   ,"kind":"method"
-  ,"kindModifiers":"public"}
-  ,{"name":"length"
-  ,"kind":"property"
-  ,"kindModifiers":"public"}]}
-{"maybeInaccurate":false
-  ,"isMemberCompletion":true
+  ,"kindModifiers":"declare"}]}
+{"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"toString"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toString"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toString(): string"
   ,"docComment":"Returns a string representation of a string. "}
   ,{"name":"toLowerCase"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toLowerCase"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toLowerCase(): string"
   ,"docComment":"Converts all the alphabetic characters in a string to lowercase. "}
   ,{"name":"toLocaleLowerCase"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toLocaleLowerCase"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toLocaleLowerCase(): string"
   ,"docComment":"Converts all alphabetic characters to lowercase, taking into account the host environment's current locale. "}
   ,{"name":"toUpperCase"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toUpperCase"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toUpperCase(): string"
   ,"docComment":"Converts all the alphabetic characters in a string to uppercase. "}
   ,{"name":"toLocaleUpperCase"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toLocaleUpperCase"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toLocaleUpperCase(): string"
   ,"docComment":"Returns a string where all alphabetic characters have been converted to uppercase, taking into account the host environment's current locale. "}]
   ,"prefix":"to"}
 "TSS closing"
@@ -637,7 +551,8 @@ node ../bin/tss.js empty.ts
   ,"character":1}
   ,"end":{"line":2
   ,"character":1}
-  ,"text":"error TS1109: Expression expected."
+  ,"text":"Expression expected."
+  ,"code":1109
   ,"phase":"Syntax"
   ,"category":"Error"}]
 "updated PREFIX/empty.ts, (0/0) errors"
@@ -648,7 +563,8 @@ node ../bin/tss.js empty.ts
   ,"character":1}
   ,"end":{"line":2
   ,"character":1}
-  ,"text":"error TS1109: Expression expected."
+  ,"text":"Expression expected."
+  ,"code":1109
   ,"phase":"Syntax"
   ,"category":"Error"}]
 "TSS closing"
@@ -662,11 +578,10 @@ node ../bin/tss.js empty.ts
 "updated PREFIX/empty.ts, (0/0) errors"
 "updated PREFIX/empty.ts, (0/0) errors"
 {"def":{"fileName":"PREFIX/empty.ts"
-  ,"minChar":4
-  ,"limChar":10
+  ,"textSpan":{"start":4
+  ,"length":6}
   ,"kind":"var"
   ,"name":"i"
-  ,"containerKind":""
   ,"containerName":""}
   ,"file":"PREFIX/empty.ts"
   ,"min":{"line":1
@@ -687,7 +602,8 @@ node ../bin/tss.js empty.ts
   ,"character":11}
   ,"end":{"line":1
   ,"character":11}
-  ,"text":"error TS1002: Missing close quote character."
+  ,"text":"Unterminated string literal."
+  ,"code":1002
   ,"phase":"Syntax"
   ,"category":"Error"}
   ,{"file":"PREFIX/empty.ts"
@@ -695,7 +611,8 @@ node ../bin/tss.js empty.ts
   ,"character":1}
   ,"end":{"line":1
   ,"character":4}
-  ,"text":"error TS2095: Cannot find name 'foo'."
+  ,"text":"Cannot find name 'foo'."
+  ,"code":2304
   ,"phase":"Semantics"
   ,"category":"Error"}]
 "TSS closing"
@@ -717,66 +634,62 @@ node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
 "updated PREFIX/empty.ts, (0/1) errors"
-{"maybeInaccurate":false
-  ,"isMemberCompletion":false
+{"isMemberCompletion":false
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"bar"
   ,"kind":"parameter"
-  ,"kindModifiers":"public"
-  ,"type":"any"
-  ,"fullSymbolName":"bar"
+  ,"kindModifiers":""
+  ,"type":"(parameter) bar: any"
   ,"docComment":""}
-  ,{"name":"boolean"
-  ,"kind":"primitive type"
-  ,"kindModifiers":""}
   ,{"name":"blur"
   ,"kind":"function"
   ,"kindModifiers":"declare"
-  ,"type":"(): void"
-  ,"fullSymbolName":"blur"
+  ,"type":"function blur(): void"
   ,"docComment":""}
   ,{"name":"btoa"
   ,"kind":"function"
   ,"kindModifiers":"declare"
-  ,"type":"(rawString: string): string"
-  ,"fullSymbolName":"btoa"
+  ,"type":"function btoa(rawString: string): string"
   ,"docComment":""}
   ,{"name":"break"
   ,"kind":"keyword"
   ,"kindModifiers":""
-  ,"type":null
-  ,"fullSymbolName":"break"
-  ,"docComment":null}]
+  ,"type":"break"
+  ,"docComment":""}
+  ,{"name":"boolean"
+  ,"kind":"keyword"
+  ,"kindModifiers":""
+  ,"type":"boolean"
+  ,"docComment":""}]
   ,"prefix":"b"}
 "updated PREFIX/empty.ts"
-{"maybeInaccurate":false
-  ,"isMemberCompletion":false
+{"isMemberCompletion":false
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"bar"
   ,"kind":"parameter"
-  ,"kindModifiers":"public"
-  ,"type":"any"
-  ,"fullSymbolName":"bar"
+  ,"kindModifiers":""
+  ,"type":"(parameter) bar: any"
   ,"docComment":""}
-  ,{"name":"boolean"
-  ,"kind":"primitive type"
-  ,"kindModifiers":""}
   ,{"name":"blur"
   ,"kind":"function"
   ,"kindModifiers":"declare"
-  ,"type":"(): void"
-  ,"fullSymbolName":"blur"
+  ,"type":"function blur(): void"
   ,"docComment":""}
   ,{"name":"btoa"
   ,"kind":"function"
   ,"kindModifiers":"declare"
-  ,"type":"(rawString: string): string"
-  ,"fullSymbolName":"btoa"
+  ,"type":"function btoa(rawString: string): string"
   ,"docComment":""}
   ,{"name":"break"
   ,"kind":"keyword"
   ,"kindModifiers":""
-  ,"type":null
-  ,"fullSymbolName":"break"
-  ,"docComment":null}]
+  ,"type":"break"
+  ,"docComment":""}
+  ,{"name":"boolean"
+  ,"kind":"keyword"
+  ,"kindModifiers":""
+  ,"type":"boolean"
+  ,"docComment":""}]
   ,"prefix":"b"}
 "TSS closing"
 
@@ -814,7 +727,8 @@ bozo;
   ,"character":1}
   ,"end":{"line":3
   ,"character":5}
-  ,"text":"error TS2095: Cannot find name 'bozo'."
+  ,"text":"Cannot find name 'bozo'."
+  ,"code":2304
   ,"phase":"Semantics"
   ,"category":"Error"}]
 "updated lines 5-5 in PREFIX/empty.ts, (0/1) errors"
@@ -841,71 +755,63 @@ node ../bin/tss.js empty.ts
 // stdout
 "loaded PREFIX/empty.ts, TSS listening.."
 "updated PREFIX/empty.ts"
-{"maybeInaccurate":false
-  ,"isMemberCompletion":true
+{"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"forEach"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void"
-  ,"fullSymbolName":"Array<T>.forEach"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<undefined>.forEach(callbackfn: (value: undefined, index: number, array: undefined[]) => void, thisArg?: any): void"
   ,"docComment":"Performs the specified action for each element in an array."}
   ,{"name":"filter"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[]"
-  ,"fullSymbolName":"Array<T>.filter"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<undefined>.filter(callbackfn: (value: undefined, index: number, array: undefined[]) => boolean, thisArg?: any): undefined[]"
   ,"docComment":"Returns the elements of an array that meet the condition specified in a callback function. "}]
   ,"prefix":"f"}
 "updated PREFIX/empty.ts"
-{"maybeInaccurate":false
-  ,"isMemberCompletion":true
+{"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"map"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[]"
-  ,"fullSymbolName":"Array<T>.map"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<any>.map<U>(callbackfn: (value: any, index: number, array: any[]) => U, thisArg?: any): U[]"
   ,"docComment":"Calls a defined callback function on each element of an array, and returns an array that contains the results."}]
   ,"prefix":"m"}
 "updated PREFIX/empty.ts"
-{"maybeInaccurate":false
-  ,"isMemberCompletion":true
+{"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"forEach"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void"
-  ,"fullSymbolName":"Array<T>.forEach"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) Array<string>.forEach(callbackfn: (value: string, index: number, array: string[]) => void, thisArg?: any): void"
   ,"docComment":"Performs the specified action for each element in an array."}]
   ,"prefix":"fo"}
 "updated PREFIX/empty.ts"
-{"maybeInaccurate":false
-  ,"isMemberCompletion":true
+{"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"toLowerCase"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toLowerCase"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toLowerCase(): string"
   ,"docComment":"Converts all the alphabetic characters in a string to lowercase. "}
   ,{"name":"toLocaleLowerCase"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toLocaleLowerCase"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toLocaleLowerCase(): string"
   ,"docComment":"Converts all alphabetic characters to lowercase, taking into account the host environment's current locale. "}
   ,{"name":"toLocaleUpperCase"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): string"
-  ,"fullSymbolName":"String.toLocaleUpperCase"
+  ,"kindModifiers":"declare"
+  ,"type":"(method) String.toLocaleUpperCase(): string"
   ,"docComment":"Returns a string where all alphabetic characters have been converted to uppercase, taking into account the host environment's current locale. "}]
   ,"prefix":"toL"}
 "updated PREFIX/empty.ts"
-{"maybeInaccurate":false
-  ,"isMemberCompletion":false
+{"isMemberCompletion":false
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"bar"
   ,"kind":"parameter"
-  ,"kindModifiers":"public"
-  ,"type":"any"
-  ,"fullSymbolName":"bar"
+  ,"kindModifiers":""
+  ,"type":"(parameter) bar: any"
   ,"docComment":""}]
   ,"prefix":"ba"}
 "TSS closing"
@@ -913,131 +819,122 @@ node ../bin/tss.js empty.ts
 // stderr
 
 // issue-15.script
-node ../bin/tss.js issue-15.ts
+node ../bin/tss.js -m commonjs issue-15.ts
 // stdout
 "loaded PREFIX/issue-15.ts, TSS listening.."
 "updated PREFIX/issue-15.ts"
-{"memberName":{"prefix":"any"
-  ,"suffix":""
-  ,"delim":""
-  ,"entries":[{"prefix":""
-  ,"suffix":""
-  ,"delim":""
-  ,"entries":[]}]}
-  ,"docComment":""
-  ,"fullSymbolName":"xx"
-  ,"kind":"local var"
-  ,"minChar":353
-  ,"limChar":355
-  ,"type":"any"}
-{"memberName":{"prefix":"Background.Class"
-  ,"suffix":""
-  ,"delim":""
-  ,"entries":[{"prefix":""
-  ,"suffix":""
-  ,"delim":""
-  ,"entries":[]}]}
-  ,"docComment":""
-  ,"fullSymbolName":"bg"
-  ,"kind":"local var"
-  ,"minChar":377
-  ,"limChar":379
-  ,"type":"Background.Class"}
-{"maybeInaccurate":false
-  ,"isMemberCompletion":true
+{"kind":"local var"
+  ,"kindModifiers":""
+  ,"textSpan":{"start":353
+  ,"length":2}
+  ,"documentation":[]
+  ,"type":"(local var) xx: any"
+  ,"docComment":""}
+{"kind":"local var"
+  ,"kindModifiers":""
+  ,"textSpan":{"start":377
+  ,"length":2}
+  ,"documentation":[]
+  ,"type":"(local var) bg: Background.Class"
+  ,"docComment":""}
+{"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"Class"
-  ,"kind":"class"
+  ,"kind":"constructor"
   ,"kindModifiers":"export"
-  ,"type":"Background.Class"
-  ,"fullSymbolName":"Background.Class"
+  ,"type":"constructor Background.Class(): Background.Class"
   ,"docComment":""}]}
-{"maybeInaccurate":false
-  ,"isMemberCompletion":true
+{"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"Class"
-  ,"kind":"class"
+  ,"kind":"constructor"
   ,"kindModifiers":"export"
-  ,"type":"Background.Class"
-  ,"fullSymbolName":"Background.Class"
+  ,"type":"constructor Background.Class(): Background.Class"
   ,"docComment":""}]}
 null
-{"maybeInaccurate":false
-  ,"isMemberCompletion":true
+{"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"a"
   ,"kind":"property"
   ,"kindModifiers":"public"
-  ,"type":"any"
-  ,"fullSymbolName":"Background.Class.a"
+  ,"type":"(property) Background.Class.a: any"
   ,"docComment":""}
   ,{"name":"b"
   ,"kind":"property"
   ,"kindModifiers":"public"
-  ,"type":"any"
-  ,"fullSymbolName":"Background.Class.b"
+  ,"type":"(property) Background.Class.b: any"
   ,"docComment":""}
   ,{"name":"init"
   ,"kind":"method"
-  ,"kindModifiers":"public"
-  ,"type":"(): void"
-  ,"fullSymbolName":"Background.Class.init"
+  ,"kindModifiers":""
+  ,"type":"(method) Background.Class.init(): void"
   ,"docComment":""}]}
-{"maybeInaccurate":false
-  ,"isMemberCompletion":true
+{"isMemberCompletion":true
+  ,"isNewIdentifierLocation":false
   ,"entries":[{"name":"test_var"
   ,"kind":"property"
   ,"kindModifiers":"public"
-  ,"type":"any"
-  ,"fullSymbolName":"Test.test_var"
+  ,"type":"(property) Test.test_var: any"
   ,"docComment":""}
   ,{"name":"test_method"
   ,"kind":"method"
   ,"kindModifiers":"public"
-  ,"type":"(): void"
-  ,"fullSymbolName":"Test.test_method"
+  ,"type":"(method) Test.test_method(): void"
   ,"docComment":""}]}
 "TSS closing"
 
 // stderr
 
 // issue-17.script
-node ../bin/tss.js issue-17.ts
+node ../bin/tss.js -m commonjs issue-17.ts
 // stdout
 "loaded PREFIX/issue-17.ts, TSS listening.."
+["c:/javascript/typescript/github/typescript-tools/node_modules/typescript/bin/lib.d.ts"
+  ,"PREFIX/issue-17.ts"]
 [{"ref":{"fileName":"PREFIX/issue-17-import.ts"
-  ,"minChar":58
-  ,"limChar":63
-  ,"isWriteAccess":false}
+  ,"textSpan":{"start":58
+  ,"length":5}
+  ,"isWriteAccess":true}
   ,"file":"PREFIX/issue-17-import.ts"
+  ,"lineText":"    public start(){"
   ,"min":{"line":7
   ,"character":12}
   ,"lim":{"line":7
   ,"character":17}}
   ,{"ref":{"fileName":"PREFIX/issue-17.ts"
-  ,"minChar":83
-  ,"limChar":88
+  ,"textSpan":{"start":83
+  ,"length":5}
   ,"isWriteAccess":false}
   ,"file":"PREFIX/issue-17.ts"
+  ,"lineText":"second.start();"
   ,"min":{"line":4
   ,"character":8}
   ,"lim":{"line":4
   ,"character":13}}]
 [{"ref":{"fileName":"PREFIX/issue-17-import.ts"
-  ,"minChar":58
-  ,"limChar":63
-  ,"isWriteAccess":false}
+  ,"textSpan":{"start":58
+  ,"length":5}
+  ,"isWriteAccess":true}
   ,"file":"PREFIX/issue-17-import.ts"
+  ,"lineText":"    public start(){"
   ,"min":{"line":7
   ,"character":12}
   ,"lim":{"line":7
   ,"character":17}}
   ,{"ref":{"fileName":"PREFIX/issue-17.ts"
-  ,"minChar":83
-  ,"limChar":88
+  ,"textSpan":{"start":83
+  ,"length":5}
   ,"isWriteAccess":false}
   ,"file":"PREFIX/issue-17.ts"
+  ,"lineText":"second.start();"
   ,"min":{"line":4
   ,"character":8}
   ,"lim":{"line":4
   ,"character":13}}]
+["PREFIX/issue-17-import.ts"
+  ,"c:/javascript/typescript/github/typescript-tools/node_modules/typescript/bin/lib.d.ts"
+  ,"PREFIX/issue-17.ts"]
+"no last error"
 "TSS closing"
 
 // stderr
@@ -1048,6 +945,24 @@ node ../bin/tss.js empty.ts
 "loaded PREFIX/empty.ts, TSS listening.."
 "updated PREFIX/empty.ts, (0/0) errors"
 []
+"TSS closing"
+
+// stderr
+
+// issue-52.script
+node ../bin/tss.js empty.ts
+// stdout
+"loaded PREFIX/empty.ts, TSS listening.."
+"updated PREFIX/empty.ts, (0/1) errors"
+[{"file":"PREFIX/empty.ts"
+  ,"start":{"line":3
+  ,"character":1}
+  ,"end":{"line":3
+  ,"character":6}
+  ,"text":"Type 'number' is not assignable to type '{ \"werwer\": number; \"oo\": number[]; }'.\nProperty '\"werwer\"' is missing in type 'Number'."
+  ,"code":2322
+  ,"phase":"Semantics"
+  ,"category":"Error"}]
 "TSS closing"
 
 // stderr
