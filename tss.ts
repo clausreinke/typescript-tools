@@ -227,8 +227,12 @@ class TSS {
     var seenNoDefaultLib = options.noLib;
     this.rootFiles.forEach(file=>{
       var source = this.compilerHost.getSourceFile(file,options.target);
-      seenNoDefaultLib = seenNoDefaultLib || source.hasNoDefaultLib;
-      this.fileCache.addFile(file,source.text);
+      if (source) {
+        seenNoDefaultLib = seenNoDefaultLib || source.hasNoDefaultLib;
+        this.fileCache.addFile(file,source.text);
+      } else {
+        throw ("tss cannot find file: "+file);
+      }
     });
     if (!seenNoDefaultLib) {
       var defaultLibFileName = this.compilerHost.getDefaultLibFileName(options);
@@ -729,5 +733,10 @@ if (!fileNames) {
 }
 
 var tss = new TSS();
-tss.setup(fileNames,options);
-tss.listen();
+try {
+  tss.setup(fileNames,options);
+  tss.listen();
+} catch (e) {
+  console.error(e.toString());
+  process.exit(1);
+}
