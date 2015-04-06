@@ -1,3 +1,10 @@
+echohl WarningMsg
+echomsg "typescript-tools vim plugin has moved to separate repo:"
+echomsg "https://github.com/clausreinke/typescript-tools.vim"
+echomsg "(you are using a deprecated version)"
+call input("hit return to continue")
+echohl None
+
 if exists("g:TSSloaded")
   finish
 endif
