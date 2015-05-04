@@ -1,3 +1,7 @@
+0.4.7:
+
+  - get it to compile and run with TypeScript 1.5-beta
+
 0.4.6:
 
   - split into vim plugin (typescript-tools.vim) and commandline server (typescript-tools)

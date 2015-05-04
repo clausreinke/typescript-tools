@@ -7,7 +7,7 @@ VERSION=$(shell git describe --tags)
 
 build: bin/tss.js bin/lib.d.ts tests/script.diff package.json tests/script.results
 
-bin/tss.js: tss.ts harness.ts $(TYPESCRIPT)/bin/typescript.d.ts $(TYPESCRIPT)/bin/typescript_internal.d.ts
+bin/tss.js: tss.ts harness.ts $(TYPESCRIPT)/bin/typescript.d.ts
 	$(TSC) tss.ts -target ES5 -m commonjs --noEmitOnError -outDir bin 2>&1 | tee build.log
 	test ! -s build.log
 

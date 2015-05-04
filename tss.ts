@@ -4,10 +4,14 @@
 
 ///<reference path='typings/node/node.d.ts'/>
 ///<reference path='node_modules/typescript/bin/typescript.d.ts'/>
-///<reference path='node_modules/typescript/bin/typescript_internal.d.ts'/>
 
 import ts = require("typescript");
 import harness = require("./harness");
+import path = require("path");
+
+function resolvePath(rpath) {
+  return switchToForwardSlashes(path.resolve(rpath));
+}
 
 function switchToForwardSlashes(path: string) {
     return path.replace(/\\/g, "/");
@@ -31,6 +35,7 @@ var EOL = require("os").EOL;
 
 /** holds list of fileNames, ScriptInfos and ScriptSnapshots for LS host */
 class FileCache {
+  public ls: ts.LanguageService;
   public fileNames: string[] = [];
   public snapshots:ts.Map<ts.IScriptSnapshot> = {};
   public fileNameToScript:ts.Map<harness.ScriptInfo> = {};
@@ -93,7 +98,7 @@ class FileCache {
   public lineColToPosition(fileName: string, line: number, col: number): number {
       var script: harness.ScriptInfo = this.getScriptInfo(fileName);
 
-      return ts.computePositionOfLineAndCharacter(script.lineMap,line-1, col-1);
+      return ts.getPositionOfLineAndCharacter(this.ls.getSourceFile(fileName),line-1, col-1);
   }
 
   /**
@@ -103,7 +108,7 @@ class FileCache {
   public positionToLineCol(fileName: string, position: number): ts.LineAndCharacter {
       var script: harness.ScriptInfo = this.getScriptInfo(fileName);
 
-      var lineChar = ts.computeLineAndCharacterOfPosition(script.lineMap,position);
+      var lineChar = ts.getLineAndCharacterOfPosition(this.ls.getSourceFile(fileName),position);
 
       return {line: lineChar.line+1, character: lineChar.character+1 };
   }
@@ -113,11 +118,10 @@ class FileCache {
    * @param line 1 based index
    */
   public getLineText(fileName,line) {
-    var script    = this.getScriptInfo(fileName);
-    var lineMap   = script.lineMap;
-    var lineStart = ts.computePositionOfLineAndCharacter(lineMap,line-1,0)
-    var lineEnd   = ts.computePositionOfLineAndCharacter(lineMap,line,0)-1;
-    var lineText  = script.content.substring(lineStart,lineEnd);
+    var source    = this.ls.getSourceFile(fileName);
+    var lineStart = ts.getPositionOfLineAndCharacter(source,line-1,0)
+    var lineEnd   = ts.getPositionOfLineAndCharacter(source,line,0)-1;
+    var lineText  = source.text.substring(lineStart,lineEnd);
     return lineText;
   }
 
@@ -167,26 +171,6 @@ class TSS {
 
   private fileCache: FileCache;
 
-  private resolveRelativePath(path: string, directory?: string): string {
-      var unQuotedPath = path; // better be.. ts.stripStartAndEndQuotes(path);
-      var normalizedPath: string;
-
-      if (ts.isRootedDiskPath(unQuotedPath) || !directory) {
-          normalizedPath = unQuotedPath;
-      } else {
-          normalizedPath = ts.combinePaths(directory, unQuotedPath);
-      }
-
-      // get the absolute path
-      normalizedPath = ts.sys.resolvePath(normalizedPath);
-
-      // Switch to forward slashes
-      normalizedPath = switchToForwardSlashes(normalizedPath)
-                           .replace(/^(.:)/,function(_,drive?){return drive.toLowerCase()});
-
-      return normalizedPath;
-  }
-
   /** collect syntactic and semantic diagnostics for all project files */
   public getErrors(): ts.Diagnostic[] {
 
@@ -216,7 +200,7 @@ class TSS {
   public setup(files,options) {
     this.fileCache = new FileCache();
 
-    this.rootFiles = files.map(file=>this.resolveRelativePath(file));
+    this.rootFiles = files.map(file=>resolvePath(file));
 
     this.compilerOptions = options;
     this.compilerHost    = ts.createCompilerHost(options);
@@ -258,7 +242,7 @@ class TSS {
         error : (message)=>console.error(message) // ??
     };
     this.ls = ts.createLanguageService(this.lsHost,ts.createDocumentRegistry());
-
+    this.fileCache.ls = this.ls;
   }
 
   /** output value/object as JSON, excluding irrelevant properties,
@@ -300,7 +284,7 @@ class TSS {
     var rl = readline.createInterface({input:process.stdin,output:process.stdout});
 
     var cmd:string, pos:number, file:string, script, added:boolean, range:boolean, check:boolean
-      , def, refs:ts.ReferenceEntry[], locs:ts.DefinitionInfo[], info, source:string
+      , def, refs:ts.ReferenceEntry[], locs:ts.DefinitionInfo[], info, source:ts.SourceFile
       , brief, member:boolean, navbarItems:ts.NavigationBarItem[], pattern:string;
 
     var collecting = 0, on_collected_callback:()=>void, lines:string[] = [];
@@ -331,7 +315,7 @@ class TSS {
           (()=>{
             line   = parseInt(m[1]);
             col    = parseInt(m[2]);
-            file   = this.resolveRelativePath(m[3]);
+            file   = resolvePath(m[3]);
 
             pos    = this.fileCache.lineColToPosition(file,line,col);
 
@@ -359,7 +343,7 @@ class TSS {
 
           line   = parseInt(m[2]);
           col    = parseInt(m[3]);
-          file   = this.resolveRelativePath(m[4]);
+          file   = resolvePath(m[4]);
 
           pos    = this.fileCache.lineColToPosition(file,line,col);
 
@@ -373,7 +357,7 @@ class TSS {
 
           line = parseInt(m[1]);
           col  = parseInt(m[2]);
-          file = this.resolveRelativePath(m[3]);
+          file = resolvePath(m[3]);
 
           pos  = this.fileCache.lineColToPosition(file,line,col);
           locs = this.ls.getDefinitionAtPosition(file, pos); // NOTE: multiple definitions
@@ -392,7 +376,7 @@ class TSS {
 
           line = parseInt(m[2]);
           col  = parseInt(m[3]);
-          file = this.resolveRelativePath(m[4]);
+          file = resolvePath(m[4]);
 
           pos  = this.fileCache.lineColToPosition(file,line,col);
           switch (m[1]) {
@@ -411,7 +395,7 @@ class TSS {
             if (ref) {
               start    = this.fileCache.positionToLineCol(ref.fileName,ref.textSpan.start);
               end      = this.fileCache.positionToLineCol(ref.fileName,ts.textSpanEnd(ref.textSpan));
-              fileName = this.resolveRelativePath(ref.fileName);
+              fileName = resolvePath(ref.fileName);
               lineText = this.fileCache.getLineText(fileName,start.line);
             }
             return {
@@ -426,7 +410,7 @@ class TSS {
 
         } else if (m = match(cmd,/^navigationBarItems (.*)$/)) {
 
-          file = this.resolveRelativePath(m[1]);
+          file = resolvePath(m[1]);
 
           this.output(this.ls.getNavigationBarItems(file)
                           .map(item=>this.handleNavBarItem(file,item)));
@@ -452,7 +436,7 @@ class TSS {
           brief  = m[1];
           line   = parseInt(m[3]);
           col    = parseInt(m[4]);
-          file   = this.resolveRelativePath(m[5]);
+          file   = resolvePath(m[5]);
 
           pos    = this.fileCache.lineColToPosition(file,line,col);
 
@@ -489,11 +473,12 @@ class TSS {
             })();
           }
 
-          this.output(info,["displayParts","documentation"]);
+          this.output(info,["displayParts","documentation","sortText"]);
 
         } else if (m = match(cmd,/^update( nocheck)? (\d+)( (\d+)-(\d+))? (.*)$/)) { // send non-saved source
 
-          file       = this.resolveRelativePath(m[6]);
+          file       = resolvePath(m[6]);
+          source     = this.ls.getSourceFile(file);
           script     = this.fileCache.getScriptInfo(file);
           added      = !script;
           range      = !!m[3]
@@ -508,7 +493,7 @@ class TSS {
               } else {
                 var startLine = parseInt(m[4]);
                 var endLine   = parseInt(m[5]);
-                var maxLines  = script.lineMap.length;
+                var maxLines  = source.getLineStarts().length;
                 var startPos  = startLine<=maxLines
                               ? (startLine<1 ? 0 : this.fileCache.lineColToPosition(file,startLine,1))
                               : script.content.length;
@@ -541,7 +526,7 @@ class TSS {
                      .map( d => {
                            if (d.file) {
 
-                             var file = this.resolveRelativePath(d.file.fileName);
+                             var file = resolvePath(d.file.fileName);
                              var lc   = this.fileCache.positionToLineCol(file,d.start);
                              var len  = this.fileCache.getScriptInfo(file).content.length;
                              var end  = Math.min(len,d.start+d.length);
@@ -590,18 +575,20 @@ class TSS {
 
         } else if (m = match(cmd,/^dump (\S+) (.*)$/)) { // debugging only
 
-          var dump = m[1];
-          file     = this.resolveRelativePath(m[2]);
+          (()=>{
+            var dump = m[1];
+            var file = resolvePath(m[2]);
 
-          source         = this.fileCache.getScriptInfo(file).content;
-          if (dump==="-") { // to console
-            console.log('dumping '+file);
-            console.log(source);
-          } else { // to file
-            ts.sys.writeFile(dump,source,false);
+            var sourceText = this.fileCache.getScriptInfo(file).content;
+            if (dump==="-") { // to console
+              console.log('dumping '+file);
+              console.log(sourceText);
+            } else { // to file
+              ts.sys.writeFile(dump,sourceText,false);
 
-            this.outputJSON('"dumped '+file+' to '+dump+'"');
-          }
+              this.outputJSON('"dumped '+file+' to '+dump+'"');
+            }
+          })();
 
         } else if (m = match(cmd,/^reload$/)) { // reload current project
 
@@ -653,31 +640,18 @@ class TSS {
   }
 }
 
-// from src/compiler/tsc.ts - not yet exported from there:-(
-function findConfigFile(): string {
-  var searchPath = ts.normalizePath(ts.sys.getCurrentDirectory());
-  var filename = "tsconfig.json";
-
-  while (true) {
-     if (ts.sys.fileExists(filename)) { return filename; }
-
-     var parentPath = ts.getDirectoryPath(searchPath);
-
-     if (parentPath === searchPath) { break; }
-
-     searchPath = parentPath;
-
-     filename = "../" + filename;
-  }
-
-  return undefined;
+function extend(o1,o2) {
+  var o = {};
+  for(var p in o1) { o[p] = o1[p] }
+  for(var p in o2) { if(!(p in o)) o[p] = o2[p] }
+  return o;
 }
 
 var fileNames;
 var configFile, configObject, configObjectParsed;
 
 // NOTE: partial options support only
-var commandLine = ts["parseCommandLine"](ts.sys.args);
+var commandLine = ts.parseCommandLine(ts.sys.args);
 
 if (commandLine.options.version) {
   console.log(require("../package.json").version);
@@ -690,11 +664,11 @@ if (commandLine.fileNames.length>0) {
 
 } else if (commandLine.options.project) {
 
-  configFile = ts.normalizePath(ts.combinePaths(commandLine.options.project,"tsconfig.json"));
+  configFile = path.join(commandLine.options.project,"tsconfig.json");
 
 } else {
 
-  configFile = findConfigFile();
+  configFile = ts.findConfigFile(path.normalize(ts.sys.getCurrentDirectory()));
 
 }
 
@@ -709,7 +683,7 @@ if (configFile) {
     process.exit(1);
   }
 
-  configObjectParsed = ts.parseConfigFile(configObject,ts.getDirectoryPath(configFile));
+  configObjectParsed = ts.parseConfigFile(configObject,path.dirname(configFile));
 
   if (configObjectParsed.errors.length>0) {
     console.error(configObjectParsed.errors);
@@ -717,11 +691,11 @@ if (configFile) {
   }
 
   fileNames = configObjectParsed.fileNames;
-  options   = ts.extend(commandLine.options,configObjectParsed.options);
+  options   = extend(commandLine.options,configObjectParsed.options);
 
 } else {
 
-  options = ts.extend(commandLine.options,ts.getDefaultCompilerOptions());
+  options = extend(commandLine.options,ts.getDefaultCompilerOptions());
 
 }
 

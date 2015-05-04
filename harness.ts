@@ -4,14 +4,41 @@
 
 ///<reference path='typings/node/node.d.ts'/>
 ///<reference path='node_modules/typescript/bin/typescript.d.ts'/>
-///<reference path='node_modules/typescript/bin/typescript_internal.d.ts'/>
 
 import ts = require("typescript");
+
+// TODO: avoid pre-computing line starts, can tss use SourceFiles instead?
+/* @internal, from scanner.ts */
+function computeLineStarts(text: string): number[] {
+    let result: number[] = new Array();
+    let pos = 0;
+    let lineStart = 0;
+    while (pos < text.length) {
+       let ch = text.charCodeAt(pos++);
+       switch (ch) {
+            case 0x0D:
+                if (text.charCodeAt(pos) === 0x0A) {
+                    pos++;
+                }
+            case 0x0A:
+                result.push(lineStart);
+                lineStart = pos;
+                break;
+            default:
+                if (ch > 0x7F && ts.isLineBreak(ch)) {
+                    result.push(lineStart);
+                    lineStart = pos;
+                }
+                break;
+        }
+    }
+    result.push(lineStart);
+    return result;
+}
 
 export class ScriptInfo {
     public version: number = 1;
     public editRanges: { length: number; textChangeRange: ts.TextChangeRange; }[] = [];
-    public lineMap: number[] = null;
 
     constructor(public fileName: string, public content: string, public isOpen = true) {
         this.setContent(content);
@@ -19,7 +46,6 @@ export class ScriptInfo {
 
     private setContent(content: string): void {
         this.content = content;
-        this.lineMap = ts.computeLineStarts(content);
     }
 
     public updateContent(content: string): void {
@@ -85,9 +111,9 @@ export class ScriptSnapshot implements ts.IScriptSnapshot {
         return this.textSnapshot.length;
     }
 
-    public getLineStartPositions(): number[] {
+    private getLineStartPositions(): number[] {
         if (this.lineMap === null) {
-            this.lineMap = ts.computeLineStarts(this.textSnapshot);
+            this.lineMap = computeLineStarts(this.textSnapshot);
         }
 
         return this.lineMap;
