@@ -3,7 +3,7 @@
 // See LICENSE.txt in the project root for complete license information.
 
 ///<reference path='typings/node/node.d.ts'/>
-///<reference path='node_modules/typescript/bin/typescript.d.ts'/>
+///<reference path='node_modules/typescript/lib/typescript.d.ts'/>
 
 import ts = require("typescript");
 

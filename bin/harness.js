@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 // See LICENSE.txt in the project root for complete license information.
 ///<reference path='typings/node/node.d.ts'/>
-///<reference path='node_modules/typescript/bin/typescript.d.ts'/>
+///<reference path='node_modules/typescript/lib/typescript.d.ts'/>
 var ts = require("typescript");
 // TODO: avoid pre-computing line starts, can tss use SourceFiles instead?
 /* @internal, from scanner.ts */

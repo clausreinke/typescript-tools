@@ -4,7 +4,7 @@ declare module 'issue-15-import' {
 }
 */
 
-import Background = require('issue-15-import');
+import Background = require('./issue-15-import');
 
 class Test {
 

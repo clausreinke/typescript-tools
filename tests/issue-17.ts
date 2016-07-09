@@ -1,4 +1,4 @@
-import Second = require("issue-17-import");
+import Second = require("./issue-17-import");
 
 var second = new Second.Test()
 second.start();

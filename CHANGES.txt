@@ -1,3 +1,25 @@
+0.5.0:
+
+  - get it to compile and run with TypeScript 1.6.3
+
+  - changed location of typescript.d.ts and typescript.js
+
+  - package.json: use standardized licence field
+
+  - Makefile; add NODE variable
+              eliminate mentions of lib.d.ts
+              don't try to bump package version on every build
+
+  - eliminate defaultLibs.d.ts (unused)
+
+  - tss.ts: getScriptIsOpen is gone
+            parseConfigFile needs an extra parameter
+            fix calculation of endPos in update command
+
+  - tests: use relative imports
+           factor out NODE_MODULES path
+           update test results
+
 0.4.7:
 
   - get it to compile and run with TypeScript 1.5-beta

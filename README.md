@@ -3,7 +3,7 @@
 
 ## typescript-tools
 
-typescript-tools (v0.4) provides access to the TypeScript Language Services (v1.5) via a simple commandline server (tss). This makes it easy to build editor plugins supporting TypeScript. Several editor plugins are available. If you build plugins for other editors/IDEs based on typescript-tools, please let me know.
+typescript-tools (v0.5) provides access to the TypeScript Language Services (v1.6) via a simple commandline server (tss). This makes it easy to build editor plugins supporting TypeScript. Several editor plugins are available. If you build plugins for other editors/IDEs based on typescript-tools, please let me know.
 
 - Vim plugin: https://github.com/clausreinke/typescript-tools.vim
 - Emacs plugin: https://github.com/aki2o/emacs-tss
@@ -13,7 +13,7 @@ For reporting bugs in typescript-tools itself (server or vim plugin), please use
 
 ### Installation
 
-npm installation goes somewhat like this - via github:
+npm installation goes somewhat like this - either clone and install:
 
   ```
   # install git and node/npm, then
@@ -22,9 +22,10 @@ npm installation goes somewhat like this - via github:
   $ npm install -g
   ```
 
-or via the npm registry (the newest version isn't there yet, waiting for post-1.4.1 typescript package):
+or let npm do the cloning:
 
   ```
+  # install git and node/npm, then
   $ npm install -g clausreinke/typescript-tools
   ```
 

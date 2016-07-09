@@ -5,6 +5,7 @@ var exec = require("child_process").exec;
 var tss_path = "../bin/tss.js";
 
 var PREFIX = __dirname.replace(/\\/g,"/");
+var NODE_MODULES = require.resolve('typescript').replace(/\/typescript\/.*$/,'');
 
 var tests = [], log = {}, done = {};
 var filter = process.argv[2] && new RegExp(process.argv[2]);
@@ -12,7 +13,8 @@ var filter = process.argv[2] && new RegExp(process.argv[2]);
 function test(scriptName,fileName,options) {
   if (filter && !filter.test(scriptName)) return;
   var script = fs.readFileSync(scriptName,"utf8")
-                 .replace(/PREFIX/g,PREFIX);
+                 .replace(/PREFIX/g,PREFIX)
+                 .replace(/NODE_MODULES/g,NODE_MODULES);
 
   var cmd = "node "+tss_path+(options?" "+options:"")+" "+fileName;
   tests.push(scriptName);
@@ -23,6 +25,7 @@ function test(scriptName,fileName,options) {
                 ,function(error, stdout, stderr) {
                    log[scriptName].push("// stdout");
                    log[scriptName].push(stdout.replace(new RegExp(PREFIX,"g"),"PREFIX")
+                                              .replace(new RegExp(NODE_MODULES,"g"),"NODE_MODULES")
                                               .replace(/(,"|,{)/g,'\n  $1')
                                               .replace(/\\r\\n/g,'\\n'));
                    log[scriptName].push("// stderr");

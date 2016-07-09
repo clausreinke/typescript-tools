@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 // See LICENSE.txt in the project root for complete license information.
 ///<reference path='typings/node/node.d.ts'/>
-///<reference path='node_modules/typescript/bin/typescript.d.ts'/>
+///<reference path='node_modules/typescript/lib/typescript.d.ts'/>
 var ts = require("typescript");
 var harness = require("./harness");
 var path = require("path");
@@ -194,7 +194,7 @@ var TSS = (function () {
             getCompilationSettings: function () { return _this.compilerOptions; },
             getScriptFileNames: function () { return _this.fileCache.getFileNames(); },
             getScriptVersion: function (fileName) { return _this.fileCache.getScriptInfo(fileName).version.toString(); },
-            getScriptIsOpen: function (fileName) { return _this.fileCache.getScriptInfo(fileName).isOpen; },
+            //getScriptIsOpen : (fileName: string)=>this.fileCache.getScriptInfo(fileName).isOpen,
             getScriptSnapshot: function (fileName) { return _this.fileCache.getScriptSnapshot(fileName); },
             getCurrentDirectory: function () { return ts.sys.getCurrentDirectory(); },
             getDefaultLibFileName: function (options) { return ts.getDefaultLibFileName(options); },
@@ -418,7 +418,7 @@ var TSS = (function () {
                                     ? (startLine < 1 ? 0 : _this.fileCache.lineColToPosition(file, startLine, 1))
                                     : script.content.length;
                                 var endPos = endLine < maxLines
-                                    ? (endLine < 1 ? 0 : _this.fileCache.lineColToPosition(file, endLine + 1, 0) - 1) //??CHECK
+                                    ? (endLine < 1 ? 0 : _this.fileCache.lineColToPosition(file, endLine + 1, 1) - 1) //??CHECK
                                     : script.content.length;
                                 _this.fileCache.editScript(file, startPos, endPos, lines.join(EOL));
                             }
@@ -568,7 +568,7 @@ if (configFile) {
         console.error("can't read tsconfig.json at", configFile);
         process.exit(1);
     }
-    configObjectParsed = ts.parseConfigFile(configObject, path.dirname(configFile));
+    configObjectParsed = ts.parseConfigFile(configObject, ts.sys, path.dirname(configFile));
     if (configObjectParsed.errors.length > 0) {
         console.error(configObjectParsed.errors);
         process.exit(1);

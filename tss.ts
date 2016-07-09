@@ -3,7 +3,7 @@
 // See LICENSE.txt in the project root for complete license information.
 
 ///<reference path='typings/node/node.d.ts'/>
-///<reference path='node_modules/typescript/bin/typescript.d.ts'/>
+///<reference path='node_modules/typescript/lib/typescript.d.ts'/>
 
 import ts = require("typescript");
 import harness = require("./harness");
@@ -232,7 +232,7 @@ class TSS {
         getCompilationSettings : ()=>this.compilerOptions,
         getScriptFileNames : ()=>this.fileCache.getFileNames(),
         getScriptVersion : (fileName: string)=>this.fileCache.getScriptInfo(fileName).version.toString(),
-        getScriptIsOpen : (fileName: string)=>this.fileCache.getScriptInfo(fileName).isOpen,
+        //getScriptIsOpen : (fileName: string)=>this.fileCache.getScriptInfo(fileName).isOpen,
         getScriptSnapshot : (fileName: string)=>this.fileCache.getScriptSnapshot(fileName),
         getCurrentDirectory : ()=>ts.sys.getCurrentDirectory(),
         getDefaultLibFileName :
@@ -498,7 +498,7 @@ class TSS {
                               ? (startLine<1 ? 0 : this.fileCache.lineColToPosition(file,startLine,1))
                               : script.content.length;
                 var endPos    = endLine<maxLines
-                              ? (endLine<1 ? 0 : this.fileCache.lineColToPosition(file,endLine+1,0)-1) //??CHECK
+                              ? (endLine<1 ? 0 : this.fileCache.lineColToPosition(file,endLine+1,1)-1) //??CHECK
                               : script.content.length;
 
                 this.fileCache.editScript(file, startPos, endPos, lines.join(EOL));
@@ -683,7 +683,7 @@ if (configFile) {
     process.exit(1);
   }
 
-  configObjectParsed = ts.parseConfigFile(configObject,path.dirname(configFile));
+  configObjectParsed = ts.parseConfigFile(configObject,ts.sys,path.dirname(configFile));
 
   if (configObjectParsed.errors.length>0) {
     console.error(configObjectParsed.errors);
