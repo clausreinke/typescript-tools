@@ -1,3 +1,15 @@
+0.6.0:
+
+  - get it to compile and run with TypeScript 1.7.5
+
+  - modified module resolution:
+    no need to reference typescript.d.ts explicitly
+    dependency chasing may involve package.json files
+
+  - readConfigFile needs additional parameter
+
+  - parseConfigFile renamed to parseJsonConfigFileContent
+
 0.5.0:
 
   - get it to compile and run with TypeScript 1.6.3

@@ -3,7 +3,6 @@
 // See LICENSE.txt in the project root for complete license information.
 
 ///<reference path='typings/node/node.d.ts'/>
-///<reference path='node_modules/typescript/lib/typescript.d.ts'/>
 
 import ts = require("typescript");
 import harness = require("./harness");
@@ -177,6 +176,7 @@ class TSS {
       var addPhase = phase => d => {d.phase = phase; return d};
       var errors = [];
       this.fileCache.getFileNames().map( file=>{
+        if (!file.match(/^.*(\.ts)$/)) return; // exclude package.json
         var syntactic = this.ls.getSyntacticDiagnostics(file);
         var semantic = this.ls.getSemanticDiagnostics(file);
         // this.ls.languageService.getEmitOutput(file).diagnostics;
@@ -676,14 +676,14 @@ var options;
 
 if (configFile) {
 
-  configObject = ts.readConfigFile(configFile);
+  configObject = ts.readConfigFile(configFile,ts.sys.readFile);
 
   if (!configObject) {
     console.error("can't read tsconfig.json at",configFile);
     process.exit(1);
   }
 
-  configObjectParsed = ts.parseConfigFile(configObject,ts.sys,path.dirname(configFile));
+  configObjectParsed = ts.parseJsonConfigFileContent(configObject,ts.sys,path.dirname(configFile));
 
   if (configObjectParsed.errors.length>0) {
     console.error(configObjectParsed.errors);

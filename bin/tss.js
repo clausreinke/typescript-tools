@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0.
 // See LICENSE.txt in the project root for complete license information.
 ///<reference path='typings/node/node.d.ts'/>
-///<reference path='node_modules/typescript/lib/typescript.d.ts'/>
 var ts = require("typescript");
 var harness = require("./harness");
 var path = require("path");
@@ -145,6 +144,8 @@ var TSS = (function () {
         var addPhase = function (phase) { return function (d) { d.phase = phase; return d; }; };
         var errors = [];
         this.fileCache.getFileNames().map(function (file) {
+            if (!file.match(/^.*(\.ts)$/))
+                return; // exclude package.json
             var syntactic = _this.ls.getSyntacticDiagnostics(file);
             var semantic = _this.ls.getSemanticDiagnostics(file);
             // this.ls.languageService.getEmitOutput(file).diagnostics;
@@ -563,12 +564,12 @@ else {
 }
 var options;
 if (configFile) {
-    configObject = ts.readConfigFile(configFile);
+    configObject = ts.readConfigFile(configFile, ts.sys.readFile);
     if (!configObject) {
         console.error("can't read tsconfig.json at", configFile);
         process.exit(1);
     }
-    configObjectParsed = ts.parseConfigFile(configObject, ts.sys, path.dirname(configFile));
+    configObjectParsed = ts.parseJsonConfigFileContent(configObject, ts.sys, path.dirname(configFile));
     if (configObjectParsed.errors.length > 0) {
         console.error(configObjectParsed.errors);
         process.exit(1);
