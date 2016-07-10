@@ -1,3 +1,9 @@
+0.7.0:
+
+  - get it to compile and run with TypeScript 1.8.10
+
+  - findConfigFile needs additional parameter
+
 0.6.0:
 
   - get it to compile and run with TypeScript 1.7.5

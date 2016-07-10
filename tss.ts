@@ -668,7 +668,7 @@ if (commandLine.fileNames.length>0) {
 
 } else {
 
-  configFile = ts.findConfigFile(path.normalize(ts.sys.getCurrentDirectory()));
+  configFile = ts.findConfigFile(path.normalize(ts.sys.getCurrentDirectory()),ts.sys.fileExists);
 
 }
 

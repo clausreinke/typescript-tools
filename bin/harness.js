@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft, Claus Reinke. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 // See LICENSE.txt in the project root for complete license information.
+"use strict";
 ///<reference path='typings/node/node.d.ts'/>
 var ts = require("typescript");
 // TODO: avoid pre-computing line starts, can tss use SourceFiles instead?
@@ -80,7 +81,7 @@ var ScriptInfo = (function () {
         return ts.collapseTextChangeRangesAcrossMultipleVersions(entries.map(function (e) { return e.textChangeRange; }));
     };
     return ScriptInfo;
-})();
+}());
 exports.ScriptInfo = ScriptInfo;
 var ScriptSnapshot = (function () {
     function ScriptSnapshot(scriptInfo) {
@@ -105,5 +106,5 @@ var ScriptSnapshot = (function () {
         return undefined;
     };
     return ScriptSnapshot;
-})();
+}());
 exports.ScriptSnapshot = ScriptSnapshot;

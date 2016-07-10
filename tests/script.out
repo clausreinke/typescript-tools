@@ -959,7 +959,7 @@ node ../bin/tss.js empty.ts
   ,"character":1}
   ,"end":{"line":3
   ,"character":6}
-  ,"text":"Type 'number' is not assignable to type '{ \"werwer\": number; \"oo\": number[]; }'.\nProperty '\"werwer\"' is missing in type 'Number'."
+  ,"text":"Type 'number' is not assignable to type '{ \"werwer\": number; \"oo\": number[]; }'."
   ,"code":2322
   ,"phase":"Semantics"
   ,"category":"Error"}]

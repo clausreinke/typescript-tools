@@ -1,6 +1,7 @@
 // Copyright (c) Claus Reinke. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 // See LICENSE.txt in the project root for complete license information.
+"use strict";
 ///<reference path='typings/node/node.d.ts'/>
 var ts = require("typescript");
 var harness = require("./harness");
@@ -129,7 +130,7 @@ var FileCache = (function () {
         throw new Error("No script with name '" + fileName + "'");
     };
     return FileCache;
-})();
+}());
 /** TypeScript Services Server,
     an interactive commandline tool
     for getting info on .ts projects */
@@ -533,7 +534,7 @@ var TSS = (function () {
         return '"' + prefix + ' ' + this.rootFiles[0] + more + ', TSS listening.."';
     };
     return TSS;
-})();
+}());
 function extend(o1, o2) {
     var o = {};
     for (var p in o1) {
@@ -560,7 +561,7 @@ else if (commandLine.options.project) {
     configFile = path.join(commandLine.options.project, "tsconfig.json");
 }
 else {
-    configFile = ts.findConfigFile(path.normalize(ts.sys.getCurrentDirectory()));
+    configFile = ts.findConfigFile(path.normalize(ts.sys.getCurrentDirectory()), ts.sys.fileExists);
 }
 var options;
 if (configFile) {
